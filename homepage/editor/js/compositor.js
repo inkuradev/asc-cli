@@ -111,98 +111,175 @@ function drawBackground(ctx, w, h, bg) {
   }
 }
 
-// Composite everything onto a canvas
-// screenshot: { sourceImage, device, background, texts }
-// canvasEl: <canvas> element
-// outSize: { width, height } — App Store output dimensions
-// bezelZoom: 0–200 — controls how large the device bezel is within the canvas (default 75)
+// ─── Two-layer live compositor ────────────────────────────────────────────────
+//
+// mainCanvas  — background only (never redraws on zoom)
+// bezelLayer  — CSS-scaled div containing screenCanvas + frameImg
+//               zoom slider only changes CSS transform → GPU, 60 fps, no canvas op
+//
+// drawBackground(canvas, bg)          — call when bg changes
+// updateBezelLayer(layer, ss, zoom)   — call when device/screenshot/zoom changes
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Draw background onto a canvas (call when background changes)
+function drawBg(canvas, bg) {
+  const w = canvas.width, h = canvas.height;
+  const ctx = canvas.getContext('2d');
+  drawBackground(ctx, w, h, bg || { type: 'gradient', colors: ['#1a1a2e', '#0f3460'], angle: 135 });
+}
+
+// Position and show the bezel layer at the right CSS scale.
+// Does NOT redraw canvas — call this on zoom slider input.
+function applyBezelZoom(bezelLayer, zoom) {
+  bezelLayer.style.transform = `scale(${zoom / 100})`;
+}
+
+// Update bezel layer content (screenCanvas + frameImg).
+// Call when device, screenshot image, or drag offset changes — NOT on zoom.
+async function updateBezelLayer(bezelLayer, screenshot, displayW, displayH) {
+  const screenCanvas = bezelLayer.querySelector('#screenCanvas');
+  const frameImgEl   = bezelLayer.querySelector('#frameImg');
+  const deviceName   = screenshot.device || null;
+  const device       = deviceName ? DEVICES_MAP[deviceName] : null;
+  const sourceImage  = screenshot.sourceImage;
+
+  if (!device || !sourceImage) {
+    // No bezel: hide layer, draw screenshot on mainCanvas instead
+    bezelLayer.style.display = 'none';
+    return;
+  }
+
+  bezelLayer.style.display = '';
+
+  let frameImg;
+  try {
+    frameImg = await getFrameImage(deviceName);
+  } catch (e) {
+    console.warn('Frame not found:', deviceName, e);
+    bezelLayer.style.display = 'none';
+    return;
+  }
+
+  // Scale frame to fill as much of the display area as possible at zoom=100%
+  const scaleF = Math.min(displayW / frameImg.width, displayH / frameImg.height);
+  const fw = Math.round(frameImg.width  * scaleF);
+  const fh = Math.round(frameImg.height * scaleF);
+
+  // Screen area at this scale
+  const screenX = Math.round(device.screenInsetX * scaleF);
+  const screenY = Math.round(device.screenInsetY * scaleF);
+  const screenW = fw - device.screenInsetX * 2 * scaleF;
+  const screenH = fh - device.screenInsetY * 2 * scaleF;
+
+  // Size screenCanvas to the frame dimensions
+  screenCanvas.width  = fw;
+  screenCanvas.height = fh;
+  screenCanvas.style.width  = fw + 'px';
+  screenCanvas.style.height = fh + 'px';
+  screenCanvas.style.left = '0';
+  screenCanvas.style.top  = '0';
+
+  // Draw screenshot clipped to screen rect
+  const sCtx = screenCanvas.getContext('2d');
+  sCtx.clearRect(0, 0, fw, fh);
+
+  // Apply flood-fill mask for clipping
+  const mask = getScreenMask(frameImg, deviceName);
+  if (mask) {
+    // Draw screenshot into offscreen, apply mask, copy to screenCanvas
+    const off = document.createElement('canvas');
+    off.width = fw; off.height = fh;
+    const oCtx = off.getContext('2d');
+
+    const sw = sourceImage.width, sh = sourceImage.height;
+    const imgScale = Math.max(screenW / sw, screenH / sh);
+    const scaledW = sw * imgScale, scaledH = sh * imgScale;
+    const drawX = screenX + (screenW - scaledW) / 2;
+    const drawY = screenY + (screenH - scaledH) / 2;
+    oCtx.drawImage(sourceImage, drawX, drawY, scaledW, scaledH);
+
+    // Mask is in frame-native coords; scale it to fw×fh
+    const mCanvas = document.createElement('canvas');
+    mCanvas.width = fw; mCanvas.height = fh;
+    mCanvas.getContext('2d').drawImage(mask, 0, 0, fw, fh);
+
+    oCtx.globalCompositeOperation = 'destination-in';
+    oCtx.drawImage(mCanvas, 0, 0);
+    sCtx.drawImage(off, 0, 0);
+  }
+
+  // Overlay the frame PNG
+  frameImgEl.src = frameImg.src;
+  frameImgEl.style.width  = fw + 'px';
+  frameImgEl.style.height = fh + 'px';
+  frameImgEl.style.left = '0';
+  frameImgEl.style.top  = '0';
+
+  // Centre the frame group inside the bezel layer
+  // (bezelLayer is 100%×100% of canvasWrapper)
+  const offsetX = Math.round((displayW - fw) / 2 + (screenshot.frameOffsetX || 0) * scaleF);
+  const offsetY = Math.round((displayH - fh) / 2 + (screenshot.frameOffsetY || 0) * scaleF);
+  screenCanvas.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+  frameImgEl.style.transform   = `translate(${offsetX}px, ${offsetY}px)`;
+}
+
+// ─── Legacy single-canvas export path ─────────────────────────────────────────
+// Used only for ZIP export (full App Store resolution, texts baked in)
+
 async function compositeScreenshot(canvasEl, screenshot, outSize, bezelZoom = 75) {
   const { width: cw, height: ch } = outSize;
-
-  // Draw everything on a work canvas first, then copy atomically to avoid flicker
   const work = document.createElement('canvas');
-  work.width = cw;
-  work.height = ch;
+  work.width = cw; work.height = ch;
   const ctx = work.getContext('2d');
 
-  // 1. Draw background
   drawBackground(ctx, cw, ch, screenshot.background || { type: 'gradient', colors: ['#1a1a2e', '#0f3460'], angle: 135 });
 
-  // 2. If device frame selected, composite screenshot into bezel
   const deviceName = screenshot.device || null;
   const device = deviceName ? DEVICES_MAP[deviceName] : null;
   const sourceImage = screenshot.sourceImage;
-  const offsetX = screenshot.frameOffsetX || 0;
-  const offsetY = screenshot.frameOffsetY || 0;
 
   if (device && sourceImage) {
     let frameImg;
-    try {
-      frameImg = await getFrameImage(deviceName);
-    } catch (e) {
-      console.warn('Frame not found:', deviceName, e);
-    }
+    try { frameImg = await getFrameImage(deviceName); }
+    catch (e) { console.warn('Frame not found:', deviceName, e); }
 
     if (frameImg) {
-      // Scale frame to fit output canvas, then apply user drag offset
       const scaleF = Math.min(cw / frameImg.width, ch / frameImg.height) * (bezelZoom / 100);
-      const fw = frameImg.width * scaleF;
-      const fh = frameImg.height * scaleF;
-      const fx = (cw - fw) / 2 + offsetX;
-      const fy = (ch - fh) / 2 + offsetY;
-
-      // Screen area inside bezel
+      const fw = frameImg.width * scaleF, fh = frameImg.height * scaleF;
+      const fx = (cw - fw) / 2 + (screenshot.frameOffsetX || 0);
+      const fy = (ch - fh) / 2 + (screenshot.frameOffsetY || 0);
       const screenX = fx + device.screenInsetX * scaleF;
       const screenY = fy + device.screenInsetY * scaleF;
       const screenW = fw - device.screenInsetX * 2 * scaleF;
       const screenH = fh - device.screenInsetY * 2 * scaleF;
-
       const sw = sourceImage.width, sh = sourceImage.height;
       const imgScale = Math.max(screenW / sw, screenH / sh);
-      const scaledW = sw * imgScale;
-      const scaledH = sh * imgScale;
+      const scaledW = sw * imgScale, scaledH = sh * imgScale;
       const drawX = screenX + (screenW - scaledW) / 2;
       const drawY = screenY + (screenH - scaledH) / 2;
-
-      // Draw screenshot masked to the screen region
-      const offscreen = document.createElement('canvas');
-      offscreen.width = cw; offscreen.height = ch;
-      const offCtx = offscreen.getContext('2d');
-      offCtx.drawImage(sourceImage, drawX, drawY, scaledW, scaledH);
-
-      // Use cached mask (flood-fill only runs once per device)
+      const off = document.createElement('canvas');
+      off.width = cw; off.height = ch;
+      const oCtx = off.getContext('2d');
+      oCtx.drawImage(sourceImage, drawX, drawY, scaledW, scaledH);
       const mask = getScreenMask(frameImg, deviceName);
       if (mask) {
-        const maskScaled = document.createElement('canvas');
-        maskScaled.width = cw; maskScaled.height = ch;
-        const mCtx = maskScaled.getContext('2d');
-        mCtx.drawImage(mask, fx, fy, fw, fh);
-
-        offCtx.globalCompositeOperation = 'destination-in';
-        offCtx.drawImage(maskScaled, 0, 0);
-        offCtx.globalCompositeOperation = 'source-over';
+        const mS = document.createElement('canvas');
+        mS.width = cw; mS.height = ch;
+        mS.getContext('2d').drawImage(mask, fx, fy, fw, fh);
+        oCtx.globalCompositeOperation = 'destination-in';
+        oCtx.drawImage(mS, 0, 0);
       }
-
-      ctx.drawImage(offscreen, 0, 0);
+      ctx.drawImage(off, 0, 0);
       ctx.drawImage(frameImg, fx, fy, fw, fh);
     }
-  } else if (sourceImage && !device) {
-    // No device frame — just fill canvas with screenshot
+  } else if (sourceImage) {
     const sw = sourceImage.width, sh = sourceImage.height;
     const scale = Math.max(cw / sw, ch / sh);
-    const scaledW = sw * scale;
-    const scaledH = sh * scale;
-    ctx.drawImage(sourceImage, (cw - scaledW) / 2, (ch - scaledH) / 2, scaledW, scaledH);
+    ctx.drawImage(sourceImage, (cw - sw * scale) / 2, (ch - sh * scale) / 2, sw * scale, sh * scale);
   }
 
-  // Atomic copy to visible canvas — no intermediate blank/partial states
-  if (canvasEl.width !== cw || canvasEl.height !== ch) {
-    canvasEl.width = cw;
-    canvasEl.height = ch;
-  }
+  if (canvasEl.width !== cw || canvasEl.height !== ch) { canvasEl.width = cw; canvasEl.height = ch; }
   canvasEl.getContext('2d').drawImage(work, 0, 0);
-
-  // 3. Draw text layers (rendered on the overlay div, not the canvas itself for export)
 }
 
 // Export screenshot as PNG blob (renders with texts baked in)
