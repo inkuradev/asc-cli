@@ -33,6 +33,30 @@ function renderGallery() {
   container.querySelectorAll('.screenshot-gallery-card:not(.screenshot-gallery-card-add)')
     .forEach(card => {
       card.addEventListener('click', () => showEditor(card.dataset.locale, card.dataset.id));
+
+      // Drag-and-drop image onto card
+      card.addEventListener('dragover', e => {
+        e.preventDefault();
+        card.classList.add('drag-over');
+      });
+      card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+      card.addEventListener('drop', e => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            const locale = project.localeByCode(card.dataset.locale);
+            const shot   = locale?.screenshotById(card.dataset.id);
+            if (shot) { shot.setSourceImage(img); renderGallery(); }
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
     });
 
   container.querySelectorAll('.screenshot-gallery-card-add').forEach(card => {
