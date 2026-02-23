@@ -25,8 +25,14 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: |
           BASE_URL="https://github.com/tddworks/asc-cli/releases/download/${VERSION}"
-          SHA256_ARM64=$(curl -sL "${BASE_URL}/asc_${VERSION}_macOS_arm64" | shasum -a 256 | cut -d ' ' -f 1)
-          SHA256_X86=$(curl -sL "${BASE_URL}/asc_${VERSION}_macOS_x86_64" | shasum -a 256 | cut -d ' ' -f 1)
+          CHECKSUMS=$(curl -sfL "${BASE_URL}/asc_${VERSION}_checksums.txt")
+          SHA256_ARM64=$(echo "$CHECKSUMS" | grep "macOS_arm64" | awk '{print $1}')
+          SHA256_X86=$(echo "$CHECKSUMS" | grep "macOS_x86_64" | awk '{print $1}')
+
+          if [[ ! "$SHA256_ARM64" =~ ^[0-9a-f]{64}$ ]] || [[ ! "$SHA256_X86" =~ ^[0-9a-f]{64}$ ]]; then
+            echo "❌ Invalid checksums: arm64='${SHA256_ARM64}' x86='${SHA256_X86}'"
+            exit 1
+          fi
 
           git clone https://x-access-token:${TAP_GITHUB_TOKEN}@github.com/tddworks/homebrew-tap.git homebrew-tap
 
