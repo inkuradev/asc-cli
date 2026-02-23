@@ -58,7 +58,8 @@ function renderGallery() {
 // device frame, and image exactly as they appear on the full-res canvas.
 
 async function generateComposedThumbnails() {
-  const CARD_W = 200;
+  const CARD_W    = 200;
+  const bezelZoom = typeof zoom !== 'undefined' ? zoom : 75;
 
   for (const locale of project.locales) {
     const outSize   = DISPLAY_TYPE_SIZES[locale.displayType] ?? { width: 1290, height: 2796 };
@@ -66,24 +67,62 @@ async function generateComposedThumbnails() {
     const thumbSize = { width: CARD_W, height: Math.round(CARD_W / ar) };
 
     for (const shot of locale.screenshots) {
-      const canvas = document.createElement('canvas');
-      // compositeScreenshot is defined in compositor.js
-      await compositeScreenshot(canvas, shot, thumbSize, typeof zoom !== 'undefined' ? zoom : 75);
-
-      const url = canvas.toDataURL('image/jpeg', 0.88);
+      const canvas = await composeShotThumbnail(shot, outSize, thumbSize, bezelZoom);
+      const url    = canvas.toDataURL('image/jpeg', 0.88);
       shot._thumbnailUrl = url;
 
-      // Update the card thumb already in the DOM
       const thumb = document.querySelector(
         `.screenshot-gallery-card[data-locale="${locale.code}"][data-id="${shot.id}"] .gallery-card-thumb`
       );
       if (thumb) {
-        thumb.style.background = 'none';
+        thumb.style.background    = 'none';
         thumb.style.backgroundImage = '';
         thumb.innerHTML = `<img class="gallery-card-img" src="${url}" alt="">`;
       }
     }
   }
+}
+
+// Renders a shot as a thumbnail by compositing at FULL App Store resolution and
+// then scaling down.  This guarantees the thumbnail matches the editor exactly:
+//
+//   - frameOffsetX/Y is in full-res coordinates → correct at full-res, wrong if
+//     applied unchanged to a small canvas
+//   - text baseline: CSS overlay uses translate(-50%,-50%) so the anchor is the
+//     CENTER of the text box → textBaseline:'middle' matches that
+//   - font rendering at tiny px sizes can look bad → scale-down produces better AA
+//
+async function composeShotThumbnail(shot, outSize, thumbSize, bezelZoom) {
+  // 1. Composite at full App Store resolution
+  const full = document.createElement('canvas');
+  await compositeScreenshot(full, shot, outSize, bezelZoom);
+
+  // 2. Bake text layers at full resolution with correct vertical centering
+  if (shot.texts?.length) {
+    const ctx = full.getContext('2d');
+    ctx.textBaseline = 'middle';   // matches CSS: transform translate(-50%,-50%)
+    for (const t of shot.texts) {
+      const fontStyle = t.fontWeight === 'bold' ? 'bold ' : '';
+      ctx.font      = `${fontStyle}${t.fontSize || 48}px -apple-system, "SF Pro Display", sans-serif`;
+      ctx.fillStyle = t.color || '#ffffff';
+      ctx.textAlign = t.align || 'center';
+      ctx.fillText(
+        t.content || '',
+        (t.x / 100) * outSize.width,
+        (t.y / 100) * outSize.height,
+      );
+    }
+  }
+
+  // 3. Scale down to thumbnail size with high-quality interpolation
+  const thumb = document.createElement('canvas');
+  thumb.width  = thumbSize.width;
+  thumb.height = thumbSize.height;
+  const tCtx  = thumb.getContext('2d');
+  tCtx.imageSmoothingEnabled  = true;
+  tCtx.imageSmoothingQuality  = 'high';
+  tCtx.drawImage(full, 0, 0, thumbSize.width, thumbSize.height);
+  return thumb;
 }
 
 // ── Section builder ───────────────────────────────────────────────────────────
