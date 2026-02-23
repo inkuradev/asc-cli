@@ -439,8 +439,18 @@
   padding: var(--space-xl);
   position: relative;
   transition: all 0.5s var(--ease-out-expo);
+  overflow: hidden;
 }
-.step-card:hover { border-color: rgba(var(--color-accent-rgb), 0.25); transform: translateY(-4px); }
+.step-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(600px circle at var(--mouse-x,50%) var(--mouse-y,50%), rgba(var(--color-accent-rgb),0.05), transparent 40%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.step-card:hover { border-color: rgba(var(--color-accent-rgb), 0.25); transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.step-card:hover::after { opacity: 1; }
 .step-number {
   width: 32px; height: 32px;
   background: var(--color-accent-dim);
