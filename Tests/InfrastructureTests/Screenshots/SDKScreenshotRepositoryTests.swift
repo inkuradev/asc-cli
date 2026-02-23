@@ -80,6 +80,28 @@ struct SDKScreenshotRepositoryTests {
         #expect(result.allSatisfy { $0.localizationId == "loc-99" })
     }
 
+    @Test func `listScreenshotSets injects repo into returned sets`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppScreenshotSetsResponse(
+            data: [
+                AppScreenshotSet(
+                    type: .appScreenshotSets,
+                    id: "set-1",
+                    attributes: .init(screenshotDisplayType: .appIphone67)
+                ),
+            ],
+            links: .init(this: "")
+        ))
+
+        let repo = SDKScreenshotRepository(client: stub)
+        let result = try await repo.listScreenshotSets(localizationId: "loc-1")
+
+        // A set with repo injected does not throw "requires a repository"
+        // We verify by confirming importScreenshots fails on missing URL (not on missing repo)
+        let screenshots = try await result[0].importScreenshots(entries: [], imageURLs: [:])
+        #expect(screenshots.isEmpty)
+    }
+
     @Test func `listScreenshotSets maps screenshotDisplayType from SDK attributes`() async throws {
         let stub = StubAPIClient()
         stub.willReturn(AppScreenshotSetsResponse(

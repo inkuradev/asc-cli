@@ -102,4 +102,15 @@ struct AppScreenshotSetTests {
         )
         #expect(results.isEmpty)
     }
+
+    @Test
+    func `importScreenshots throws when repo is nil`() async throws {
+        let set = MockRepositoryFactory.makeScreenshotSet(id: "set-1")  // repo: nil (default)
+        await #expect(throws: (any Error).self) {
+            try await set.importScreenshots(
+                entries: [ScreenshotManifest.ScreenshotEntry(order: 1, file: "en-US/1.png")],
+                imageURLs: ["en-US/1.png": URL(fileURLWithPath: "/fake")]
+            )
+        }
+    }
 }
