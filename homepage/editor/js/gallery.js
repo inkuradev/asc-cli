@@ -23,6 +23,11 @@ function renderGallery() {
     container.appendChild(buildLocaleSection(locale));
   }
 
+  // After the sync DOM render, generate composited thumbnails asynchronously.
+  // Each thumbnail replaces the CSS-background placeholder with the full
+  // composited view (background + bezel + screenshot + frame).
+  generateComposedThumbnails();
+
   // ── Wire card clicks (delegated would survive re-renders but innerHTML
   //    is rebuilt anyway, so direct wiring is fine here) ──────────────────────
   container.querySelectorAll('.screenshot-gallery-card:not(.screenshot-gallery-card-add)')
@@ -45,6 +50,40 @@ function renderGallery() {
       renderGallery();
     });
   });
+}
+
+// ── Composited thumbnails (async, non-blocking) ───────────────────────────────
+// Renders each shot at card-width resolution and updates the card in-place.
+// Uses the same compositor path as ZIP export so thumbnails reflect background,
+// device frame, and image exactly as they appear on the full-res canvas.
+
+async function generateComposedThumbnails() {
+  const CARD_W = 200;
+
+  for (const locale of project.locales) {
+    const outSize   = DISPLAY_TYPE_SIZES[locale.displayType] ?? { width: 1290, height: 2796 };
+    const ar        = outSize.width / outSize.height;
+    const thumbSize = { width: CARD_W, height: Math.round(CARD_W / ar) };
+
+    for (const shot of locale.screenshots) {
+      const canvas = document.createElement('canvas');
+      // compositeScreenshot is defined in compositor.js
+      await compositeScreenshot(canvas, shot, thumbSize, typeof zoom !== 'undefined' ? zoom : 75);
+
+      const url = canvas.toDataURL('image/jpeg', 0.88);
+      shot._thumbnailUrl = url;
+
+      // Update the card thumb already in the DOM
+      const thumb = document.querySelector(
+        `.screenshot-gallery-card[data-locale="${locale.code}"][data-id="${shot.id}"] .gallery-card-thumb`
+      );
+      if (thumb) {
+        thumb.style.background = 'none';
+        thumb.style.backgroundImage = '';
+        thumb.innerHTML = `<img class="gallery-card-img" src="${url}" alt="">`;
+      }
+    }
+  }
 }
 
 // ── Section builder ───────────────────────────────────────────────────────────
@@ -112,27 +151,32 @@ function buildShotCard(locale, shot, outSize, ar) {
   card.dataset.id     = shot.id;
   card.style.setProperty('--ar', ar.toString());
 
-  const bg    = shot.background ?? { type: 'gradient', colors: ['#1a1a2e', '#0f3460'], angle: 135 };
-  const bgCSS = bg.type === 'solid'
-    ? `background:${bg.color ?? '#1a1a2e'};`
-    : `background:linear-gradient(${bg.angle ?? 135}deg,${(bg.colors ?? ['#1a1a2e','#0f3460'])[0]},${(bg.colors ?? ['#1a1a2e','#0f3460'])[1]});`;
-
-  const imgHTML   = shot.sourceImage
-    ? `<img class="gallery-card-img" src="${shot.sourceImage.src}" alt="">`
-    : '';
-  const emptyHTML = shot.isEmpty ? `
-    <div class="gallery-card-empty">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-        <circle cx="12" cy="13" r="4"/>
-      </svg>
-      <span>Add image</span>
-    </div>` : '';
+  // If a composited thumbnail has been generated (after editor visit), use it.
+  // Otherwise show the CSS background as a placeholder (replaced async by generateComposedThumbnails).
+  let thumbContent;
+  if (shot._thumbnailUrl) {
+    thumbContent = `<div class="gallery-card-thumb"><img class="gallery-card-img" src="${shot._thumbnailUrl}" alt=""></div>`;
+  } else {
+    const bg    = shot.background ?? { type: 'gradient', colors: ['#1a1a2e', '#0f3460'], angle: 135 };
+    const bgCSS = bg.type === 'solid'
+      ? `background:${bg.color ?? '#1a1a2e'};`
+      : `background:linear-gradient(${bg.angle ?? 135}deg,${(bg.colors ?? ['#1a1a2e','#0f3460'])[0]},${(bg.colors ?? ['#1a1a2e','#0f3460'])[1]});`;
+    const imgHTML   = shot.sourceImage
+      ? `<img class="gallery-card-img" src="${shot.sourceImage.src}" alt="">`
+      : '';
+    const emptyHTML = shot.isEmpty ? `
+      <div class="gallery-card-empty">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <span>Add image</span>
+      </div>` : '';
+    thumbContent = `<div class="gallery-card-thumb" style="${bgCSS}">${imgHTML}${emptyHTML}</div>`;
+  }
 
   card.innerHTML = `
-    <div class="gallery-card-thumb" style="${bgCSS}">
-      ${imgHTML}${emptyHTML}
-    </div>
+    ${thumbContent}
     <div class="gallery-card-meta">
       <span class="gallery-card-title">Screenshot ${shot.order}</span>
       <span class="gallery-card-dims">${outSize.width} × ${outSize.height}</span>

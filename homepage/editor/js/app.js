@@ -29,6 +29,10 @@ function activeOutSize() {
 // ── Navigation ────────────────────────────────────────────────────────────────
 
 function showGallery() {
+  // Invalidate thumbnail for the shot that was just edited so it regenerates
+  const editedShot = activeShot();
+  if (editedShot) editedShot._thumbnailUrl = null;
+
   ui.view = 'gallery';
   document.getElementById('editorView').classList.add('hidden');
   document.getElementById('galleryView').classList.remove('hidden');
