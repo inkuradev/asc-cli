@@ -121,7 +121,8 @@ async function compositeScreenshot(canvasEl, screenshot, outSize) {
   drawBackground(ctx, cw, ch, screenshot.background || { type: 'gradient', colors: ['#1a1a2e', '#0f3460'], angle: 135 });
 
   // 2. If device frame selected, composite screenshot into bezel
-  const device = screenshot.device ? DEVICES.find(d => d.name === screenshot.device) : null;
+  const deviceName = screenshot.device || null;
+  const device = deviceName ? DEVICES_MAP[deviceName] : null;
   const sourceImage = screenshot.sourceImage;
   const offsetX = screenshot.frameOffsetX || 0;
   const offsetY = screenshot.frameOffsetY || 0;
@@ -129,9 +130,9 @@ async function compositeScreenshot(canvasEl, screenshot, outSize) {
   if (device && sourceImage) {
     let frameImg;
     try {
-      frameImg = await getFrameImage(device.name);
+      frameImg = await getFrameImage(deviceName);
     } catch (e) {
-      console.warn('Frame not found:', device.name, e);
+      console.warn('Frame not found:', deviceName, e);
     }
 
     if (frameImg) {
@@ -143,10 +144,10 @@ async function compositeScreenshot(canvasEl, screenshot, outSize) {
       const fy = (ch - fh) / 2 + offsetY;
 
       // Screen area inside bezel
-      const screenX = fx + device.x * scaleF;
-      const screenY = fy + device.y * scaleF;
-      const screenW = fw - device.x * 2 * scaleF;
-      const screenH = fh - device.y * 2 * scaleF;
+      const screenX = fx + device.screenInsetX * scaleF;
+      const screenY = fy + device.screenInsetY * scaleF;
+      const screenW = fw - device.screenInsetX * 2 * scaleF;
+      const screenH = fh - device.screenInsetY * 2 * scaleF;
 
       const sw = sourceImage.width, sh = sourceImage.height;
       const imgScale = Math.max(screenW / sw, screenH / sh);
@@ -162,7 +163,7 @@ async function compositeScreenshot(canvasEl, screenshot, outSize) {
       offCtx.drawImage(sourceImage, drawX, drawY, scaledW, scaledH);
 
       // Use cached mask (flood-fill only runs once per device)
-      const mask = getScreenMask(frameImg, device.name);
+      const mask = getScreenMask(frameImg, deviceName);
       if (mask) {
         const maskScaled = document.createElement('canvas');
         maskScaled.width = cw; maskScaled.height = ch;

@@ -38,9 +38,6 @@ let zoom = 40;
 let bezelDrag = null;
 let rafPending = false;
 
-// Populate device dropdown
-populateDeviceDropdown(deviceSelect);
-
 function getLocale() {
   return state.currentLocale ? state.locales[state.currentLocale] : null;
 }
@@ -446,9 +443,11 @@ canvasWrapper.addEventListener('pointerup', () => {
 
 // --- Init ---
 
-// Start with en-US locale
-state.locales['en-US'] = {
-  displayType: 'APP_IPHONE_67',
-  screenshots: [makeScreenshot(1)]
-};
-selectLocale('en-US');
+initDevices().then(() => {
+  populateDeviceDropdown(deviceSelect);
+  state.locales['en-US'] = {
+    displayType: 'APP_IPHONE_67',
+    screenshots: [makeScreenshot(1)]
+  };
+  selectLocale('en-US');
+});
