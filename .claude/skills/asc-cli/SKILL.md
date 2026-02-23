@@ -22,7 +22,7 @@ export ASC_ISSUER_ID="YOUR_ISSUER_ID"
 export ASC_PRIVATE_KEY_PATH="~/.asc/AuthKey_XXXXXX.p8"
 ```
 
-Verify with: `swift run asc auth`
+Verify with: `asc auth check`
 
 ---
 
