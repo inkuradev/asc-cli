@@ -5,7 +5,7 @@ struct ScreenshotsCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "screenshots",
         abstract: "Manage App Store screenshots",
-        subcommands: [ScreenshotsList.self, ScreenshotsUpload.self]
+        subcommands: [ScreenshotsList.self, ScreenshotsUpload.self, ScreenshotsImport.self]
     )
 }
 
