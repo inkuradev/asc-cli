@@ -24,6 +24,9 @@ Implement features using architecture-first design, TDD, rich domain models, and
    • Domain tests → Domain value types + AffordanceProviding + @Mockable protocol
    • Infrastructure: SDK adapter injecting parent IDs
    • Command: formatAgentItems → {"data":[{...,"affordances":{...}}]}
+
+3. FEATURE DOC
+   • Write docs/features/<feature>.md from the actual implementation
 ```
 
 ## Phase 0: Architecture Design (MANDATORY)
@@ -145,6 +148,22 @@ See [tdd-patterns.md](references/tdd-patterns.md) for complete patterns includin
 4. Register in `ASC.swift` subcommands array
 5. Run `swift test` — all must pass
 
+### Phase 4: Feature doc
+
+Write `docs/features/<feature>.md` from the actual implementation. The doc is derived from code — read the files, then write. Never write from memory.
+
+Structure:
+1. **CLI Usage** — one section per command, with flags table + examples + table-output sample
+2. **Typical Workflow** — end-to-end bash script showing the happy path
+3. **Architecture** — three-layer ASCII diagram + dependency note
+4. **Domain Models** — every public struct/enum/protocol with fields, computed properties, and affordances
+5. **File Map** — `Sources/` and `Tests/` trees + wiring files table
+6. **API Reference** — endpoint → SDK call → repository method table
+7. **Testing** — one representative test snippet + `swift test` command
+8. **Extending** — natural next steps with stub code
+
+Use `docs/features/screenshots.md` as the canonical reference example.
+
 ---
 
 ## References
@@ -185,3 +204,10 @@ See [tdd-patterns.md](references/tdd-patterns.md) for complete patterns includin
 - [ ] Registered in `ASC.swift`
 - [ ] Affordance tests added to `AffordancesTests.swift`
 - [ ] `swift test` — all 100+ tests pass
+
+### Phase 4: Feature Doc
+- [ ] `docs/features/<feature>.md` written from actual code (read files first)
+- [ ] All CLI commands documented with flags table + examples
+- [ ] Domain models section matches actual struct fields
+- [ ] File map reflects actual directory structure
+- [ ] API reference table complete

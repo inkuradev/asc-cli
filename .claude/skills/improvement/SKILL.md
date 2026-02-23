@@ -48,6 +48,16 @@ Make improvements to existing functionality using TDD and rich domain design.
 │  • New test PASSES                                           │
 │  • All existing tests still pass                             │
 └─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. UPDATE FEATURE DOC (if public surface changed)           │
+├─────────────────────────────────────────────────────────────┤
+│  • Update docs/features/<feature>.md to match new behavior   │
+│  • Only required when CLI flags, domain model fields,        │
+│    affordances, or architecture changed                       │
+│  • Derive from code — read files, then write                 │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## Types of Improvements
@@ -175,3 +185,4 @@ swift test  # Must remain all green
 - [ ] Improvement implemented
 - [ ] New test PASSES
 - [ ] All existing tests still pass (`swift test`)
+- [ ] `docs/features/<feature>.md` updated if CLI flags, domain model fields, affordances, or architecture changed
