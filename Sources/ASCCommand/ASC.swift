@@ -9,7 +9,7 @@ struct ASC: AsyncParsableCommand {
         subcommands: [
             AppsCommand.self,
             VersionsCommand.self,
-            LocalizationsCommand.self,
+            VersionLocalizationsCommand.self,
             ScreenshotSetsCommand.self,
             ScreenshotsCommand.self,
             AppInfosCommand.self,

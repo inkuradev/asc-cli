@@ -35,7 +35,7 @@ public struct AppStoreVersion: Sendable, Equatable, Identifiable, Codable {
 extension AppStoreVersion: AffordanceProviding {
     public var affordances: [String: String] {
         var cmds: [String: String] = [
-            "listLocalizations": "asc localizations list --version-id \(id)",
+            "listLocalizations": "asc version-localizations list --version-id \(id)",
             "listVersions": "asc versions list --app-id \(appId)",
         ]
         if isEditable {

@@ -27,7 +27,7 @@ struct AppStoreVersionLocalizationTests {
 
     @Test func `localization affordances include updateLocalization command`() {
         let loc = MockRepositoryFactory.makeLocalization(id: "loc-1", versionId: "v-1")
-        #expect(loc.affordances["updateLocalization"] == "asc localizations update --localization-id loc-1")
+        #expect(loc.affordances["updateLocalization"] == "asc version-localizations update --localization-id loc-1")
     }
 
     @Test func `localization affordances include listScreenshotSets command`() {
@@ -37,7 +37,7 @@ struct AppStoreVersionLocalizationTests {
 
     @Test func `localization affordances include listLocalizations command`() {
         let loc = MockRepositoryFactory.makeLocalization(id: "loc-1", versionId: "v-1")
-        #expect(loc.affordances["listLocalizations"] == "asc localizations list --version-id v-1")
+        #expect(loc.affordances["listLocalizations"] == "asc version-localizations list --version-id v-1")
     }
 
     @Test func `nil optional fields are omitted from JSON`() throws {

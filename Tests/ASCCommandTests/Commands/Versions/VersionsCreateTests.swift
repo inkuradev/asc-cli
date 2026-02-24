@@ -20,7 +20,7 @@ struct VersionsCreateTests {
           "data" : [
             {
               "affordances" : {
-                "listLocalizations" : "asc localizations list --version-id v-new",
+                "listLocalizations" : "asc version-localizations list --version-id v-new",
                 "listVersions" : "asc versions list --app-id app-1",
                 "submitForReview" : "asc versions submit --version-id v-new"
               },
@@ -49,7 +49,7 @@ struct VersionsCreateTests {
           "data" : [
             {
               "affordances" : {
-                "listLocalizations" : "asc localizations list --version-id v-1",
+                "listLocalizations" : "asc version-localizations list --version-id v-1",
                 "listVersions" : "asc versions list --app-id app-42",
                 "submitForReview" : "asc versions submit --version-id v-1"
               },

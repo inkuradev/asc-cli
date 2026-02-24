@@ -1,15 +1,15 @@
 import ArgumentParser
 import Domain
 
-struct LocalizationsCommand: AsyncParsableCommand {
+struct VersionLocalizationsCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "localizations",
+        commandName: "version-localizations",
         abstract: "Manage App Store version localizations",
-        subcommands: [LocalizationsList.self, LocalizationsCreate.self, LocalizationsUpdate.self]
+        subcommands: [VersionLocalizationsList.self, VersionLocalizationsCreate.self, VersionLocalizationsUpdate.self]
     )
 }
 
-struct LocalizationsList: AsyncParsableCommand {
+struct VersionLocalizationsList: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "list",
         abstract: "List localizations for an App Store version"

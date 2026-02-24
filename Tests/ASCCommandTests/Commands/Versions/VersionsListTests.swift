@@ -20,7 +20,7 @@ struct VersionsListTests {
           "data" : [
             {
               "affordances" : {
-                "listLocalizations" : "asc localizations list --version-id v-1",
+                "listLocalizations" : "asc version-localizations list --version-id v-1",
                 "listVersions" : "asc versions list --app-id app-1"
               },
               "appId" : "app-1",

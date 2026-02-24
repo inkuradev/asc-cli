@@ -74,8 +74,8 @@ extension AppStoreVersionLocalization: AffordanceProviding {
     public var affordances: [String: String] {
         [
             "listScreenshotSets": "asc screenshot-sets list --localization-id \(id)",
-            "listLocalizations": "asc localizations list --version-id \(versionId)",
-            "updateLocalization": "asc localizations update --localization-id \(id)",
+            "listLocalizations": "asc version-localizations list --version-id \(versionId)",
+            "updateLocalization": "asc version-localizations update --localization-id \(id)",
         ]
     }
 }

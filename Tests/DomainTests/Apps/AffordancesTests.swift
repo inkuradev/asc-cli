@@ -17,7 +17,7 @@ struct AffordancesTests {
     @Test
     func `version affordances include listLocalizations and listVersions`() {
         let version = MockRepositoryFactory.makeVersion(id: "v1", appId: "app-abc")
-        #expect(version.affordances["listLocalizations"] == "asc localizations list --version-id v1")
+        #expect(version.affordances["listLocalizations"] == "asc version-localizations list --version-id v1")
         #expect(version.affordances["listVersions"] == "asc versions list --app-id app-abc")
     }
 
@@ -35,13 +35,13 @@ struct AffordancesTests {
     func `localization affordances include listScreenshotSets and listLocalizations`() {
         let loc = MockRepositoryFactory.makeLocalization(id: "loc-1", versionId: "v1")
         #expect(loc.affordances["listScreenshotSets"] == "asc screenshot-sets list --localization-id loc-1")
-        #expect(loc.affordances["listLocalizations"] == "asc localizations list --version-id v1")
+        #expect(loc.affordances["listLocalizations"] == "asc version-localizations list --version-id v1")
     }
 
     @Test
     func `localization affordances include updateLocalization command`() {
         let loc = MockRepositoryFactory.makeLocalization(id: "loc-42", versionId: "v1")
-        #expect(loc.affordances["updateLocalization"] == "asc localizations update --localization-id loc-42")
+        #expect(loc.affordances["updateLocalization"] == "asc version-localizations update --localization-id loc-42")
     }
 
     // MARK: - ReviewSubmission affordances
