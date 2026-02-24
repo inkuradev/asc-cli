@@ -73,6 +73,25 @@ protocol AffordanceProviding {
 Commands mirror the App Store Connect API hierarchy exactly:
 ```
 App → AppStoreVersion → AppStoreVersionLocalization → AppScreenshotSet → AppScreenshot
+App → AppInfo → AppInfoLocalization
+App → Build
+App → TestFlight (BetaGroup → BetaTester)
+```
+
+Domain folders map one-to-one to hierarchy levels:
+```
+Domain/
+├── Apps/           → App, AppRepository
+├── Versions/       → AppStoreVersion, AppStoreVersionState
+├── Localizations/  → AppStoreVersionLocalization, VersionLocalizationRepository
+├── ScreenshotSets/ → AppScreenshotSet, ScreenshotDisplayType, ScreenshotImport, ScreenshotRepository
+├── Screenshots/    → AppScreenshot
+├── AppInfos/       → AppInfo, AppInfoLocalization, AppInfoRepository
+├── Builds/         → Build, BuildRepository
+├── Submissions/    → ReviewSubmission, ReviewSubmissionState, SubmissionRepository
+├── TestFlight/     → BetaGroup, BetaTester, TestFlightRepository
+├── Auth/           → AuthCredentials, AuthProvider, AuthStatus, AuthStorage, CredentialSource, AuthError
+└── Shared/         → AffordanceProviding, APIError, OutputFormat, PaginatedResponse
 ```
 
 ## Testing
@@ -100,7 +119,7 @@ The codebase has two distinct localization concepts with separate repositories:
 | `AppStoreVersionLocalization` | `Domain/Localizations/` | `VersionLocalizationRepository` | `asc version-localizations *` | whatsNew, description, keywords, screenshots |
 | `AppInfoLocalization` | `Domain/AppInfos/` | `AppInfoRepository` | `asc app-info-localizations *` | name, subtitle, privacyPolicyUrl |
 
-`ScreenshotRepository` handles only screenshot sets and screenshot images — **no localization methods**.
+`ScreenshotRepository` (in `Domain/ScreenshotSets/`) handles screenshot sets and screenshot images — **no localization methods**.
 
 ## Authentication
 
