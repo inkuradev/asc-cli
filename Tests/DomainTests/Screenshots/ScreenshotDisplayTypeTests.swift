@@ -67,18 +67,40 @@ struct ScreenshotDisplayTypeTests {
         #expect(type == nil)
     }
 
-    @Test
-    func `appleTV category display name is Apple TV`() {
-        #expect(ScreenshotDisplayType.DeviceCategory.appleTV.displayName == "Apple TV")
+    @Test(arguments: zip(
+        [ScreenshotDisplayType.DeviceCategory.iPhone, .iPad, .mac, .watch, .appleTV, .appleVisionPro, .iMessage],
+        ["iPhone", "iPad", "Mac", "Apple Watch", "Apple TV", "Apple Vision Pro", "iMessage"]
+    ))
+    func `device category display names are human readable`(
+        category: ScreenshotDisplayType.DeviceCategory, expected: String
+    ) {
+        #expect(category.displayName == expected)
     }
 
-    @Test
-    func `appleVisionPro category display name is Apple Vision Pro`() {
-        #expect(ScreenshotDisplayType.DeviceCategory.appleVisionPro.displayName == "Apple Vision Pro")
-    }
-
-    @Test
-    func `iMessage category display name is iMessage`() {
-        #expect(ScreenshotDisplayType.DeviceCategory.iMessage.displayName == "iMessage")
+    @Test(arguments: zip(
+        ScreenshotDisplayType.allCases,
+        [
+            // iPhone
+            "iPhone 6.7\"", "iPhone 6.5\"", "iPhone 6.1\"", "iPhone 5.8\"",
+            "iPhone 5.5\"", "iPhone 4.7\"", "iPhone 4.0\"", "iPhone 3.5\"",
+            // iPad
+            "iPad Pro 12.9\" (3rd gen)", "iPad Pro 11\" (3rd gen)",
+            "iPad Pro 12.9\"", "iPad 10.5\"", "iPad 9.7\"",
+            // Other
+            "Mac", "Apple Watch Ultra", "Apple Watch Series 10",
+            "Apple Watch Series 7", "Apple Watch Series 4", "Apple Watch Series 3",
+            "Apple TV", "Apple Vision Pro",
+            // iMessage
+            "iMessage iPhone 6.7\"", "iMessage iPhone 6.5\"", "iMessage iPhone 6.1\"",
+            "iMessage iPhone 5.8\"", "iMessage iPhone 5.5\"", "iMessage iPhone 4.7\"",
+            "iMessage iPhone 4.0\"",
+            "iMessage iPad Pro 12.9\" (3rd gen)", "iMessage iPad Pro 11\" (3rd gen)",
+            "iMessage iPad Pro 12.9\"", "iMessage iPad 10.5\"", "iMessage iPad 9.7\"",
+        ]
+    ))
+    func `all display types have correct display name`(
+        type: ScreenshotDisplayType, expected: String
+    ) {
+        #expect(type.displayName == expected)
     }
 }

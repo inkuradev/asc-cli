@@ -35,4 +35,37 @@ struct ReviewSubmissionTests {
         #expect(submission.isPending == false)
         #expect(submission.isComplete == false)
     }
+
+    @Test func `canceling submission is pending`() {
+        let submission = MockRepositoryFactory.makeReviewSubmission(state: .canceling)
+        #expect(submission.isPending == true)
+    }
+
+    @Test func `completing submission is pending`() {
+        let submission = MockRepositoryFactory.makeReviewSubmission(state: .completing)
+        #expect(submission.isPending == true)
+    }
+
+    @Test func `readyForReview submission is not pending and not complete`() {
+        let submission = MockRepositoryFactory.makeReviewSubmission(state: .readyForReview)
+        #expect(submission.isPending == false)
+        #expect(submission.isComplete == false)
+        #expect(submission.hasIssues == false)
+    }
+
+    @Test(arguments: zip(
+        ReviewSubmissionState.allCases,
+        [
+            "Ready for Review",
+            "Waiting for Review",
+            "In Review",
+            "Unresolved Issues",
+            "Canceling",
+            "Completing",
+            "Complete",
+        ]
+    ))
+    func `state displayName is human readable`(state: ReviewSubmissionState, expected: String) {
+        #expect(state.displayName == expected)
+    }
 }

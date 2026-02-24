@@ -42,4 +42,25 @@ struct AppStoreVersionTests {
         )
         #expect(version.displayName == "iOS 2.1.0")
     }
+
+    @Test(arguments: zip(
+        AppStorePlatform.allCases,
+        ["iOS", "macOS", "tvOS", "watchOS", "visionOS"]
+    ))
+    func `platform displayName is human readable`(platform: AppStorePlatform, expected: String) {
+        #expect(platform.displayName == expected)
+    }
+
+    @Test(arguments: zip(
+        ["ios", "macos", "tvos", "watchos", "visionos"],
+        AppStorePlatform.allCases
+    ))
+    func `platform cliArgument parses all platforms`(arg: String, expected: AppStorePlatform) {
+        #expect(AppStorePlatform(cliArgument: arg) == expected)
+    }
+
+    @Test
+    func `unknown platform cliArgument returns nil`() {
+        #expect(AppStorePlatform(cliArgument: "unknown") == nil)
+    }
 }
