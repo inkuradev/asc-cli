@@ -4,7 +4,7 @@ import Testing
 @testable import Domain
 
 @Suite
-struct SDKAppRepositoryCreateTests {
+struct SDKVersionRepositoryCreateTests {
 
     @Test func `createVersion injects appId into response`() async throws {
         let stub = StubAPIClient()
@@ -17,7 +17,7 @@ struct SDKAppRepositoryCreateTests {
             links: .init(this: "")
         ))
 
-        let repo = SDKAppRepository(client: stub)
+        let repo = SDKVersionRepository(client: stub)
         let result = try await repo.createVersion(appId: "app-42", versionString: "2.0.0", platform: .iOS)
 
         #expect(result.id == "v-new")
@@ -38,7 +38,7 @@ struct SDKAppRepositoryCreateTests {
             links: .init(this: "")
         ))
 
-        let repo = SDKAppRepository(client: stub)
+        let repo = SDKVersionRepository(client: stub)
         let result = try await repo.createVersion(appId: "app-1", versionString: "1.0.0", platform: .macOS)
 
         #expect(result.platform == .macOS)

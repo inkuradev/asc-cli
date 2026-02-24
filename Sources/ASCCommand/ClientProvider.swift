@@ -8,6 +8,12 @@ struct ClientProvider {
         return try factory.makeAppRepository(authProvider: authProvider)
     }
 
+    static func makeVersionRepository() throws -> any VersionRepository {
+        let authProvider = CompositeAuthProvider()
+        let factory = ClientFactory()
+        return try factory.makeVersionRepository(authProvider: authProvider)
+    }
+
     static func makeBuildRepository() throws -> any BuildRepository {
         let authProvider = CompositeAuthProvider()
         let factory = ClientFactory()

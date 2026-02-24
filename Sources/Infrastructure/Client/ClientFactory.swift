@@ -11,6 +11,11 @@ public struct ClientFactory: Sendable {
         return SDKAppRepository(client: provider)
     }
 
+    public func makeVersionRepository(authProvider: any AuthProvider) throws -> any VersionRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKVersionRepository(client: provider)
+    }
+
     public func makeBuildRepository(authProvider: any AuthProvider) throws -> any BuildRepository {
         let provider = try makeProvider(authProvider: authProvider)
         return SDKBuildRepository(client: provider)

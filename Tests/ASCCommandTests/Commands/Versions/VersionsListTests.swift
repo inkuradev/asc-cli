@@ -7,7 +7,7 @@ import Testing
 struct VersionsListTests {
 
     @Test func `execute json output`() async throws {
-        let mockRepo = MockAppRepository()
+        let mockRepo = MockVersionRepository()
         given(mockRepo).listVersions(appId: .any).willReturn([
             AppStoreVersion(id: "v-1", appId: "app-1", versionString: "2.3.0", platform: .iOS, state: .readyForSale),
         ])

@@ -233,7 +233,7 @@ final class TUIApp {
 
     private func loadVersions(for app: App) async {
         do {
-            let repo = try ClientProvider.makeAppRepository()
+            let repo = try ClientProvider.makeVersionRepository()
             let versions = try await repo.listVersions(appId: app.id)
 
             guard !versions.isEmpty else {

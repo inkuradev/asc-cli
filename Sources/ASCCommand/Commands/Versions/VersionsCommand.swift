@@ -21,11 +21,11 @@ struct VersionsList: AsyncParsableCommand {
     var appId: String
 
     func run() async throws {
-        let repo = try ClientProvider.makeAppRepository()
+        let repo = try ClientProvider.makeVersionRepository()
         print(try await execute(repo: repo))
     }
 
-    func execute(repo: any AppRepository) async throws -> String {
+    func execute(repo: any VersionRepository) async throws -> String {
         let versions = try await repo.listVersions(appId: appId)
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
         return try formatter.formatAgentItems(
