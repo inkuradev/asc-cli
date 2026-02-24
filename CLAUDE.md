@@ -97,7 +97,7 @@ The codebase has two distinct localization concepts with separate repositories:
 
 | Type | Domain folder | Repository | Commands | Data |
 |------|--------------|------------|----------|------|
-| `AppStoreVersionLocalization` | `Domain/Localizations/` | `VersionLocalizationRepository` | `asc localizations *` | whatsNew, description, keywords, screenshots |
+| `AppStoreVersionLocalization` | `Domain/Localizations/` | `VersionLocalizationRepository` | `asc version-localizations *` | whatsNew, description, keywords, screenshots |
 | `AppInfoLocalization` | `Domain/AppInfos/` | `AppInfoRepository` | `asc app-info-localizations *` | name, subtitle, privacyPolicyUrl |
 
 `ScreenshotRepository` handles only screenshot sets and screenshot images — **no localization methods**.

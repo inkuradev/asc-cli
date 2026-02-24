@@ -65,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `asc versions list --app-id <id>`
   - `asc versions create --app-id <id> --version <string> --platform <ios|macos|...>`
 - **Localization Management**: List and create App Store version localizations.
-  - `asc localizations list --version-id <id>`
+  - `asc version-localizations list --version-id <id>`
   - `asc localizations create --version-id <id> --locale <locale>`
 - **Screenshot Sets**: List and create screenshot sets for a localization (one set per display type: iPhone 6.7", iPad Pro 12.9", Mac, etc.).
   - `asc screenshot-sets list --localization-id <id>`

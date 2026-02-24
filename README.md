@@ -48,7 +48,7 @@ Every response includes an `affordances` field. Agents read it and execute — n
   "state": "PREPARE_FOR_SUBMISSION",
   "isEditable": true,
   "affordances": {
-    "listLocalizations": "asc localizations list --version-id v1",
+    "listLocalizations": "asc version-localizations list --version-id v1",
     "listVersions":      "asc versions list --app-id app-abc",
     "submitForReview":   "asc versions submit --version-id v1"
   }
@@ -141,7 +141,7 @@ asc versions create --app-id <id> --version <v> --platform ios
 asc versions submit --version-id <id>                     # submit for App Store review
 
 # Localizations
-asc localizations list --version-id <id>
+asc version-localizations list --version-id <id>
 asc localizations create --version-id <id> --locale zh-Hans
 asc localizations update --localization-id <id> --whats-new "Bug fixes"
 
@@ -177,7 +177,7 @@ asc apps list
 asc versions list --app-id APP_ID
 
 # 3. Navigate to localizations (command is in the version affordances)
-asc localizations list --version-id VERSION_ID
+asc version-localizations list --version-id VERSION_ID
 
 # 4. Browse screenshot sets and upload new screenshots
 asc screenshot-sets list --localization-id LOC_ID
