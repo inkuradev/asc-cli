@@ -61,6 +61,7 @@ Every response includes an `affordances` field. Agents read it and execute — n
 
 - **Agent-first JSON output** — complete models with parent IDs, semantic booleans, and state-aware affordances
 - **CAEOAS** — responses tell agents exactly what to run next
+- **Persistent auth** — `asc auth login` saves credentials to `~/.asc/credentials.json`; no env vars needed after setup
 - **Full resource hierarchy** — Apps → Versions → Localizations → Screenshot Sets → Screenshots
 - **Version localizations** — update What's New, description, keywords, and URLs per locale
 - **App info localizations** — read and write per-locale name, subtitle, and privacy policy
@@ -95,52 +96,80 @@ cp .build/release/asc /usr/local/bin/
 
 ## Authentication
 
+### Persistent login (recommended)
+
+```bash
+asc auth login \
+  --key-id YOUR_KEY_ID \
+  --issuer-id YOUR_ISSUER_ID \
+  --private-key-path ~/.asc/AuthKey_XXXXXX.p8
+
+asc auth check   # → shows source: "file"
+```
+
+Credentials are saved to `~/.asc/credentials.json`. All `asc` commands pick them up automatically — no environment variables needed per session.
+
+```bash
+asc auth logout  # remove saved credentials
+```
+
+### Environment variables (alternative)
+
 ```bash
 export ASC_KEY_ID="YOUR_KEY_ID"
 export ASC_ISSUER_ID="YOUR_ISSUER_ID"
 export ASC_PRIVATE_KEY_PATH="~/.asc/AuthKey_XXXXXX.p8"
-
-asc auth check
+# or: export ASC_PRIVATE_KEY="<PEM content>"
 ```
 
-Or use `ASC_PRIVATE_KEY` with the PEM content inline instead of `ASC_PRIVATE_KEY_PATH`.
+**Resolution order:** `~/.asc/credentials.json` → environment variables.
 
 ## Usage
 
 ### Command Reference
 
 ```
+# Auth
+asc auth login --key-id <id> --issuer-id <id> --private-key-path <path>
+asc auth logout
+asc auth check
+
+# Apps & Versions
 asc apps list                                              # list all apps
 asc versions list --app-id <id>                           # list versions for an app
 asc versions create --app-id <id> --version <v> --platform ios
 asc versions submit --version-id <id>                     # submit for App Store review
 
+# Localizations
 asc localizations list --version-id <id>
 asc localizations create --version-id <id> --locale zh-Hans
 asc localizations update --localization-id <id> --whats-new "Bug fixes"
 
+# Screenshots
 asc screenshot-sets list --localization-id <id>
 asc screenshot-sets create --localization-id <id> --display-type APP_IPHONE_67
-
 asc screenshots list --set-id <id>
 asc screenshots upload --set-id <id> --file ./screen.png
 
+# App Info
 asc app-infos list --app-id <id>
 asc app-info-localizations list --app-info-id <id>
 asc app-info-localizations create --app-info-id <id> --locale zh-Hans --name "我的应用"
 asc app-info-localizations update --localization-id <id> --name "My App" --subtitle "Do things faster"
 
+# Other
 asc builds list [--app-id <id>]
 asc testflight groups [--app-id <id>]
 asc testflight testers --group-id <id>
-
 asc tui                                                    # interactive browser
-asc auth check
 ```
 
 ### Agent Workflow Example
 
 ```bash
+# 0. One-time setup — no env vars needed after this
+asc auth login --key-id KEY --issuer-id ISSUER --private-key-path ~/.asc/AuthKey_KEY.p8
+
 # 1. Find your app — response includes affordances.listVersions and affordances.listAppInfos
 asc apps list
 
@@ -186,6 +215,7 @@ Navigate interactively: **arrow keys** to move, **Enter** to drill in, **Escape*
 
 Detailed documentation for each feature area:
 
+- [Auth Login](docs/features/auth-login.md) — persistent credential storage, login/logout/check
 - [Version Localizations](docs/features/version-localizations.md) — updating What's New, description, keywords, and URLs
 - [Screenshots](docs/features/screenshots.md) — listing, creating sets, uploading images
 - [App Info Localizations](docs/features/app-info-localizations.md) — managing per-locale name, subtitle, and privacy policy
@@ -194,7 +224,7 @@ Detailed documentation for each feature area:
 
 ```bash
 swift build          # Build
-swift test           # Run tests (224 tests, Chicago School TDD)
+swift test           # Run tests (226 tests, Chicago School TDD)
 swift format --in-place --recursive Sources Tests  # Format
 ```
 

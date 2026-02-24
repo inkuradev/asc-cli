@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Persistent Auth Login**: Save API key credentials to `~/.asc/credentials.json` so environment variables are not required on every session.
+  - `asc auth login --key-id <id> --issuer-id <id> --private-key-path <path>` — save credentials to disk
+  - `asc auth logout` — remove saved credentials
+  - `asc auth check` — verify credentials and show their source (`file` or `environment`)
+  - Credential resolution order: `~/.asc/credentials.json` → environment variables (fully backwards-compatible)
+  - `asc auth check` now outputs JSON with an `affordances` field (same agent-first format as all other commands)
+
+### Technical
+- Added `AuthStorage` `@Mockable` protocol (`save`, `load`, `delete`) in Domain
+- Added `AuthStatus` domain model (`keyID`, `issuerID`, `source: CredentialSource`) with `AffordanceProviding`
+- Added `CredentialSource` enum (`.file` / `.environment`) as `Codable` String raw value
+- `AuthCredentials` gains `Codable` conformance for JSON file serialization
+- `FileAuthStorage` (Infrastructure) reads/writes `~/.asc/credentials.json` using `JSONEncoder`/`JSONDecoder`
+- `FileAuthProvider` (Infrastructure) implements `AuthProvider` backed by `FileAuthStorage`
+- `CompositeAuthProvider` (Infrastructure) tries file credentials first, falls back to `EnvironmentAuthProvider`
+- `ClientProvider` updated to use `CompositeAuthProvider` — all existing commands gain file-based auth transparently
+
 ---
 
 ## [0.1.3] - 2026-02-24
