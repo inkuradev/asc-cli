@@ -7,7 +7,7 @@ import Testing
 struct LocalizationsListTests {
 
     @Test func `execute json output`() async throws {
-        let mockRepo = MockScreenshotRepository()
+        let mockRepo = MockVersionLocalizationRepository()
         given(mockRepo).listLocalizations(versionId: .any).willReturn([
             AppStoreVersionLocalization(id: "loc-1", versionId: "v-1", locale: "en-US"),
             AppStoreVersionLocalization(id: "loc-2", versionId: "v-1", locale: "zh-Hans"),
@@ -22,7 +22,8 @@ struct LocalizationsListTests {
             {
               "affordances" : {
                 "listLocalizations" : "asc localizations list --version-id v-1",
-                "listScreenshotSets" : "asc screenshot-sets list --localization-id loc-1"
+                "listScreenshotSets" : "asc screenshot-sets list --localization-id loc-1",
+                "updateLocalization" : "asc localizations update --localization-id loc-1"
               },
               "id" : "loc-1",
               "locale" : "en-US",
@@ -31,7 +32,8 @@ struct LocalizationsListTests {
             {
               "affordances" : {
                 "listLocalizations" : "asc localizations list --version-id v-1",
-                "listScreenshotSets" : "asc screenshot-sets list --localization-id loc-2"
+                "listScreenshotSets" : "asc screenshot-sets list --localization-id loc-2",
+                "updateLocalization" : "asc localizations update --localization-id loc-2"
               },
               "id" : "loc-2",
               "locale" : "zh-Hans",
@@ -43,7 +45,7 @@ struct LocalizationsListTests {
     }
 
     @Test func `execute passes versionId to repository`() async throws {
-        let mockRepo = MockScreenshotRepository()
+        let mockRepo = MockVersionLocalizationRepository()
         given(mockRepo).listLocalizations(versionId: .value("v-42")).willReturn([])
 
         let cmd = try LocalizationsList.parse(["--version-id", "v-42"])

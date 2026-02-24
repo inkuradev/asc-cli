@@ -47,14 +47,16 @@ struct ScreenshotsImportTests {
     // MARK: - Output format
 
     @Test func `execute formats uploaded screenshots as JSON`() async throws {
-        let mockRepo = MockScreenshotRepository()
-        given(mockRepo).listLocalizations(versionId: .any).willReturn([makeLocalization()])
-        given(mockRepo).listScreenshotSets(localizationId: .any).willReturn([makeSet(repo: mockRepo)])
-        given(mockRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot(id: "img-1", fileName: "1.png"))
+        let mockLocRepo = MockVersionLocalizationRepository()
+        let mockSsRepo = MockScreenshotRepository()
+        given(mockLocRepo).listLocalizations(versionId: .any).willReturn([makeLocalization()])
+        given(mockSsRepo).listScreenshotSets(localizationId: .any).willReturn([makeSet(repo: mockSsRepo)])
+        given(mockSsRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot(id: "img-1", fileName: "1.png"))
 
         let cmd = try ScreenshotsImport.parse(["--version-id", "v1", "--from", "/fake.zip", "--pretty"])
         let output = try await cmd.execute(
-            repo: mockRepo,
+            localizationRepo: mockLocRepo,
+            screenshotRepo: mockSsRepo,
             manifest: makeManifest(),
             imageURLs: makeImageURLs(["en-US/1.png"])
         )
@@ -66,69 +68,77 @@ struct ScreenshotsImportTests {
     // MARK: - Find-or-create localization
 
     @Test func `execute reuses existing localization when locale matches`() async throws {
-        let mockRepo = MockScreenshotRepository()
-        given(mockRepo).listLocalizations(versionId: .any).willReturn([makeLocalization(id: "loc-existing", locale: "en-US")])
-        given(mockRepo).listScreenshotSets(localizationId: .value("loc-existing")).willReturn([makeSet(repo: mockRepo)])
-        given(mockRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot())
+        let mockLocRepo = MockVersionLocalizationRepository()
+        let mockSsRepo = MockScreenshotRepository()
+        given(mockLocRepo).listLocalizations(versionId: .any).willReturn([makeLocalization(id: "loc-existing", locale: "en-US")])
+        given(mockSsRepo).listScreenshotSets(localizationId: .value("loc-existing")).willReturn([makeSet(repo: mockSsRepo)])
+        given(mockSsRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot())
 
         let cmd = try ScreenshotsImport.parse(["--version-id", "v1", "--from", "/fake.zip"])
         _ = try await cmd.execute(
-            repo: mockRepo,
+            localizationRepo: mockLocRepo,
+            screenshotRepo: mockSsRepo,
             manifest: makeManifest(locale: "en-US"),
             imageURLs: makeImageURLs(["en-US/1.png"])
         )
-        verify(mockRepo).createLocalization(versionId: .any, locale: .any).called(.never)
+        verify(mockLocRepo).createLocalization(versionId: .any, locale: .any).called(.never)
     }
 
     @Test func `execute creates localization when locale is not found`() async throws {
-        let mockRepo = MockScreenshotRepository()
-        given(mockRepo).listLocalizations(versionId: .any).willReturn([])
-        given(mockRepo).createLocalization(versionId: .any, locale: .any)
+        let mockLocRepo = MockVersionLocalizationRepository()
+        let mockSsRepo = MockScreenshotRepository()
+        given(mockLocRepo).listLocalizations(versionId: .any).willReturn([])
+        given(mockLocRepo).createLocalization(versionId: .any, locale: .any)
             .willReturn(AppStoreVersionLocalization(id: "loc-new", versionId: "v1", locale: "ja"))
-        given(mockRepo).listScreenshotSets(localizationId: .any).willReturn([makeSet(repo: mockRepo)])
-        given(mockRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot())
+        given(mockSsRepo).listScreenshotSets(localizationId: .any).willReturn([makeSet(repo: mockSsRepo)])
+        given(mockSsRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot())
 
         let cmd = try ScreenshotsImport.parse(["--version-id", "v1", "--from", "/fake.zip"])
         _ = try await cmd.execute(
-            repo: mockRepo,
+            localizationRepo: mockLocRepo,
+            screenshotRepo: mockSsRepo,
             manifest: makeManifest(locale: "ja", files: ["ja/1.png"]),
             imageURLs: makeImageURLs(["ja/1.png"])
         )
-        verify(mockRepo).createLocalization(versionId: .value("v1"), locale: .value("ja")).called(.once)
+        verify(mockLocRepo).createLocalization(versionId: .value("v1"), locale: .value("ja")).called(.once)
     }
 
     // MARK: - Find-or-create screenshot set
 
     @Test func `execute reuses existing screenshot set when display type matches`() async throws {
-        let mockRepo = MockScreenshotRepository()
-        given(mockRepo).listLocalizations(versionId: .any).willReturn([makeLocalization()])
-        given(mockRepo).listScreenshotSets(localizationId: .any)
-            .willReturn([makeSet(id: "set-existing", displayType: .iphone67, repo: mockRepo)])
-        given(mockRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot())
+        let mockLocRepo = MockVersionLocalizationRepository()
+        let mockSsRepo = MockScreenshotRepository()
+        given(mockLocRepo).listLocalizations(versionId: .any).willReturn([makeLocalization()])
+        given(mockSsRepo).listScreenshotSets(localizationId: .any)
+            .willReturn([makeSet(id: "set-existing", displayType: .iphone67, repo: mockSsRepo)])
+        given(mockSsRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot())
 
         let cmd = try ScreenshotsImport.parse(["--version-id", "v1", "--from", "/fake.zip"])
         _ = try await cmd.execute(
-            repo: mockRepo,
+            localizationRepo: mockLocRepo,
+            screenshotRepo: mockSsRepo,
             manifest: makeManifest(displayType: .iphone67),
             imageURLs: makeImageURLs(["en-US/1.png"])
         )
-        verify(mockRepo).createScreenshotSet(localizationId: .any, displayType: .any).called(.never)
+        verify(mockSsRepo).createScreenshotSet(localizationId: .any, displayType: .any).called(.never)
     }
 
     @Test func `execute creates screenshot set when display type is not found`() async throws {
-        let mockRepo = MockScreenshotRepository()
-        given(mockRepo).listLocalizations(versionId: .any).willReturn([makeLocalization()])
-        given(mockRepo).listScreenshotSets(localizationId: .any).willReturn([])
-        given(mockRepo).createScreenshotSet(localizationId: .any, displayType: .any)
-            .willReturn(makeSet(id: "set-new", displayType: .iphone67, repo: mockRepo))
-        given(mockRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot())
+        let mockLocRepo = MockVersionLocalizationRepository()
+        let mockSsRepo = MockScreenshotRepository()
+        given(mockLocRepo).listLocalizations(versionId: .any).willReturn([makeLocalization()])
+        given(mockSsRepo).listScreenshotSets(localizationId: .any).willReturn([])
+        given(mockSsRepo).createScreenshotSet(localizationId: .any, displayType: .any)
+            .willReturn(makeSet(id: "set-new", displayType: .iphone67, repo: mockSsRepo))
+        given(mockSsRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(makeScreenshot())
 
         let cmd = try ScreenshotsImport.parse(["--version-id", "v1", "--from", "/fake.zip"])
         _ = try await cmd.execute(
-            repo: mockRepo,
+            localizationRepo: mockLocRepo,
+            screenshotRepo: mockSsRepo,
             manifest: makeManifest(displayType: .iphone67),
             imageURLs: makeImageURLs(["en-US/1.png"])
         )
-        verify(mockRepo).createScreenshotSet(localizationId: .value("loc-1"), displayType: .value(.iphone67)).called(.once)
+        verify(mockSsRepo).createScreenshotSet(localizationId: .value("loc-1"), displayType: .value(.iphone67)).called(.once)
     }
 }

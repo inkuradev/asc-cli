@@ -68,9 +68,25 @@ struct MockRepositoryFactory {
     static func makeLocalization(
         id: String = "1",
         versionId: String = "version-1",
-        locale: String = "en-US"
+        locale: String = "en-US",
+        whatsNew: String? = nil,
+        description: String? = nil,
+        keywords: String? = nil,
+        marketingUrl: String? = nil,
+        supportUrl: String? = nil,
+        promotionalText: String? = nil
     ) -> AppStoreVersionLocalization {
-        AppStoreVersionLocalization(id: id, versionId: versionId, locale: locale)
+        AppStoreVersionLocalization(
+            id: id,
+            versionId: versionId,
+            locale: locale,
+            whatsNew: whatsNew,
+            description: description,
+            keywords: keywords,
+            marketingUrl: marketingUrl,
+            supportUrl: supportUrl,
+            promotionalText: promotionalText
+        )
     }
 
     static func makeScreenshotSet(

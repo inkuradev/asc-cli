@@ -20,6 +20,12 @@ struct ClientProvider {
         return try factory.makeTestFlightRepository(authProvider: authProvider)
     }
 
+    static func makeVersionLocalizationRepository() throws -> any VersionLocalizationRepository {
+        let authProvider = EnvironmentAuthProvider()
+        let factory = ClientFactory()
+        return try factory.makeVersionLocalizationRepository(authProvider: authProvider)
+    }
+
     static func makeScreenshotRepository() throws -> any ScreenshotRepository {
         let authProvider = EnvironmentAuthProvider()
         let factory = ClientFactory()

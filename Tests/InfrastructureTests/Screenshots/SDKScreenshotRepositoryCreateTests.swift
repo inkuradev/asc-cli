@@ -6,27 +6,6 @@ import Testing
 @Suite
 struct SDKScreenshotRepositoryCreateTests {
 
-    // MARK: - createLocalization
-
-    @Test func `createLocalization injects versionId into response`() async throws {
-        let stub = StubAPIClient()
-        stub.willReturn(AppStoreVersionLocalizationResponse(
-            data: AppStoreVersionLocalization(
-                type: .appStoreVersionLocalizations,
-                id: "loc-new",
-                attributes: .init(locale: "en-US")
-            ),
-            links: .init(this: "")
-        ))
-
-        let repo = SDKScreenshotRepository(client: stub)
-        let result = try await repo.createLocalization(versionId: "v-42", locale: "en-US")
-
-        #expect(result.id == "loc-new")
-        #expect(result.versionId == "v-42")
-        #expect(result.locale == "en-US")
-    }
-
     // MARK: - createScreenshotSet
 
     @Test func `createScreenshotSet injects localizationId into response`() async throws {

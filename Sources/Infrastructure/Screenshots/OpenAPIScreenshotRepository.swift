@@ -10,12 +10,6 @@ public struct SDKScreenshotRepository: ScreenshotRepository, @unchecked Sendable
         self.client = client
     }
 
-    public func listLocalizations(versionId: String) async throws -> [Domain.AppStoreVersionLocalization] {
-        let request = APIEndpoint.v1.appStoreVersions.id(versionId).appStoreVersionLocalizations.get()
-        let response = try await client.request(request)
-        return response.data.map { mapLocalization($0, versionId: versionId) }
-    }
-
     public func listScreenshotSets(localizationId: String) async throws -> [Domain.AppScreenshotSet] {
         let request = APIEndpoint.v1.appStoreVersionLocalizations.id(localizationId).appScreenshotSets.get()
         let response = try await client.request(request)
@@ -26,18 +20,6 @@ public struct SDKScreenshotRepository: ScreenshotRepository, @unchecked Sendable
         let request = APIEndpoint.v1.appScreenshotSets.id(setId).appScreenshots.get()
         let response = try await client.request(request)
         return response.data.map { mapScreenshot($0, setId: setId) }
-    }
-
-    public func createLocalization(versionId: String, locale: String) async throws -> Domain.AppStoreVersionLocalization {
-        let body = AppStoreVersionLocalizationCreateRequest(
-            data: .init(
-                type: .appStoreVersionLocalizations,
-                attributes: .init(locale: locale),
-                relationships: .init(appStoreVersion: .init(data: .init(type: .appStoreVersions, id: versionId)))
-            )
-        )
-        let response = try await client.request(APIEndpoint.v1.appStoreVersionLocalizations.post(body))
-        return mapLocalization(response.data, versionId: versionId)
     }
 
     public func createScreenshotSet(localizationId: String, displayType: Domain.ScreenshotDisplayType) async throws -> Domain.AppScreenshotSet {
@@ -101,17 +83,6 @@ public struct SDKScreenshotRepository: ScreenshotRepository, @unchecked Sendable
         )
         let confirmed = try await client.request(APIEndpoint.v1.appScreenshots.id(screenshotId).patch(confirmBody))
         return mapScreenshot(confirmed.data, setId: setId)
-    }
-
-    private func mapLocalization(
-        _ sdkLoc: AppStoreConnect_Swift_SDK.AppStoreVersionLocalization,
-        versionId: String
-    ) -> Domain.AppStoreVersionLocalization {
-        Domain.AppStoreVersionLocalization(
-            id: sdkLoc.id,
-            versionId: versionId,
-            locale: sdkLoc.attributes?.locale ?? ""
-        )
     }
 
     private func mapScreenshotSet(

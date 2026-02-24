@@ -267,7 +267,7 @@ final class TUIApp {
 
     private func loadLocalizations(for version: AppStoreVersion) async {
         do {
-            let repo = try ClientProvider.makeScreenshotRepository()
+            let repo = try ClientProvider.makeVersionLocalizationRepository()
             let localizations = try await repo.listLocalizations(versionId: version.id)
 
             guard !localizations.isEmpty else {

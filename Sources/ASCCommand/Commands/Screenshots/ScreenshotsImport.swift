@@ -19,14 +19,16 @@ struct ScreenshotsImport: AsyncParsableCommand {
     func run() async throws {
         let (manifest, imageURLs, tempDir) = try unzipAndParse(from: from)
         defer { try? FileManager.default.removeItem(at: tempDir) }
-        let repo = try ClientProvider.makeScreenshotRepository()
-        print(try await execute(repo: repo, manifest: manifest, imageURLs: imageURLs))
+        let localizationRepo = try ClientProvider.makeVersionLocalizationRepository()
+        let screenshotRepo = try ClientProvider.makeScreenshotRepository()
+        print(try await execute(localizationRepo: localizationRepo, screenshotRepo: screenshotRepo, manifest: manifest, imageURLs: imageURLs))
     }
 
     // MARK: - Testable core (no I/O)
 
     func execute(
-        repo: any ScreenshotRepository,
+        localizationRepo: any VersionLocalizationRepository,
+        screenshotRepo: any ScreenshotRepository,
         manifest: ScreenshotManifest,
         imageURLs: [String: URL]
     ) async throws -> String {
@@ -34,21 +36,21 @@ struct ScreenshotsImport: AsyncParsableCommand {
 
         for (locale, locManifest) in manifest.localizations.sorted(by: { $0.key < $1.key }) {
             // Find or create localization
-            let localizations = try await repo.listLocalizations(versionId: versionId)
+            let localizations = try await localizationRepo.listLocalizations(versionId: versionId)
             let localization: AppStoreVersionLocalization
             if let existing = localizations.first(where: { $0.locale == locale }) {
                 localization = existing
             } else {
-                localization = try await repo.createLocalization(versionId: versionId, locale: locale)
+                localization = try await localizationRepo.createLocalization(versionId: versionId, locale: locale)
             }
 
             // Find or create screenshot set — set comes with repo already injected
-            let sets = try await repo.listScreenshotSets(localizationId: localization.id)
+            let sets = try await screenshotRepo.listScreenshotSets(localizationId: localization.id)
             let set: AppScreenshotSet
             if let existing = sets.first(where: { $0.screenshotDisplayType == locManifest.displayType }) {
                 set = existing
             } else {
-                set = try await repo.createScreenshotSet(localizationId: localization.id, displayType: locManifest.displayType)
+                set = try await screenshotRepo.createScreenshotSet(localizationId: localization.id, displayType: locManifest.displayType)
             }
 
             // Domain operation: set uploads its own entries in order

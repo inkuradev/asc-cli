@@ -7,7 +7,7 @@ import Testing
 struct LocalizationsCreateTests {
 
     @Test func `execute json output`() async throws {
-        let mockRepo = MockScreenshotRepository()
+        let mockRepo = MockVersionLocalizationRepository()
         given(mockRepo).createLocalization(versionId: .any, locale: .any).willReturn(
             AppStoreVersionLocalization(id: "loc-new", versionId: "v-1", locale: "en-US")
         )
@@ -21,7 +21,8 @@ struct LocalizationsCreateTests {
             {
               "affordances" : {
                 "listLocalizations" : "asc localizations list --version-id v-1",
-                "listScreenshotSets" : "asc screenshot-sets list --localization-id loc-new"
+                "listScreenshotSets" : "asc screenshot-sets list --localization-id loc-new",
+                "updateLocalization" : "asc localizations update --localization-id loc-new"
               },
               "id" : "loc-new",
               "locale" : "en-US",
@@ -33,7 +34,7 @@ struct LocalizationsCreateTests {
     }
 
     @Test func `execute passes correct arguments to repository`() async throws {
-        let mockRepo = MockScreenshotRepository()
+        let mockRepo = MockVersionLocalizationRepository()
         given(mockRepo).createLocalization(versionId: .value("v-99"), locale: .value("zh-Hans")).willReturn(
             AppStoreVersionLocalization(id: "loc-1", versionId: "v-99", locale: "zh-Hans")
         )

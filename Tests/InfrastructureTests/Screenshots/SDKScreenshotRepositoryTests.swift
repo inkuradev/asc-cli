@@ -6,53 +6,6 @@ import Testing
 @Suite
 struct SDKScreenshotRepositoryTests {
 
-    // MARK: - listLocalizations
-
-    @Test func `listLocalizations injects versionId into each localization`() async throws {
-        let stub = StubAPIClient()
-        stub.willReturn(AppStoreVersionLocalizationsResponse(
-            data: [
-                AppStoreVersionLocalization(
-                    type: .appStoreVersionLocalizations,
-                    id: "loc-1",
-                    attributes: .init(locale: "en-US")
-                ),
-                AppStoreVersionLocalization(
-                    type: .appStoreVersionLocalizations,
-                    id: "loc-2",
-                    attributes: .init(locale: "zh-Hans")
-                ),
-            ],
-            links: .init(this: "")
-        ))
-
-        let repo = SDKScreenshotRepository(client: stub)
-        let result = try await repo.listLocalizations(versionId: "v-42")
-
-        #expect(result.count == 2)
-        #expect(result.allSatisfy { $0.versionId == "v-42" })
-    }
-
-    @Test func `listLocalizations maps locale from SDK attributes`() async throws {
-        let stub = StubAPIClient()
-        stub.willReturn(AppStoreVersionLocalizationsResponse(
-            data: [
-                AppStoreVersionLocalization(
-                    type: .appStoreVersionLocalizations,
-                    id: "loc-1",
-                    attributes: .init(locale: "fr-FR")
-                ),
-            ],
-            links: .init(this: "")
-        ))
-
-        let repo = SDKScreenshotRepository(client: stub)
-        let result = try await repo.listLocalizations(versionId: "v-1")
-
-        #expect(result[0].id == "loc-1")
-        #expect(result[0].locale == "fr-FR")
-    }
-
     // MARK: - listScreenshotSets
 
     @Test func `listScreenshotSets injects localizationId into each set`() async throws {
@@ -97,7 +50,6 @@ struct SDKScreenshotRepositoryTests {
         let result = try await repo.listScreenshotSets(localizationId: "loc-1")
 
         // A set with repo injected does not throw "requires a repository"
-        // We verify by confirming importScreenshots fails on missing URL (not on missing repo)
         let screenshots = try await result[0].importScreenshots(entries: [], imageURLs: [:])
         #expect(screenshots.isEmpty)
     }
