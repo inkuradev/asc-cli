@@ -45,13 +45,6 @@ struct AppScreenshotSetTests {
     }
 
     @Test
-    func `set is equatable`() {
-        let a = MockRepositoryFactory.makeScreenshotSet(id: "1")
-        let b = MockRepositoryFactory.makeScreenshotSet(id: "1")
-        #expect(a == b)
-    }
-
-    @Test
     func `set is equatable regardless of injected repo`() {
         let a = MockRepositoryFactory.makeScreenshotSet(id: "1", repo: MockScreenshotRepository())
         let b = MockRepositoryFactory.makeScreenshotSet(id: "1", repo: MockScreenshotRepository())

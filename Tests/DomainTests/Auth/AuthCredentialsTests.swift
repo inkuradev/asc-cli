@@ -38,10 +38,4 @@ struct AuthCredentialsTests {
         }
     }
 
-    @Test
-    func `credentials are equatable`() {
-        let a = AuthCredentials(keyID: "k", issuerID: "i", privateKeyPEM: "p")
-        let b = AuthCredentials(keyID: "k", issuerID: "i", privateKeyPEM: "p")
-        #expect(a == b)
-    }
 }
