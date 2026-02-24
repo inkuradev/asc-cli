@@ -37,7 +37,7 @@ public enum ScreenshotDisplayType: String, Sendable, Equatable, Hashable, CaseIt
     case imessageIPad105 = "IMESSAGE_APP_IPAD_105"
     case imessageIPad97 = "IMESSAGE_APP_IPAD_97"
 
-    public enum DeviceCategory: String, Sendable, Equatable {
+    public enum DeviceCategory: String, Sendable, Equatable, CaseIterable {
         case iPhone, iPad, mac, watch, appleTV, appleVisionPro, iMessage
 
         public var displayName: String {

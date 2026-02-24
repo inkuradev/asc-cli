@@ -68,7 +68,7 @@ struct ScreenshotDisplayTypeTests {
     }
 
     @Test(arguments: zip(
-        [ScreenshotDisplayType.DeviceCategory.iPhone, .iPad, .mac, .watch, .appleTV, .appleVisionPro, .iMessage],
+        ScreenshotDisplayType.DeviceCategory.allCases,
         ["iPhone", "iPad", "Mac", "Apple Watch", "Apple TV", "Apple Vision Pro", "iMessage"]
     ))
     func `device category display names are human readable`(
