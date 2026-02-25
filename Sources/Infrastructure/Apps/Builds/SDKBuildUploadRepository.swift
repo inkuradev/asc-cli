@@ -72,14 +72,14 @@ public struct SDKBuildUploadRepository: BuildUploadRepository, @unchecked Sendab
             _ = try await URLSession.shared.data(for: request)
         }
 
-        // Step 4: Confirm upload with MD5 checksum
-        let md5 = fileData.md5HexString
+        // Step 4: Confirm upload with SHA-256 checksum
+        let sha256 = fileData.sha256HexString
         let confirmBody = BuildUploadFileUpdateRequest(
             data: .init(
                 type: .buildUploadFiles,
                 id: fileId,
                 attributes: .init(
-                    sourceFileChecksums: .init(composite: .init(hash: md5, algorithm: .md5)),
+                    sourceFileChecksums: .init(file: .init(hash: sha256, algorithm: .sha256)),
                     isUploaded: true
                 )
             )
@@ -147,8 +147,8 @@ public struct SDKBuildUploadRepository: BuildUploadRepository, @unchecked Sendab
 }
 
 private extension Data {
-    var md5HexString: String {
-        let digest = Insecure.MD5.hash(data: self)
+    var sha256HexString: String {
+        let digest = SHA256.hash(data: self)
         return digest.map { String(format: "%02x", $0) }.joined()
     }
 }
