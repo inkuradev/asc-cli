@@ -142,8 +142,8 @@ asc versions submit --version-id <id>                     # submit for App Store
 
 # Localizations
 asc version-localizations list --version-id <id>
-asc localizations create --version-id <id> --locale zh-Hans
-asc localizations update --localization-id <id> --whats-new "Bug fixes"
+asc version-localizations create --version-id <id> --locale zh-Hans
+asc version-localizations update --localization-id <id> --whats-new "Bug fixes"
 
 # Screenshots
 asc screenshot-sets list --localization-id <id>
@@ -184,7 +184,7 @@ asc screenshot-sets list --localization-id LOC_ID
 asc screenshots upload --set-id SET_ID --file ./hero.png
 
 # 5. Update What's New text for each locale
-asc localizations update --localization-id LOC_ID --whats-new "Bug fixes and performance improvements"
+asc version-localizations update --localization-id LOC_ID --whats-new "Bug fixes and performance improvements"
 
 # 6. Update app name / subtitle per locale
 asc app-infos list --app-id APP_ID

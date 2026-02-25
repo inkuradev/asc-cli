@@ -39,8 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Version Localization Update**: Set What's New text, description, keywords, marketing URL, support URL, and promotional text for any locale directly from the CLI.
-  - `asc localizations update --localization-id <id> --whats-new "text"` — update What's New
-  - `asc localizations update --localization-id <id> --description "text" --keywords "a,b,c"` — update other fields
+  - `asc version-localizations update --localization-id <id> --whats-new "text"` — update What's New
+  - `asc version-localizations update --localization-id <id> --description "text" --keywords "a,b,c"` — update other fields
   - All content fields are optional — only provided fields are sent to the API
 - **App Info Localizations**: Manage per-locale app metadata (name, subtitle, privacy policy) directly from the CLI. Each locale's App Store listing information is now fully writable.
   - `asc app-infos list --app-id <id>` — list AppInfo records for an app
@@ -70,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `asc versions create --app-id <id> --version <string> --platform <ios|macos|...>`
 - **Localization Management**: List and create App Store version localizations.
   - `asc version-localizations list --version-id <id>`
-  - `asc localizations create --version-id <id> --locale <locale>`
+  - `asc version-localizations create --version-id <id> --locale <locale>`
 - **Screenshot Sets**: List and create screenshot sets for a localization (one set per display type: iPhone 6.7", iPad Pro 12.9", Mac, etc.).
   - `asc screenshot-sets list --localization-id <id>`
   - `asc screenshot-sets create --localization-id <id> --display-type <TYPE>`
