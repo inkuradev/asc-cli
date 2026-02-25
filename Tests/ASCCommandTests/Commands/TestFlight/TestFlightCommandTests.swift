@@ -167,6 +167,7 @@ struct BetaTestersImportTests {
         let mockRepo = MockTestFlightRepository()
         given(mockRepo).addBetaTester(groupId: .any, email: .any, firstName: .any, lastName: .any)
             .willReturn(BetaTester(id: "t-1", groupId: "g-1", firstName: "Jane", lastName: "Doe", email: "jane@example.com"))
+        given(mockRepo).addBetaTester(groupId: .any, email: .any, firstName: .any, lastName: .any)
             .willReturn(BetaTester(id: "t-2", groupId: "g-1", firstName: "John", lastName: nil, email: "john@example.com"))
 
         let csvContent = """

@@ -25,6 +25,7 @@ final class TUIApp {
     private var currentComponent: Component?
     private var navigationStack: [Screen] = []
     private var exitContinuation: CheckedContinuation<Void, Never>?
+    private var selectedGroupId: String?
 
     init(tui: TUI) {
         self.tui = tui
@@ -450,18 +451,9 @@ final class TUIApp {
             let list = SelectList(items: items)
             list.onSelect = { [weak self] item in
                 guard let self else { return }
-                if let group = response.data.first(where: { $0.id == item.value }) {
-                    let lines = [
-                        "Beta Group Detail",
-                        String(repeating: "─", count: 40),
-                        "ID:           \(group.id)",
-                        "Name:         \(group.name)",
-                        "Internal:     \(group.isInternalGroup ? "Yes" : "No")",
-                        "Public Link:  \(group.publicLinkEnabled ? "Yes" : "No")",
-                        "",
-                        "Press Escape to go back",
-                    ]
-                    self.showComponent(self.makeTextView(lines: lines))
+                if response.data.first(where: { $0.id == item.value }) != nil {
+                    self.selectedGroupId = item.value
+                    self.navigate(to: .betaTestersList)
                 }
             }
             list.onCancel = { [weak self] in
@@ -474,9 +466,19 @@ final class TUIApp {
     }
 
     private func loadBetaTesters() async {
+        guard let groupId = selectedGroupId else {
+            showComponent(makeTextView(lines: [
+                "No Group Selected",
+                String(repeating: "─", count: 40),
+                "Select a beta group first to view its testers.",
+                "",
+                "Press Escape to go back",
+            ]))
+            return
+        }
         do {
             let repo = try ClientProvider.makeTestFlightRepository()
-            let response = try await repo.listBetaTesters(groupId: nil, limit: nil)
+            let response = try await repo.listBetaTesters(groupId: groupId, limit: nil)
             let items = response.data.map { tester in
                 SelectItem(
                     value: tester.id,
