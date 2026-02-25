@@ -11,7 +11,9 @@ public struct SDKScreenshotRepository: ScreenshotRepository, @unchecked Sendable
     }
 
     public func listScreenshotSets(localizationId: String) async throws -> [Domain.AppScreenshotSet] {
-        let request = APIEndpoint.v1.appStoreVersionLocalizations.id(localizationId).appScreenshotSets.get()
+        let request = APIEndpoint.v1.appStoreVersionLocalizations.id(localizationId).appScreenshotSets.get(
+            parameters: .init(include: [.appScreenshots])
+        )
         let response = try await client.request(request)
         return response.data.map { mapScreenshotSet($0, localizationId: localizationId) }
     }
