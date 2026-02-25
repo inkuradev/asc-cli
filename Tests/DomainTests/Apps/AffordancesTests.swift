@@ -96,4 +96,38 @@ struct AffordancesTests {
         #expect(set.affordances["listScreenshots"] == "asc screenshots list --set-id set-1")
         #expect(set.affordances["listScreenshotSets"] == "asc screenshot-sets list --localization-id loc-1")
     }
+
+    // MARK: - BundleID affordances
+
+    @Test
+    func `bundle id affordances include listProfiles and delete`() {
+        let bundleId = MockRepositoryFactory.makeBundleID(id: "bid-42")
+        #expect(bundleId.affordances["listProfiles"] == "asc profiles list --bundle-id-id bid-42")
+        #expect(bundleId.affordances["delete"] == "asc bundle-ids delete --bundle-id-id bid-42")
+    }
+
+    // MARK: - Certificate affordances
+
+    @Test
+    func `certificate affordances include revoke`() {
+        let cert = MockRepositoryFactory.makeCertificate(id: "cert-1")
+        #expect(cert.affordances["revoke"] == "asc certificates revoke --certificate-id cert-1")
+    }
+
+    // MARK: - Device affordances
+
+    @Test
+    func `device affordances include listDevices`() {
+        let device = MockRepositoryFactory.makeDevice(id: "dev-1")
+        #expect(device.affordances["listDevices"] == "asc devices list")
+    }
+
+    // MARK: - Profile affordances
+
+    @Test
+    func `profile affordances include delete and listProfiles`() {
+        let profile = MockRepositoryFactory.makeProfile(id: "prof-1", bundleIdId: "bid-abc")
+        #expect(profile.affordances["delete"] == "asc profiles delete --profile-id prof-1")
+        #expect(profile.affordances["listProfiles"] == "asc profiles list --bundle-id-id bid-abc")
+    }
 }

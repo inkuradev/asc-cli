@@ -1,0 +1,30 @@
+import ArgumentParser
+import Domain
+
+struct DevicesList: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "list",
+        abstract: "List registered test devices"
+    )
+
+    @OptionGroup var globals: GlobalOptions
+
+    @Option(name: .long, help: "Filter by platform (ios, macos)")
+    var platform: String?
+
+    func run() async throws {
+        let repo = try ClientProvider.makeDeviceRepository()
+        print(try await execute(repo: repo))
+    }
+
+    func execute(repo: any DeviceRepository) async throws -> String {
+        let domainPlatform = platform.flatMap { BundleIDPlatform(cliArgument: $0) }
+        let items = try await repo.listDevices(platform: domainPlatform)
+        let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
+        return try formatter.formatAgentItems(
+            items,
+            headers: ["ID", "Name", "UDID", "Class", "Status"],
+            rowMapper: { [$0.id, $0.name, $0.udid, $0.deviceClass.rawValue, $0.status.rawValue] }
+        )
+    }
+}

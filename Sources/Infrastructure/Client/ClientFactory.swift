@@ -46,6 +46,26 @@ public struct ClientFactory: Sendable {
         return OpenAPISubmissionRepository(client: provider)
     }
 
+    public func makeBundleIDRepository(authProvider: any AuthProvider) throws -> any BundleIDRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKBundleIDRepository(client: provider)
+    }
+
+    public func makeCertificateRepository(authProvider: any AuthProvider) throws -> any CertificateRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKCertificateRepository(client: provider)
+    }
+
+    public func makeDeviceRepository(authProvider: any AuthProvider) throws -> any DeviceRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKDeviceRepository(client: provider)
+    }
+
+    public func makeProfileRepository(authProvider: any AuthProvider) throws -> any ProfileRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKProfileRepository(client: provider)
+    }
+
     private func makeProvider(authProvider: any AuthProvider) throws -> APIProvider {
         let credentials = try authProvider.resolve()
         let strippedKey = credentials.privateKeyPEM

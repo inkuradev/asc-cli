@@ -49,4 +49,28 @@ struct ClientProvider {
         let factory = ClientFactory()
         return try factory.makeSubmissionRepository(authProvider: authProvider)
     }
+
+    static func makeBundleIDRepository() throws -> any BundleIDRepository {
+        let authProvider = CompositeAuthProvider()
+        let factory = ClientFactory()
+        return try factory.makeBundleIDRepository(authProvider: authProvider)
+    }
+
+    static func makeCertificateRepository() throws -> any CertificateRepository {
+        let authProvider = CompositeAuthProvider()
+        let factory = ClientFactory()
+        return try factory.makeCertificateRepository(authProvider: authProvider)
+    }
+
+    static func makeDeviceRepository() throws -> any DeviceRepository {
+        let authProvider = CompositeAuthProvider()
+        let factory = ClientFactory()
+        return try factory.makeDeviceRepository(authProvider: authProvider)
+    }
+
+    static func makeProfileRepository() throws -> any ProfileRepository {
+        let authProvider = CompositeAuthProvider()
+        let factory = ClientFactory()
+        return try factory.makeProfileRepository(authProvider: authProvider)
+    }
 }

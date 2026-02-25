@@ -3,6 +3,7 @@
 
 final class StubAPIClient: APIClient, @unchecked Sendable {
     private var stubbedResponse: Any?
+    private(set) var voidRequestCalled = false
 
     func willReturn<T>(_ response: T) {
         stubbedResponse = response
@@ -13,5 +14,9 @@ final class StubAPIClient: APIClient, @unchecked Sendable {
             fatalError("StubAPIClient: no stub configured for \(T.self)")
         }
         return response
+    }
+
+    func request(_ endpoint: Request<Void>) async throws {
+        voidRequestCalled = true
     }
 }

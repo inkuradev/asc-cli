@@ -19,6 +19,10 @@ struct ASC: AsyncParsableCommand {
             AuthCommand.self,
             VersionCommand.self,
             TUICommand.self,
+            BundleIDsCommand.self,
+            CertificatesCommand.self,
+            DevicesCommand.self,
+            ProfilesCommand.self,
         ]
     )
 }

@@ -18,4 +18,6 @@ final class SequencedStubAPIClient: APIClient, @unchecked Sendable {
         }
         return typed
     }
+
+    func request(_ endpoint: Request<Void>) async throws {}
 }

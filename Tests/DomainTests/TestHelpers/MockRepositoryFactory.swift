@@ -167,4 +167,82 @@ struct MockRepositoryFactory {
             imageHeight: imageHeight
         )
     }
+
+    // MARK: - Code Signing
+
+    static func makeBundleID(
+        id: String = "bid-1",
+        name: String = "My App",
+        identifier: String = "com.example.app",
+        platform: BundleIDPlatform = .iOS,
+        seedID: String? = nil
+    ) -> BundleID {
+        BundleID(id: id, name: name, identifier: identifier, platform: platform, seedID: seedID)
+    }
+
+    static func makeCertificate(
+        id: String = "cert-1",
+        name: String = "iOS Distribution",
+        certificateType: CertificateType = .distribution,
+        displayName: String? = nil,
+        serialNumber: String? = nil,
+        platform: BundleIDPlatform? = nil,
+        expirationDate: Date? = nil,
+        certificateContent: String? = nil
+    ) -> Certificate {
+        Certificate(
+            id: id,
+            name: name,
+            certificateType: certificateType,
+            displayName: displayName,
+            serialNumber: serialNumber,
+            platform: platform,
+            expirationDate: expirationDate,
+            certificateContent: certificateContent
+        )
+    }
+
+    static func makeDevice(
+        id: String = "dev-1",
+        name: String = "My iPhone",
+        udid: String = "00000000-0000-0000-0000-000000000000",
+        deviceClass: DeviceClass = .iPhone,
+        platform: BundleIDPlatform = .iOS,
+        status: DeviceStatus = .enabled,
+        model: String? = nil,
+        addedDate: Date? = nil
+    ) -> Device {
+        Device(
+            id: id,
+            name: name,
+            udid: udid,
+            deviceClass: deviceClass,
+            platform: platform,
+            status: status,
+            model: model,
+            addedDate: addedDate
+        )
+    }
+
+    static func makeProfile(
+        id: String = "prof-1",
+        name: String = "My Profile",
+        profileType: ProfileType = .iosAppStore,
+        profileState: ProfileState = .active,
+        bundleIdId: String = "bid-1",
+        expirationDate: Date? = nil,
+        uuid: String? = nil,
+        profileContent: String? = nil
+    ) -> Profile {
+        Profile(
+            id: id,
+            name: name,
+            profileType: profileType,
+            profileState: profileState,
+            bundleIdId: bundleIdId,
+            expirationDate: expirationDate,
+            uuid: uuid,
+            profileContent: profileContent
+        )
+    }
 }
