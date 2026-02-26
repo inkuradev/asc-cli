@@ -16,7 +16,6 @@ struct ASCBarApp: App {
         MenuBarExtra {
             MenuContentView(portfolio: portfolio, detailRepository: detailRepository)
                 .appThemeProvider(themeModeId: settings.themeMode)
-                .task { await portfolio.refresh() }
         } label: {
             StatusBarIcon(status: portfolio.overallStatus, isSyncing: portfolio.isSyncing)
                 .appThemeProvider(themeModeId: settings.themeMode)

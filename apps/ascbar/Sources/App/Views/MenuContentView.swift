@@ -73,7 +73,9 @@ struct MenuContentView: View {
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .task {
             withAnimation(.easeOut(duration: 0.4)) { animateIn = true }
-            await portfolio.refresh()
+            if portfolio.apps.isEmpty {
+                await portfolio.refresh()
+            }
         }
     }
 
