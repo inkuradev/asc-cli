@@ -108,8 +108,10 @@
             <div class="detail-row">
               <div class="dr-icon green">🔨</div><span class="dr-label">Build</span><span class="dr-badge orange">Not attached</span>
             </div>
-            <div class="detail-row">
-              <div class="dr-icon purple">🌍</div><span class="dr-label">Localizations</span><span class="dr-value">3 locales</span>
+            <div class="detail-row detail-row-tappable" title="Click to edit localizations">
+              <div class="dr-icon purple">🌍</div><span class="dr-label">Localizations</span>
+              <span class="dr-value">3 locales</span>
+              <svg style="width:10px;height:10px;color:rgba(255,255,255,.28);margin-left:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
             </div>
             <div class="detail-row">
               <div class="dr-icon orange">📊</div><span class="dr-label">Pricing</span><span class="dr-badge green">Set</span>
@@ -189,6 +191,186 @@
             <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></div>
           </div>
         </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Localizations Flow ── -->
+  <div class="row-label" style="margin-top:40px;">
+    <div class="row-label-line"></div>
+    <span>Localizations Flow — from Version Detail</span>
+    <div class="row-label-line"></div>
+  </div>
+
+  <div class="flow-row">
+
+    <!-- 5b. Version Detail (reference — Localizations row highlighted) -->
+    <div class="flow-step">
+      <div class="step-label"><div class="step-num">5</div><span class="step-name">Version Detail</span></div>
+      <div style="position:relative;">
+        <div class="popover-caret"></div>
+        <div class="popover">
+          <div class="pop-header" style="border-bottom:none;">
+            <div style="display:flex;align-items:center;gap:8px;color:var(--accent);font-size:13px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+              Back
+            </div>
+            <div style="flex:1;text-align:center;font-size:14px;font-weight:700;">ASCBar 2.1.0</div>
+            <div style="width:60px;"></div>
+          </div>
+          <div class="divider"></div>
+          <div style="margin:10px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-card);overflow:hidden;">
+            <div class="detail-row">
+              <div class="dr-icon blue">📱</div><span class="dr-label">Platform</span><span class="dr-value">macOS</span>
+            </div>
+            <div class="detail-row">
+              <div class="dr-icon green">🔨</div><span class="dr-label">Build</span><span class="dr-badge orange">Not attached</span>
+            </div>
+            <!-- Localizations row — highlighted as active/tappable -->
+            <div class="detail-row detail-row-tappable" style="background:rgba(191,90,242,.1);border-bottom:1px solid rgba(191,90,242,.2);">
+              <div class="dr-icon purple">🌍</div><span class="dr-label">Localizations</span>
+              <span class="dr-value">3 locales</span>
+              <svg style="width:10px;height:10px;color:var(--purple);margin-left:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="detail-row">
+              <div class="dr-icon orange">📊</div><span class="dr-label">Pricing</span><span class="dr-badge green">Set</span>
+            </div>
+          </div>
+        </div>
+        <div class="annotation right" style="top:160px;right:-195px;">Click "Localizations 3 locales" row</div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+
+    <!-- 7. Localizations Edit (new — locale tabs + focused What's New) -->
+    <div class="flow-step">
+      <div class="step-label"><div class="step-num">7</div><span class="step-name">Localizations ✦ new</span></div>
+      <div style="position:relative;">
+        <div class="popover-caret"></div>
+        <div class="popover">
+
+          <!-- Header -->
+          <div class="pop-header" style="border-bottom:none;">
+            <div style="display:flex;align-items:center;gap:8px;color:var(--accent);font-size:13px;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+              2.1.0
+            </div>
+            <div style="flex:1;text-align:center;font-size:14px;font-weight:700;">Localizations</div>
+            <div style="width:60px;"></div>
+          </div>
+          <div class="divider"></div>
+
+          <!-- Locale tab pills -->
+          <div class="locale-tabs">
+            <div class="locale-tab active">
+              en-US <span class="primary-star">★</span>
+            </div>
+            <div class="locale-tab">zh-Hans</div>
+            <div class="locale-tab">ja</div>
+          </div>
+          <div class="divider"></div>
+
+          <!-- What's New field — primary, prominent -->
+          <div class="field-block" style="padding-top:10px;">
+            <div class="field-label">What's New</div>
+            <textarea class="field-textarea" rows="4" readonly>Bug fixes and improvements.</textarea>
+            <div class="field-hint">Visible to users in the App Store update tab</div>
+          </div>
+
+          <!-- Collapsed: other fields (Description · Keywords · URLs) -->
+          <div class="collapsed-section">
+            <span style="font-size:13px;">🔤</span>
+            <span class="collapsed-section-label">Description · Keywords · URLs</span>
+            <span class="collapsed-section-badge">3/5 set</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+
+          <!-- CLI snippet for the diff command -->
+          <div class="code-snippet">
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">asc version-localizations update --localization-id l1 --whats-new '…'</span>
+            <span class="copy-btn">Copy</span>
+          </div>
+
+          <!-- Action bar -->
+          <div class="action-bar">
+            <div class="bar-btn ghost" style="opacity:.45;cursor:default;">No changes</div>
+            <div class="bar-spacer"></div>
+            <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></div>
+          </div>
+
+        </div>
+        <div class="annotation left" style="top:110px;left:-175px;">Locale tabs = pick language</div>
+        <div class="annotation left" style="top:195px;left:-175px;">What's New prominent</div>
+        <div class="annotation right" style="top:295px;right:-170px;">Other fields collapsed</div>
+        <div class="annotation right" style="top:360px;right:-175px;">CAEOAS: ready-to-run CLI</div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+
+    <!-- 7b. After editing — Save active -->
+    <div class="flow-step">
+      <div class="step-label"><div class="step-num">7</div><span class="step-name">Editing State</span></div>
+      <div style="position:relative;">
+        <div class="popover-caret"></div>
+        <div class="popover">
+
+          <!-- Header -->
+          <div class="pop-header" style="border-bottom:none;">
+            <div style="display:flex;align-items:center;gap:8px;color:var(--accent);font-size:13px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+              2.1.0
+            </div>
+            <div style="flex:1;text-align:center;font-size:14px;font-weight:700;">Localizations</div>
+            <div style="width:60px;"></div>
+          </div>
+          <div class="divider"></div>
+
+          <!-- Locale tabs — zh-Hans active -->
+          <div class="locale-tabs">
+            <div class="locale-tab">en-US <span class="primary-star">★</span></div>
+            <div class="locale-tab active">zh-Hans</div>
+            <div class="locale-tab">ja</div>
+          </div>
+          <div class="divider"></div>
+
+          <!-- What's New — empty / editing -->
+          <div class="field-block" style="padding-top:10px;">
+            <div class="field-label" style="color:var(--orange);">What's New <span style="font-weight:400;color:var(--text-tertiary);">— empty</span></div>
+            <textarea class="field-textarea" rows="4" style="border-color:rgba(255,159,10,.4);background:rgba(255,159,10,.04);" readonly>修复了若干问题并提升了性能。</textarea>
+            <div class="field-hint" style="color:var(--orange);">Provide What's New for this locale</div>
+          </div>
+
+          <!-- Collapsed fields -->
+          <div class="collapsed-section">
+            <span style="font-size:13px;">🔤</span>
+            <span class="collapsed-section-label">Description · Keywords · URLs</span>
+            <span class="collapsed-section-badge" style="background:rgba(255,159,10,.15);color:var(--orange);">0/5 set</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+
+          <!-- CLI snippet with actual command -->
+          <div class="code-snippet">
+            <span>asc version-localizations update --localization-id l2 \<br>&nbsp;&nbsp;--whats-new '修复了若干问题并提升了性能。'</span>
+          </div>
+
+          <!-- Action bar — Save enabled -->
+          <div class="action-bar">
+            <div class="bar-btn ghost">Cancel</div>
+            <div class="bar-spacer"></div>
+            <div class="bar-btn ghost" style="gap:4px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Cmd
+            </div>
+            <div class="bar-btn primary" style="background:linear-gradient(135deg,#bf5af2,#9b59b6);">✓ Save</div>
+          </div>
+
+        </div>
+        <div class="annotation right" style="top:112px;right:-180px;">Switch locale — content reloads</div>
+        <div class="annotation right" style="top:240px;right:-175px;">Badge shows 0/5 — warning</div>
+        <div class="annotation left" style="top:350px;left:-170px;">Copy Cmd = CAEOAS diff</div>
       </div>
     </div>
 

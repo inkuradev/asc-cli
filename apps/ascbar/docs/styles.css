@@ -258,6 +258,55 @@ body {
   border-bottom:1px solid rgba(255,255,255,.05);
 }
 .detail-row:last-child { border-bottom:none; }
+.detail-row-tappable { cursor:pointer; transition:background .15s; }
+.detail-row-tappable:hover { background:rgba(255,255,255,.06); }
+
+/* ── Locale tab pills ── */
+.locale-tabs { display:flex; gap:6px; padding:10px 16px; overflow-x:auto; }
+.locale-tabs::-webkit-scrollbar { display:none; }
+.locale-tab {
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--bg-card); border:1px solid transparent;
+  border-radius:var(--radius-pill); padding:4px 12px;
+  font-size:12px; font-weight:600; white-space:nowrap; cursor:pointer;
+  color:var(--text-secondary); transition:all .15s;
+}
+.locale-tab.active {
+  background:rgba(191,90,242,.15); border-color:rgba(191,90,242,.35);
+  color:var(--text-primary);
+}
+.locale-tab .primary-star {
+  font-size:9px; color:var(--purple); font-weight:700; opacity:.8;
+}
+
+/* ── Textarea field ── */
+.field-block { padding:4px 16px 10px; }
+.field-label {
+  font-size:10px; font-weight:700; color:var(--text-tertiary);
+  text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px;
+}
+.field-textarea {
+  width:100%; background:var(--bg-input); border:1px solid var(--border-focus);
+  border-radius:8px; padding:8px 10px;
+  font-size:12px; font-family:-apple-system,sans-serif; color:var(--text-primary);
+  line-height:1.5; resize:none; outline:none;
+}
+.field-textarea:focus { border-color:rgba(191,90,242,.5); }
+.field-hint { font-size:10px; color:var(--text-tertiary); margin-top:4px; }
+
+/* ── Collapsed section ── */
+.collapsed-section {
+  margin:0 16px 10px; padding:8px 12px;
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; display:flex; align-items:center; gap:8px; cursor:pointer;
+}
+.collapsed-section:hover { background:var(--bg-card-hover); }
+.collapsed-section-label { flex:1; font-size:12px; color:var(--text-secondary); }
+.collapsed-section-badge {
+  font-size:9px; font-weight:700; padding:2px 6px; border-radius:4px;
+  background:rgba(48,209,88,.15); color:var(--green);
+}
+.collapsed-section svg { width:10px; height:10px; color:var(--text-tertiary); }
 .dr-icon {
   width:28px; height:28px; border-radius:6px; flex-shrink:0;
   display:flex; align-items:center; justify-content:center; font-size:13px;
