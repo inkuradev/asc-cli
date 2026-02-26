@@ -301,7 +301,7 @@ struct SettingsContentView: View {
         guard let data = try? Data(contentsOf: url),
               let stored = try? JSONDecoder().decode(StoredCredentials.self, from: data)
         else { return nil }
-        return CredentialInfo(keyID: stored.keyId, issuerID: stored.issuerId)
+        return CredentialInfo(keyID: stored.keyID, issuerID: stored.issuerID)
     }
 }
 
@@ -313,6 +313,6 @@ private struct CredentialInfo {
 }
 
 private struct StoredCredentials: Decodable {
-    let keyId: String
-    let issuerId: String
+    let keyID: String
+    let issuerID: String
 }
