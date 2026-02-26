@@ -45,6 +45,13 @@ public protocol AppThemeProvider: Sendable {
     var hoverBackground: Color { get }
     var pressedBackground: Color { get }
     var progressTrack: Color { get }
+
+    // Surface
+    var backgroundColor: Color { get }   // popover base fill
+    var dividerColor: Color { get }       // 1px horizontal rule
+    var codeBackground: Color { get }     // code snippet background
+    var shimmerBase: Color { get }        // skeleton bar base fill
+    var shimmerHighlight: Color { get }   // skeleton shimmer sweep color
 }
 
 // MARK: - Default Helpers

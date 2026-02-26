@@ -83,4 +83,12 @@ public struct DarkTheme: AppThemeProvider {
     public var hoverBackground: Color   { Color.white.opacity(0.10) }  // --bg-card-hover
     public var pressedBackground: Color { Color.white.opacity(0.14) }
     public var progressTrack: Color     { Color.white.opacity(0.10) }
+
+    // MARK: - Surface
+
+    public var backgroundColor: Color  { Color(red: 0.118, green: 0.118, blue: 0.125) } // #1e1e20
+    public var dividerColor: Color     { Color.white.opacity(0.06) }  // rgba(255,255,255,.06)
+    public var codeBackground: Color   { Color.black.opacity(0.35) }  // .code-snippet bg
+    public var shimmerBase: Color      { Color.white.opacity(0.18) }
+    public var shimmerHighlight: Color { Color.white.opacity(0.45) }
 }

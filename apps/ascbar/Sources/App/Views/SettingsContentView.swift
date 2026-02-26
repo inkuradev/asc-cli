@@ -242,7 +242,7 @@ struct SettingsContentView: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(
-                        isSelected ? theme.accentPrimary : Color.white.opacity(0.08),
+                        isSelected ? theme.accentPrimary : theme.glassBorder,
                         lineWidth: isSelected ? 1.5 : 1
                     )
             )
@@ -252,7 +252,7 @@ struct SettingsContentView: View {
 
     private var rowDivider: some View {
         Rectangle()
-            .fill(Color.white.opacity(0.05))
+            .fill(theme.dividerColor)
             .frame(height: 1)
     }
 

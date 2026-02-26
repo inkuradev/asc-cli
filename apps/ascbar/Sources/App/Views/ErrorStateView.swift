@@ -69,7 +69,7 @@ struct ErrorStateView: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color.black.opacity(0.35))
+                .fill(theme.codeBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(theme.textMono.opacity(0.15), lineWidth: 1)

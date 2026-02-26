@@ -46,8 +46,7 @@ struct MenuContentView: View {
 
     private var popoverBackground: some View {
         GeometryReader { proxy in
-            // --bg-base: #1e1e20
-            Color(red: 0.118, green: 0.118, blue: 0.125)
+            theme.backgroundColor
 
             if settings.backgroundOrbs {
                 // Orb 1 — purple top-left  (--orb1: rgba(120,60,220,.35))
@@ -107,8 +106,7 @@ struct MenuContentView: View {
     }
 
     private var divider: some View {
-        // rgba(255,255,255,.06)
-        Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1)
+        Rectangle().fill(theme.dividerColor).frame(height: 1)
     }
 
     // MARK: - Header  (matches .pop-header)
@@ -306,10 +304,10 @@ struct MenuContentView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color.white.opacity(0.04))
+                .fill(theme.glassBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 1)
+                        .stroke(theme.glassBorder, lineWidth: 1)
                 )
         )
     }
@@ -322,16 +320,16 @@ struct MenuContentView: View {
         ZStack {
             // Always-on base — the "skeleton" you always see
             RoundedRectangle(cornerRadius: height / 2)
-                .fill(Color.white.opacity(0.18))
+                .fill(theme.shimmerBase)
 
             // Traveling highlight — adds brightness on top of the base
             RoundedRectangle(cornerRadius: height / 2)
-                .fill(Color.white.opacity(0.18))
+                .fill(theme.shimmerBase)
                 .shimmering(
                     animation: .easeInOut(duration: 1.6).repeatForever(autoreverses: false),
                     gradient: Gradient(colors: [
                         Color.clear,
-                        Color.white.opacity(0.45),
+                        theme.shimmerHighlight,
                         Color.clear,
                     ])
                 )
@@ -380,7 +378,7 @@ struct MenuContentView: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color.black.opacity(0.35))
+                .fill(theme.codeBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(theme.textMono.opacity(0.15), lineWidth: 1)
