@@ -8,7 +8,7 @@
 #endif
 public protocol VersionDetailRepository: Sendable {
     func fetchReadiness(versionId: String) async throws -> VersionReadinessResult
-    func fetchLocalizations(versionId: String) async throws -> [LocalizationSummary]
+    func fetchLocalizations(versionId: String, primaryLocale: String?) async throws -> [LocalizationSummary]
     /// Updates any subset of localization text fields. Only non-nil arguments are sent to the API.
     func updateLocalization(
         localizationId: String,

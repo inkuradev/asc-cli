@@ -46,6 +46,7 @@ private struct LocalizationDraft: Equatable {
 /// Mental model: "I'm writing release notes — pick a language, fill in What's New, save."
 struct VersionLocalizationsView: View {
     let version: ASCVersion
+    let primaryLocale: String?
     let detailRepository: any VersionDetailRepository
     let onBack: () -> Void
 
@@ -602,7 +603,7 @@ struct VersionLocalizationsView: View {
         isLoading = true
         loadError = nil
         do {
-            localizations = try await detailRepository.fetchLocalizations(versionId: version.id)
+            localizations = try await detailRepository.fetchLocalizations(versionId: version.id, primaryLocale: primaryLocale)
             let primary = localizations.first(where: { $0.isPrimary }) ?? localizations.first
             if let first = primary {
                 selectedId = first.id
@@ -680,6 +681,7 @@ private extension LocalizationSummary {
     VersionLocalizationsView(
         version: ASCVersion(id: "v1", appId: "app1", versionString: "2.1.0",
                             platform: "MAC_OS", state: "PREPARE_FOR_SUBMISSION"),
+        primaryLocale: "en-US",
         detailRepository: PreviewVersionDetailRepository(),
         onBack: {}
     )
@@ -691,6 +693,7 @@ private extension LocalizationSummary {
     VersionLocalizationsView(
         version: ASCVersion(id: "v1", appId: "app1", versionString: "2.1.0",
                             platform: "MAC_OS", state: "PREPARE_FOR_SUBMISSION"),
+        primaryLocale: "en-US",
         detailRepository: PreviewVersionDetailRepository(),
         onBack: {}
     )

@@ -6,6 +6,7 @@ import Domain
 struct VersionDetailView: View {
     let appName: String
     let version: ASCVersion
+    let primaryLocale: String?
     let detailRepository: any VersionDetailRepository
     let onOpenReadiness: () -> Void
     let onOpenLocalizations: () -> Void
@@ -379,7 +380,7 @@ struct VersionDetailView: View {
 
     private func loadLocalizationCount() async {
         do {
-            let locs = try await detailRepository.fetchLocalizations(versionId: version.id)
+            let locs = try await detailRepository.fetchLocalizations(versionId: version.id, primaryLocale: primaryLocale)
             localizationCount = locs.count
         } catch {
             localizationCount = 0
@@ -394,6 +395,7 @@ struct VersionDetailView: View {
         appName: "ASCBar",
         version: ASCVersion(id: "v21", appId: "app1", versionString: "2.1.0", platform: "MAC_OS",
                             state: "PREPARE_FOR_SUBMISSION"),
+        primaryLocale: "en-US",
         detailRepository: PreviewVersionDetailRepository(),
         onOpenReadiness: {},
         onOpenLocalizations: {},
@@ -408,6 +410,7 @@ struct VersionDetailView: View {
         appName: "ASCBar",
         version: ASCVersion(id: "v20", appId: "app1", versionString: "2.0.1", platform: "MAC_OS",
                             state: "READY_FOR_SALE"),
+        primaryLocale: "en-US",
         detailRepository: PreviewVersionDetailRepository(),
         onOpenReadiness: {},
         onOpenLocalizations: {},
@@ -451,7 +454,7 @@ struct PreviewVersionDetailRepository: VersionDetailRepository {
         )
     }
 
-    func fetchLocalizations(versionId: String) async throws -> [LocalizationSummary] {
+    func fetchLocalizations(versionId: String, primaryLocale: String?) async throws -> [LocalizationSummary] {
         try await Task.sleep(for: .milliseconds(600))
         return [
             LocalizationSummary(id: "l1", locale: "en-US", isPrimary: true,

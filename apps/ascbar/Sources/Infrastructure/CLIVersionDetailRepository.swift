@@ -79,18 +79,22 @@ public final class CLIVersionDetailRepository: VersionDetailRepository, @uncheck
         return mapReadiness(raw, versionId: versionId)
     }
 
-    public func fetchLocalizations(versionId: String) async throws -> [LocalizationSummary] {
+    public func fetchLocalizations(versionId: String, primaryLocale: String?) async throws -> [LocalizationSummary] {
         let output = try await executor.execute(
             "asc", args: ["version-localizations", "list", "--version-id", versionId, "--output", "json"]
         )
         let response = try JSONDecoder().decode(
             DataResponse<CLILocalizationItem>.self, from: Data(output.utf8)
         )
-        return response.data.enumerated().map { index, loc in
-            LocalizationSummary(
+        return response.data.map { loc in
+            // Use the app's primaryLocale for accurate isPrimary; fall back to first item
+            let isPrimary = primaryLocale != nil
+                ? loc.locale == primaryLocale
+                : response.data.first?.id == loc.id
+            return LocalizationSummary(
                 id: loc.id,
                 locale: loc.locale,
-                isPrimary: index == 0,
+                isPrimary: isPrimary,
                 whatsNew: loc.whatsNew,
                 description: loc.description,
                 keywords: loc.keywords,

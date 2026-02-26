@@ -51,9 +51,11 @@ struct MenuContentView: View {
                         monitor: portfolio
                     )
                 case .versionDetail(let version):
+                    let app = portfolio.apps.first(where: { $0.id == version.appId })
                     VersionDetailView(
-                        appName: portfolio.apps.first(where: { $0.id == version.appId })?.displayName ?? "",
+                        appName: app?.displayName ?? "",
                         version: version,
+                        primaryLocale: app?.primaryLocale,
                         detailRepository: detailRepository,
                         onOpenReadiness: { navigation = .readiness(version) },
                         onOpenLocalizations: { navigation = .localizations(version) },
@@ -67,8 +69,10 @@ struct MenuContentView: View {
                         onBack: { navigation = .versionDetail(version) }
                     )
                 case .localizations(let version):
+                    let primaryLocale = portfolio.apps.first(where: { $0.id == version.appId })?.primaryLocale
                     VersionLocalizationsView(
                         version: version,
+                        primaryLocale: primaryLocale,
                         detailRepository: detailRepository,
                         onBack: { navigation = .versionDetail(version) }
                     )
