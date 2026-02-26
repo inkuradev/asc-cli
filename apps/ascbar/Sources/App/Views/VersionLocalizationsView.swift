@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 import Domain
 
 // MARK: - Draft Model
@@ -271,7 +272,9 @@ struct VersionLocalizationsView: View {
                             get: { currentDraft.description },
                             set: { currentDraft.description = $0; draft = currentDraft }
                         ),
-                        isMultiline: true
+                        isMultiline: true,
+                        hint: "Minimum 10 characters",
+                        validationError: fieldValidationError(field: "description", value: currentDraft.description)
                     )
                     // Keywords
                     fieldEditor(
@@ -280,7 +283,8 @@ struct VersionLocalizationsView: View {
                             get: { currentDraft.keywords },
                             set: { currentDraft.keywords = $0; draft = currentDraft }
                         ),
-                        isMultiline: false
+                        isMultiline: false,
+                        hint: "Comma-separated"
                     )
                     // Marketing URL
                     fieldEditor(
@@ -289,7 +293,9 @@ struct VersionLocalizationsView: View {
                             get: { currentDraft.marketingUrl },
                             set: { currentDraft.marketingUrl = $0; draft = currentDraft }
                         ),
-                        isMultiline: false
+                        isMultiline: false,
+                        hint: "https://",
+                        validationError: fieldValidationError(field: "url", value: currentDraft.marketingUrl)
                     )
                     // Support URL
                     fieldEditor(
@@ -298,7 +304,9 @@ struct VersionLocalizationsView: View {
                             get: { currentDraft.supportUrl },
                             set: { currentDraft.supportUrl = $0; draft = currentDraft }
                         ),
-                        isMultiline: false
+                        isMultiline: false,
+                        hint: "https://",
+                        validationError: fieldValidationError(field: "url", value: currentDraft.supportUrl)
                     )
                     // Promotional Text
                     fieldEditor(
@@ -311,18 +319,21 @@ struct VersionLocalizationsView: View {
                     )
 
                     if let err = saveError {
-                        HStack(spacing: 4) {
+                        HStack(alignment: .top, spacing: 4) {
                             Image(systemName: "exclamationmark.circle.fill")
                                 .font(.system(size: 10))
                                 .foregroundStyle(BaseColors.systemRed)
+                                .padding(.top, 1)
                             Text("Failed: \(err)")
                                 .font(.system(size: 10, design: theme.fontDesign))
                                 .foregroundStyle(BaseColors.systemRed)
-                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                     }
 
-                    // Cancel / Save buttons
+                    // Cancel / Copy / Save buttons
+                    let hasErrors = hasDraftValidationErrors(currentDraft)
+                    let cmd = buildCLICommand(draft: currentDraft, loc: loc)
                     HStack(spacing: 8) {
                         Button {
                             withAnimation(.easeOut(duration: 0.15)) {
@@ -349,6 +360,31 @@ struct VersionLocalizationsView: View {
 
                         Spacer()
 
+                        if let cmd {
+                            Button {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(cmd, forType: .string)
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "doc.on.doc").font(.system(size: 9, weight: .semibold))
+                                    Text("Copy Cmd")
+                                        .font(.system(size: 10, weight: .semibold, design: theme.fontDesign))
+                                }
+                                .foregroundStyle(theme.accentPrimary)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(theme.accentPrimary.opacity(0.1))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 4)
+                                                .stroke(theme.accentPrimary.opacity(0.2), lineWidth: 1)
+                                        )
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+
                         if isSaving {
                             ProgressView().progressViewStyle(.circular).scaleEffect(0.7)
                         } else {
@@ -366,9 +402,10 @@ struct VersionLocalizationsView: View {
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 4)
-                                .background(RoundedRectangle(cornerRadius: 5).fill(theme.accentPrimary))
+                                .background(RoundedRectangle(cornerRadius: 5).fill(hasErrors ? Color.gray.opacity(0.4) : theme.accentPrimary))
                             }
                             .buttonStyle(.plain)
+                            .disabled(hasErrors)
                         }
                     }
                 }
@@ -382,11 +419,13 @@ struct VersionLocalizationsView: View {
 
     // MARK: - Field Editor
 
-    private func fieldEditor(label: String, text: Binding<String>, isMultiline: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+    private func fieldEditor(label: String, text: Binding<String>, isMultiline: Bool,
+                             hint: String? = nil, validationError: String? = nil) -> some View {
+        let hasError = validationError != nil
+        return VStack(alignment: .leading, spacing: 4) {
             Text(label)
                 .font(.system(size: 10, weight: .semibold, design: theme.fontDesign))
-                .foregroundStyle(theme.textTertiary)
+                .foregroundStyle(hasError ? BaseColors.systemRed : theme.textTertiary)
                 .tracking(0.3)
 
             if isMultiline {
@@ -398,10 +437,10 @@ struct VersionLocalizationsView: View {
                     .padding(4)
                     .background(
                         RoundedRectangle(cornerRadius: 5)
-                            .fill(theme.codeBackground)
+                            .fill(hasError ? BaseColors.systemRed.opacity(0.07) : theme.codeBackground)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 5)
-                                    .stroke(theme.glassBorder, lineWidth: 1)
+                                    .stroke(hasError ? BaseColors.systemRed.opacity(0.5) : theme.glassBorder, lineWidth: 1)
                             )
                     )
             } else {
@@ -413,12 +452,22 @@ struct VersionLocalizationsView: View {
                     .padding(.vertical, 5)
                     .background(
                         RoundedRectangle(cornerRadius: 5)
-                            .fill(theme.codeBackground)
+                            .fill(hasError ? BaseColors.systemRed.opacity(0.07) : theme.codeBackground)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 5)
-                                    .stroke(theme.glassBorder, lineWidth: 1)
+                                    .stroke(hasError ? BaseColors.systemRed.opacity(0.5) : theme.glassBorder, lineWidth: 1)
                             )
                     )
+            }
+
+            if let err = validationError {
+                Text(err)
+                    .font(.system(size: 9, design: theme.fontDesign))
+                    .foregroundStyle(BaseColors.systemRed)
+            } else if let hint {
+                Text(hint)
+                    .font(.system(size: 9, design: theme.fontDesign))
+                    .foregroundStyle(theme.textTertiary)
             }
         }
     }
@@ -461,6 +510,44 @@ struct VersionLocalizationsView: View {
             )
     }
 
+    // MARK: - Validation & Commands
+
+    private func fieldValidationError(field: String, value: String) -> String? {
+        switch field {
+        case "description":
+            if !value.isEmpty && value.count < 10 { return "At least 10 characters required" }
+        case "url":
+            if !value.isEmpty && !value.hasPrefix("https://") && !value.hasPrefix("http://") {
+                return "Must start with https://"
+            }
+        default: break
+        }
+        return nil
+    }
+
+    private func hasDraftValidationErrors(_ draft: LocalizationDraft) -> Bool {
+        fieldValidationError(field: "description", value: draft.description) != nil ||
+        fieldValidationError(field: "url", value: draft.marketingUrl) != nil ||
+        fieldValidationError(field: "url", value: draft.supportUrl) != nil
+    }
+
+    private func buildCLICommand(draft: LocalizationDraft, loc: LocalizationSummary) -> String? {
+        let changed = draft.changedFields(from: loc)
+        var parts: [String] = ["asc version-localizations update --localization-id \(loc.id)"]
+        if let v = changed.whatsNew        { parts.append("--whats-new \(shellQuote(v))") }
+        if let v = changed.description     { parts.append("--description \(shellQuote(v))") }
+        if let v = changed.keywords        { parts.append("--keywords \(shellQuote(v))") }
+        if let v = changed.marketingUrl    { parts.append("--marketing-url \(shellQuote(v))") }
+        if let v = changed.supportUrl      { parts.append("--support-url \(shellQuote(v))") }
+        if let v = changed.promotionalText { parts.append("--promotional-text \(shellQuote(v))") }
+        guard parts.count > 1 else { return nil }
+        return parts.joined(separator: " \\\n  ")
+    }
+
+    private func shellQuote(_ s: String) -> String {
+        "'\(s.replacingOccurrences(of: "'", with: "'\\''"))'"
+    }
+
     private func loadLocalizations() async {
         isLoading = true
         loadError = nil
@@ -498,9 +585,25 @@ struct VersionLocalizationsView: View {
                 supportUrl: changed.supportUrl,
                 promotionalText: changed.promotionalText
             )
+            // Update local state without a network round-trip
+            if let idx = localizations.firstIndex(where: { $0.id == localizationId }) {
+                let orig = localizations[idx]
+                func apply(_ c: String?, _ o: String?) -> String? {
+                    guard let c else { return o }
+                    return c.isEmpty ? nil : c
+                }
+                localizations[idx] = LocalizationSummary(
+                    id: orig.id, locale: orig.locale, isPrimary: orig.isPrimary,
+                    whatsNew: apply(changed.whatsNew, orig.whatsNew),
+                    description: apply(changed.description, orig.description),
+                    keywords: apply(changed.keywords, orig.keywords),
+                    marketingUrl: apply(changed.marketingUrl, orig.marketingUrl),
+                    supportUrl: apply(changed.supportUrl, orig.supportUrl),
+                    promotionalText: apply(changed.promotionalText, orig.promotionalText)
+                )
+            }
             savingId = nil
             withAnimation(.easeOut(duration: 0.15)) { editingId = nil; draft = nil }
-            await loadLocalizations()
         } catch {
             saveError = error.localizedDescription
             savingId = nil
