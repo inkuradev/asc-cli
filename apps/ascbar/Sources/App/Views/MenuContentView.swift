@@ -36,40 +36,46 @@ struct MenuContentView: View {
     // MARK: - Root
 
     var body: some View {
-        Group {
-            switch navigation {
-            case .main:
-                mainContent
-            case .settings:
-                SettingsContentView(
-                    showSettings: Binding(get: { true }, set: { _ in navigation = .main }),
-                    monitor: portfolio
-                )
-            case .versionDetail(let version):
-                VersionDetailView(
-                    version: version,
-                    detailRepository: detailRepository,
-                    onOpenReadiness: { navigation = .readiness(version) },
-                    onOpenLocalizations: { navigation = .localizations(version) },
-                    onBack: { navigation = .main }
-                )
-            case .readiness(let version):
-                ReadinessCheckView(
-                    version: version,
-                    detailRepository: detailRepository,
-                    onFixLocalizations: { navigation = .localizations(version) },
-                    onBack: { navigation = .versionDetail(version) }
-                )
-            case .localizations(let version):
-                VersionLocalizationsView(
-                    version: version,
-                    detailRepository: detailRepository,
-                    onBack: { navigation = .versionDetail(version) }
-                )
+        ZStack(alignment: .top) {
+            // Background as ZStack sibling (not .background modifier) — mirrors claudebar.
+            // GeometryReader's ideal height is 0, so ZStack sizing is driven solely by
+            // the content Group, eliminating the circular constraint in MenuBarExtraWindow.
+            popoverBackground
+            Group {
+                switch navigation {
+                case .main:
+                    mainContent
+                case .settings:
+                    SettingsContentView(
+                        showSettings: Binding(get: { true }, set: { _ in navigation = .main }),
+                        monitor: portfolio
+                    )
+                case .versionDetail(let version):
+                    VersionDetailView(
+                        version: version,
+                        detailRepository: detailRepository,
+                        onOpenReadiness: { navigation = .readiness(version) },
+                        onOpenLocalizations: { navigation = .localizations(version) },
+                        onBack: { navigation = .main }
+                    )
+                case .readiness(let version):
+                    ReadinessCheckView(
+                        version: version,
+                        detailRepository: detailRepository,
+                        onFixLocalizations: { navigation = .localizations(version) },
+                        onBack: { navigation = .versionDetail(version) }
+                    )
+                case .localizations(let version):
+                    VersionLocalizationsView(
+                        version: version,
+                        detailRepository: detailRepository,
+                        onBack: { navigation = .versionDetail(version) }
+                    )
+                }
             }
         }
         .frame(width: 400)
-        .background { popoverBackground }
+        .fixedSize(horizontal: false, vertical: true)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .task {
             withAnimation(.easeOut(duration: 0.4)) { animateIn = true }
@@ -517,13 +523,7 @@ struct MenuContentView: View {
             HStack(spacing: 5) {
                 Image(systemName: portfolio.isSyncing ? "arrow.triangle.2.circlepath" : "arrow.clockwise")
                     .font(.system(size: 10, weight: .bold))
-                    .rotationEffect(portfolio.isSyncing ? .degrees(360) : .zero)
-                    .animation(
-                        portfolio.isSyncing
-                            ? .linear(duration: 1.0).repeatForever(autoreverses: false)
-                            : .default,
-                        value: portfolio.isSyncing
-                    )
+                    .symbolEffect(.rotate, options: .repeat(.continuous), isActive: portfolio.isSyncing)
                 Text(portfolio.isSyncing ? "Syncing" : "Refresh")
                     .font(.system(size: 12, weight: .bold))
             }
@@ -591,21 +591,28 @@ struct MenuContentView: View {
 }
 
 // MARK: - Pulsing dot  (.dot.pulse → CSS keyframes pulse)
+//
+// Uses TimelineView instead of .repeatForever animation to avoid calling
+// requestUpdate(after:) during NSHostingView.sizeThatFits, which is the root
+// cause of the "Update Constraints in Window" constraint loop in MenuBarExtra.
 
 private struct PulsingDot: View {
     let color: Color
-    @State private var pulse = false
 
     var body: some View {
-        ZStack {
-            Circle().fill(color.opacity(0.3))
-                .frame(width: 14, height: 14)
-                .scaleEffect(pulse ? 1.6 : 1.0)
-                .opacity(pulse ? 0 : 0.7)
-                .animation(.easeOut(duration: 1.0).repeatForever(autoreverses: false), value: pulse)
-            Circle().fill(color).frame(width: 7, height: 7)
+        TimelineView(.animation(minimumInterval: 1.0 / 24)) { context in
+            let phase = context.date.timeIntervalSinceReferenceDate
+                .truncatingRemainder(dividingBy: 1.0)
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.3 * max(0, 1.0 - phase)))
+                    .scaleEffect(1.0 + 0.6 * phase)
+                Circle()
+                    .fill(color)
+                    .frame(width: 7, height: 7)
+            }
+            .frame(width: 14, height: 14)
         }
-        .onAppear { pulse = true }
     }
 }
 

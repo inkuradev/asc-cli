@@ -24,6 +24,7 @@ struct SettingsContentView: View {
                 }
                 .padding(.bottom, 4)
             }
+            .frame(maxHeight: 400)
 
             actionBar
         }
