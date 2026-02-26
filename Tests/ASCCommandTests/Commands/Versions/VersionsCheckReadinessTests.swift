@@ -33,11 +33,11 @@ struct VersionsCheckReadinessTests {
         )
     }
 
-    private func makeLocalization() -> AppStoreVersionLocalization {
+    private func makeLocalization(id: String = "loc-1", locale: String = "en-US") -> AppStoreVersionLocalization {
         AppStoreVersionLocalization(
-            id: "loc-1",
+            id: id,
             versionId: "v-123",
-            locale: "en-US",
+            locale: locale,
             description: "App description",
             keywords: "app, tool"
         )
@@ -251,6 +251,92 @@ struct VersionsCheckReadinessTests {
                 "pass" : false
               },
               "versionString" : "1.0.0"
+            }
+          ]
+        }
+        """)
+    }
+
+    @Test func `secondary locale without screenshots does not block submission`() async throws {
+        let mockVersionRepo = MockVersionRepository()
+        let mockBuildRepo = MockBuildRepository()
+        let mockReviewDetailRepo = MockReviewDetailRepository()
+        let mockLocalizationRepo = MockVersionLocalizationRepository()
+        let mockScreenshotRepo = MockScreenshotRepository()
+        let mockPricingRepo = MockPricingRepository()
+
+        given(mockVersionRepo).getVersion(id: .value("v-123")).willReturn(makeEditable())
+        given(mockBuildRepo).getBuild(id: .value("build-55")).willReturn(makeBuild())
+        given(mockPricingRepo).hasPricing(appId: .value("app-456")).willReturn(true)
+        given(mockReviewDetailRepo).getReviewDetail(versionId: .value("v-123")).willReturn(makeReviewDetail())
+        given(mockLocalizationRepo).listLocalizations(versionId: .value("v-123")).willReturn([
+            makeLocalization(id: "loc-1", locale: "en-US"),
+            makeLocalization(id: "loc-2", locale: "zh-Hans"),
+        ])
+        // Primary locale has screenshots; secondary does not
+        given(mockScreenshotRepo).listScreenshotSets(localizationId: .value("loc-1")).willReturn([makeScreenshotSet()])
+        given(mockScreenshotRepo).listScreenshotSets(localizationId: .value("loc-2")).willReturn([])
+
+        let cmd = try VersionsCheckReadiness.parse(["--version-id", "v-123", "--pretty"])
+        let output = try await cmd.execute(
+            versionRepo: mockVersionRepo,
+            buildRepo: mockBuildRepo,
+            reviewDetailRepo: mockReviewDetailRepo,
+            localizationRepo: mockLocalizationRepo,
+            screenshotRepo: mockScreenshotRepo,
+            pricingRepo: mockPricingRepo
+        )
+
+        #expect(output == """
+        {
+          "data" : [
+            {
+              "affordances" : {
+                "checkReadiness" : "asc versions check-readiness --version-id v-123",
+                "listLocalizations" : "asc version-localizations list --version-id v-123",
+                "submit" : "asc versions submit --version-id v-123"
+              },
+              "appId" : "app-456",
+              "buildCheck" : {
+                "buildVersion" : "1.2.0 (55)",
+                "linked" : true,
+                "notExpired" : true,
+                "pass" : true,
+                "valid" : true
+              },
+              "id" : "v-123",
+              "isReadyToSubmit" : true,
+              "localizations" : [
+                {
+                  "hasDescription" : true,
+                  "hasKeywords" : true,
+                  "hasSupportUrl" : false,
+                  "hasWhatsNew" : false,
+                  "locale" : "en-US",
+                  "pass" : true,
+                  "screenshotSetCount" : 1
+                },
+                {
+                  "hasDescription" : true,
+                  "hasKeywords" : true,
+                  "hasSupportUrl" : false,
+                  "hasWhatsNew" : false,
+                  "locale" : "zh-Hans",
+                  "pass" : false,
+                  "screenshotSetCount" : 0
+                }
+              ],
+              "pricingCheck" : {
+                "pass" : true
+              },
+              "reviewContactCheck" : {
+                "pass" : true
+              },
+              "state" : "PREPARE_FOR_SUBMISSION",
+              "stateCheck" : {
+                "pass" : true
+              },
+              "versionString" : "1.2.0"
             }
           ]
         }
