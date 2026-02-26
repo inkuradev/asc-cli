@@ -16,17 +16,22 @@ struct ScreenshotsListTests {
         let output = try await cmd.execute(repo: mockRepo)
 
         #expect(output == """
-        [
-          {
-            "assetState" : "COMPLETE",
-            "fileName" : "hero.png",
-            "fileSize" : 2048000,
-            "id" : "img-1",
-            "imageHeight" : 2796,
-            "imageWidth" : 1290,
-            "setId" : "set-1"
-          }
-        ]
+        {
+          "data" : [
+            {
+              "affordances" : {
+                "listScreenshots" : "asc screenshots list --set-id set-1"
+              },
+              "assetState" : "COMPLETE",
+              "fileName" : "hero.png",
+              "fileSize" : 2048000,
+              "id" : "img-1",
+              "imageHeight" : 2796,
+              "imageWidth" : 1290,
+              "setId" : "set-1"
+            }
+          ]
+        }
         """)
     }
 
@@ -40,14 +45,19 @@ struct ScreenshotsListTests {
         let output = try await cmd.execute(repo: mockRepo)
 
         #expect(output == """
-        [
-          {
-            "fileName" : "screen.png",
-            "fileSize" : 100,
-            "id" : "img-1",
-            "setId" : "set-1"
-          }
-        ]
+        {
+          "data" : [
+            {
+              "affordances" : {
+                "listScreenshots" : "asc screenshots list --set-id set-1"
+              },
+              "fileName" : "screen.png",
+              "fileSize" : 100,
+              "id" : "img-1",
+              "setId" : "set-1"
+            }
+          ]
+        }
         """)
     }
 }

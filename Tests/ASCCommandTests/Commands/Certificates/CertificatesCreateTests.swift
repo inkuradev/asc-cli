@@ -34,8 +34,20 @@ struct CertificatesCreateTests {
         ])
         let output = try await cmd.execute(repo: makeMock(id: "cert-1"))
 
-        #expect(output.contains("\"cert-1\""))
-        #expect(output.contains("MAC_APP_DISTRIBUTION"))
+        #expect(output == """
+        {
+          "data" : [
+            {
+              "affordances" : {
+                "revoke" : "asc certificates revoke --certificate-id cert-1"
+              },
+              "certificateType" : "MAC_APP_DISTRIBUTION",
+              "id" : "cert-1",
+              "name" : "Mac App Distribution"
+            }
+          ]
+        }
+        """)
     }
 
     // MARK: - --csr-path
@@ -53,7 +65,20 @@ struct CertificatesCreateTests {
         ])
         let output = try await cmd.execute(repo: makeMock(id: "cert-2"))
 
-        #expect(output.contains("\"cert-2\""))
+        #expect(output == """
+        {
+          "data" : [
+            {
+              "affordances" : {
+                "revoke" : "asc certificates revoke --certificate-id cert-2"
+              },
+              "certificateType" : "MAC_APP_DISTRIBUTION",
+              "id" : "cert-2",
+              "name" : "Mac App Distribution"
+            }
+          ]
+        }
+        """)
     }
 
     // MARK: - Validation errors

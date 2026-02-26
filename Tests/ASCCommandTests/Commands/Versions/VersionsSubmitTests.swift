@@ -6,7 +6,7 @@ import Testing
 @Suite
 struct VersionsSubmitTests {
 
-    @Test func `execute json output`() async throws {
+    @Test func `submitted version returns submission in waitingForReview state`() async throws {
         let mockRepo = MockSubmissionRepository()
         given(mockRepo).submitVersion(versionId: .any).willReturn(
             ReviewSubmission(

@@ -25,7 +25,7 @@ struct ScreenshotsUpload: AsyncParsableCommand {
         let fileURL = URL(fileURLWithPath: file)
         let screenshot = try await repo.uploadScreenshot(setId: setId, fileURL: fileURL)
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
-        return try formatter.formatItems(
+        return try formatter.formatAgentItems(
             [screenshot],
             headers: ["ID", "File Name", "Size", "Dimensions", "State"],
             rowMapper: { [

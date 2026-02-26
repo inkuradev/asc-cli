@@ -6,7 +6,7 @@ import Testing
 @Suite
 struct BuildsListTests {
 
-    @Test func `execute json output`() async throws {
+    @Test func `valid build includes TestFlight affordances`() async throws {
         let mockRepo = MockBuildRepository()
         given(mockRepo).listBuilds(appId: .any, limit: .any).willReturn(
             PaginatedResponse(data: [
@@ -35,7 +35,7 @@ struct BuildsListTests {
         """)
     }
 
-    @Test func `execute json output for expired build`() async throws {
+    @Test func `expired build has no affordances`() async throws {
         let mockRepo = MockBuildRepository()
         given(mockRepo).listBuilds(appId: .any, limit: .any).willReturn(
             PaginatedResponse(data: [

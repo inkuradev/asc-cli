@@ -70,7 +70,7 @@ struct BetaTestersListTests {
           "data" : [
             {
               "affordances" : {
-                "listSiblings" : "asc testflight testers list --group-id g-1",
+                "listTesters" : "asc testflight testers list --group-id g-1",
                 "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-1"
               },
               "email" : "jane@example.com",
@@ -101,7 +101,7 @@ struct BetaTestersListTests {
           "data" : [
             {
               "affordances" : {
-                "listSiblings" : "asc testflight testers list --group-id g-1",
+                "listTesters" : "asc testflight testers list --group-id g-1",
                 "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-1"
               },
               "firstName" : "Unknown",
@@ -131,7 +131,7 @@ struct BetaTestersAddTests {
           "data" : [
             {
               "affordances" : {
-                "listSiblings" : "asc testflight testers list --group-id g-1",
+                "listTesters" : "asc testflight testers list --group-id g-1",
                 "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-new"
               },
               "email" : "new@example.com",
@@ -184,7 +184,7 @@ struct BetaTestersImportTests {
           "data" : [
             {
               "affordances" : {
-                "listSiblings" : "asc testflight testers list --group-id g-1",
+                "listTesters" : "asc testflight testers list --group-id g-1",
                 "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-1"
               },
               "email" : "jane@example.com",
@@ -195,7 +195,7 @@ struct BetaTestersImportTests {
             },
             {
               "affordances" : {
-                "listSiblings" : "asc testflight testers list --group-id g-1",
+                "listTesters" : "asc testflight testers list --group-id g-1",
                 "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-2"
               },
               "email" : "john@example.com",
@@ -222,7 +222,21 @@ struct BetaTestersImportTests {
         let cmd = try BetaTestersImport.parse(["--group-id", "g-1", "--file", "ignored.csv", "--pretty"])
         let output = try await cmd.execute(repo: mockRepo, csvContent: csvContent)
 
-        #expect(output.contains("\"single@example.com\""))
+        #expect(output == """
+        {
+          "data" : [
+            {
+              "affordances" : {
+                "listTesters" : "asc testflight testers list --group-id g-1",
+                "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-1"
+              },
+              "email" : "single@example.com",
+              "groupId" : "g-1",
+              "id" : "t-1"
+            }
+          ]
+        }
+        """)
     }
 }
 

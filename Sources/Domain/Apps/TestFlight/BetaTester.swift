@@ -62,7 +62,7 @@ extension BetaTester: Codable {
 extension BetaTester: AffordanceProviding {
     public var affordances: [String: String] {
         [
-            "listSiblings": "asc testflight testers list --group-id \(groupId)",
+            "listTesters": "asc testflight testers list --group-id \(groupId)",
             "remove": "asc testflight testers remove --group-id \(groupId) --tester-id \(id)",
         ]
     }

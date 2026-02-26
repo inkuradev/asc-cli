@@ -28,7 +28,7 @@ struct ScreenshotsList: AsyncParsableCommand {
     func execute(repo: any ScreenshotRepository) async throws -> String {
         let screenshots = try await repo.listScreenshots(setId: setId)
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
-        return try formatter.formatItems(
+        return try formatter.formatAgentItems(
             screenshots,
             headers: ["ID", "File Name", "Size", "Dimensions", "State"],
             rowMapper: { [

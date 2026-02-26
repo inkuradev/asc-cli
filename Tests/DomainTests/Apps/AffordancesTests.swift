@@ -183,10 +183,10 @@ struct AffordancesTests {
     // MARK: - BetaTester affordances
 
     @Test
-    func `beta tester affordances include remove and listSiblings`() {
+    func `beta tester affordances include remove and listTesters`() {
         let tester = MockRepositoryFactory.makeBetaTester(id: "t-1", groupId: "g-1")
         #expect(tester.affordances["remove"] == "asc testflight testers remove --group-id g-1 --tester-id t-1")
-        #expect(tester.affordances["listSiblings"] == "asc testflight testers list --group-id g-1")
+        #expect(tester.affordances["listTesters"] == "asc testflight testers list --group-id g-1")
     }
 
     // MARK: - BetaBuildLocalization affordances
