@@ -15,7 +15,6 @@ struct SettingsContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-            Divider().background(theme.glassBorder)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
@@ -26,7 +25,6 @@ struct SettingsContentView: View {
                 .padding(.bottom, 4)
             }
 
-            Divider().background(theme.glassBorder)
             actionBar
         }
         .task { credInfo = loadCredentials() }

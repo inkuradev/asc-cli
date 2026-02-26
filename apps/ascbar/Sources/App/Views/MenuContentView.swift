@@ -78,13 +78,11 @@ struct MenuContentView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 14)
                 .padding(.bottom, 10)
-                .overlay(alignment: .bottom) { divider }
 
             if !portfolio.apps.isEmpty {
                 appPillsRow
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .overlay(alignment: .bottom) { divider }
             }
 
             contentSection
@@ -98,16 +96,12 @@ struct MenuContentView: View {
 
             actionBar
                 .padding(.horizontal, 16)
-                .padding(.top, 2)
+                .padding(.top, 10)
                 .padding(.bottom, 14)
-                .overlay(alignment: .top) { divider }
         }
         .animation(.easeOut(duration: 0.2), value: lastCopiedCommand)
     }
 
-    private var divider: some View {
-        Rectangle().fill(theme.dividerColor).frame(height: 1)
-    }
 
     // MARK: - Header  (matches .pop-header)
 
