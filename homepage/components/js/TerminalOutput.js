@@ -143,5 +143,63 @@
     appendJson(container, data);
   }
 
-  window.TerminalOutput = { render, renderJson };
+  /**
+   * Render raw text lines after a command (table / markdown / plain output).
+   * lineClass defaults to 't-dim'.
+   */
+  function renderRaw(container, cmd, lines, lineClass) {
+    container.innerHTML = '';
+    const cls = lineClass || 't-dim';
+    container.appendChild(cmdDiv(cmd));
+    lines.forEach(line => {
+      const div  = document.createElement('div');
+      div.className = 't-line t-indent';
+      const wrap = document.createElement('span');
+      wrap.innerHTML = `<span class="${esc(cls)}">${esc(line)}</span>`;
+      div.appendChild(wrap);
+      container.appendChild(div);
+    });
+    container.appendChild(blankDiv());
+    const cur = document.createElement('div');
+    cur.className = 't-line';
+    cur.innerHTML = '<span class="t-prompt">$</span> <span class="t-cursor"></span>';
+    container.appendChild(cur);
+  }
+
+  /**
+   * Render a tabbed output-format demo inside a container.
+   * tabs: [{ label, render(el) }, ...]
+   * The container should have padding:0 (tabs provide their own inner spacing).
+   */
+  function renderTabbed(container, tabs) {
+    container.innerHTML = '';
+
+    const tabBar     = document.createElement('div');
+    tabBar.className = 'format-tabs';
+
+    const contentPane     = document.createElement('div');
+    contentPane.className = 'format-tab-content';
+
+    function showTab(i) {
+      tabBar.querySelectorAll('.format-tab-btn').forEach((btn, j) => {
+        btn.classList.toggle('active', j === i);
+      });
+      contentPane.innerHTML = '';
+      tabs[i].render(contentPane);
+    }
+
+    tabs.forEach((tab, i) => {
+      const btn       = document.createElement('button');
+      btn.className   = 'format-tab-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = tab.label;
+      btn.addEventListener('click', () => showTab(i));
+      tabBar.appendChild(btn);
+    });
+
+    container.appendChild(tabBar);
+    container.appendChild(contentPane);
+    showTab(0);
+  }
+
+  window.TerminalOutput = { render, renderJson, renderRaw, renderTabbed };
 })();

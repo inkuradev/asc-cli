@@ -427,6 +427,38 @@
   line-height: 1.8;
 }
 
+/* Output format tabs (feature card tabs) */
+.format-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.format-tab-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.13);
+  color: rgba(255,255,255,0.4);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1.7;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.format-tab-btn:hover {
+  border-color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.72);
+}
+.format-tab-btn.active {
+  background: rgba(0, 255, 136, 0.1);
+  border-color: rgba(0, 255, 136, 0.38);
+  color: #00ff88;
+}
+.format-tab-content {
+  padding: 12px 14px 10px;
+}
+
 /* ---- Steps ---- */
 .steps-grid {
   display: grid;

@@ -257,19 +257,7 @@
       <div class="feature-card" data-animate="fade-up" data-delay="5">
         <div class="feature-card-preview">
           <div class="feature-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></svg></div>
-          <div class="code-snippet">
-            <div class="t-line"><span class="t-dim"># default: machine-readable JSON</span></div>
-            <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">asc apps list</span></div>
-            <div class="t-blank"></div>
-            <div class="t-line"><span class="t-dim"># human-readable table</span></div>
-            <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">asc apps list --output table</span></div>
-            <div class="t-blank"></div>
-            <div class="t-line"><span class="t-dim"># for docs / AI agents</span></div>
-            <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">asc apps list --output markdown</span></div>
-            <div class="t-blank"></div>
-            <div class="t-line"><span class="t-dim"># pipe-friendly</span></div>
-            <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">asc apps list | jq '.data[0].id'</span></div>
-          </div>
+          <div class="code-snippet" id="output-formats-demo" style="padding:0;overflow:hidden;"></div>
         </div>
         <div class="feature-card-content">
           <h3 class="feature-card-title">Formati di output multipli</h3>
@@ -440,6 +428,53 @@
 
   <script src="../components/js/TerminalOutput.js"></script>
   <script>
+    // Output formats tabbed demo
+    TerminalOutput.renderTabbed(document.getElementById('output-formats-demo'), [
+      {
+        label: 'JSON',
+        render: function(el) {
+          TerminalOutput.render(el, [{
+            cmd: 'asc apps list',
+            json: {
+              data: [{
+                id: '6748760927',
+                name: 'AppNexus',
+                bundleId: 'com.tddworks.appnexus',
+                affordances: { listVersions: 'asc versions list --app-id 6748760927' }
+              }]
+            }
+          }]);
+        }
+      },
+      {
+        label: 'table',
+        render: function(el) {
+          TerminalOutput.renderRaw(el, 'asc apps list --output table', [
+            'ID             NAME        BUNDLE ID',
+            '6748760927     AppNexus    com.tddworks.appnexus'
+          ]);
+        }
+      },
+      {
+        label: 'markdown',
+        render: function(el) {
+          TerminalOutput.renderRaw(el, 'asc apps list --output markdown', [
+            '| ID         | Name     | Bundle ID             |',
+            '| ---------- | -------- | --------------------- |',
+            '| 6748760927 | AppNexus | com.tddworks.appnexus |'
+          ]);
+        }
+      },
+      {
+        label: 'jq',
+        render: function(el) {
+          TerminalOutput.renderRaw(el, "asc apps list | jq '.data[0].id'", [
+            '"6748760927"'
+          ], 't-success');
+        }
+      }
+    ]);
+
     // CAEOAS affordances demo
     TerminalOutput.renderJson(document.getElementById('caeoas-demo'), {
       affordances: {
