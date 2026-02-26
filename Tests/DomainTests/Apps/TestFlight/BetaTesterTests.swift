@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import Domain
 
@@ -58,5 +59,34 @@ struct BetaTesterTests {
     @Test func `beta tester affordances include listTesters with groupId`() {
         let tester = MockRepositoryFactory.makeBetaTester(id: "t-1", groupId: "g-1")
         #expect(tester.affordances["listTesters"] == "asc testflight testers list --group-id g-1")
+    }
+
+    // MARK: - Codable round-trip
+
+    @Test func `decode round-trip preserves all fields including inviteType`() throws {
+        let original = BetaTester(
+            id: "t-1", groupId: "g-1",
+            firstName: "Jane", lastName: "Doe",
+            email: "jane@example.com", inviteType: .email
+        )
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(BetaTester.self, from: data)
+        #expect(decoded.id == "t-1")
+        #expect(decoded.groupId == "g-1")
+        #expect(decoded.firstName == "Jane")
+        #expect(decoded.lastName == "Doe")
+        #expect(decoded.email == "jane@example.com")
+        #expect(decoded.inviteType == .email)
+    }
+
+    @Test func `decode round-trip with nil optional fields`() throws {
+        let original = BetaTester(id: "t-2", groupId: "g-2")
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(BetaTester.self, from: data)
+        #expect(decoded.id == "t-2")
+        #expect(decoded.firstName == nil)
+        #expect(decoded.lastName == nil)
+        #expect(decoded.email == nil)
+        #expect(decoded.inviteType == nil)
     }
 }

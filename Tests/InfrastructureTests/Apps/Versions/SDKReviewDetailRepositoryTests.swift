@@ -1,4 +1,5 @@
 @preconcurrency import AppStoreConnect_Swift_SDK
+import Foundation
 import Testing
 @testable import Infrastructure
 @testable import Domain
@@ -65,5 +66,25 @@ struct SDKReviewDetailRepositoryTests {
         #expect(result.demoAccountName == "demo_user")
         #expect(result.demoAccountPassword == "secret123")
         #expect(result.hasContact == false)
+    }
+
+    @Test func `getReviewDetail returns empty detail when API throws`() async throws {
+        let repo = SDKReviewDetailRepository(client: ReviewDetailThrowingStub())
+        let result = try await repo.getReviewDetail(versionId: "v-empty")
+
+        #expect(result.id == "")
+        #expect(result.versionId == "v-empty")
+        #expect(result.contactFirstName == nil)
+        #expect(result.hasContact == false)
+        #expect(result.demoAccountRequired == false)
+    }
+}
+
+private final class ReviewDetailThrowingStub: APIClient, @unchecked Sendable {
+    func request<T: Decodable>(_ endpoint: Request<T>) async throws -> T {
+        throw URLError(.badServerResponse)
+    }
+    func request(_ endpoint: Request<Void>) async throws {
+        throw URLError(.badServerResponse)
     }
 }

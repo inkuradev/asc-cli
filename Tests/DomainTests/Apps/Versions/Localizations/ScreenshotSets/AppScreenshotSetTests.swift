@@ -106,4 +106,20 @@ struct AppScreenshotSetTests {
             )
         }
     }
+
+    // MARK: - Codable round-trip
+
+    @Test
+    func `decode round-trip preserves value fields`() throws {
+        let original = MockRepositoryFactory.makeScreenshotSet(
+            id: "set-42", localizationId: "loc-99",
+            displayType: .ipadPro3gen129, screenshotsCount: 5
+        )
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(AppScreenshotSet.self, from: data)
+        #expect(decoded.id == "set-42")
+        #expect(decoded.localizationId == "loc-99")
+        #expect(decoded.screenshotDisplayType == .ipadPro3gen129)
+        #expect(decoded.screenshotsCount == 5)
+    }
 }

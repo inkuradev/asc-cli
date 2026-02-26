@@ -77,4 +77,68 @@ struct SDKAppInfoRepositoryTests {
         #expect(result[0].name == "Mon App")
         #expect(result[0].subtitle == "Fait des choses")
     }
+
+    // MARK: - createLocalization
+
+    @Test func `createLocalization injects appInfoId into response`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppInfoLocalizationResponse(
+            data: AppInfoLocalization(
+                type: .appInfoLocalizations,
+                id: "loc-new",
+                attributes: .init(locale: "en-US", name: "My App")
+            ),
+            links: .init(this: "")
+        ))
+
+        let repo = SDKAppInfoRepository(client: stub)
+        let result = try await repo.createLocalization(appInfoId: "info-42", locale: "en-US", name: "My App")
+
+        #expect(result.id == "loc-new")
+        #expect(result.appInfoId == "info-42")
+        #expect(result.locale == "en-US")
+        #expect(result.name == "My App")
+    }
+
+    // MARK: - updateLocalization
+
+    @Test func `updateLocalization injects appInfoId from response relationships`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppInfoLocalizationResponse(
+            data: AppInfoLocalization(
+                type: .appInfoLocalizations,
+                id: "loc-1",
+                attributes: .init(locale: "en-US", name: "Updated App", subtitle: "New subtitle"),
+                relationships: .init(appInfo: .init(data: .init(type: .appInfos, id: "info-42")))
+            ),
+            links: .init(this: "")
+        ))
+
+        let repo = SDKAppInfoRepository(client: stub)
+        let result = try await repo.updateLocalization(
+            id: "loc-1", name: "Updated App", subtitle: "New subtitle", privacyPolicyUrl: nil
+        )
+
+        #expect(result.id == "loc-1")
+        #expect(result.appInfoId == "info-42")
+        #expect(result.name == "Updated App")
+        #expect(result.subtitle == "New subtitle")
+    }
+
+    @Test func `updateLocalization defaults appInfoId to empty when no relationship`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppInfoLocalizationResponse(
+            data: AppInfoLocalization(
+                type: .appInfoLocalizations,
+                id: "loc-2",
+                attributes: .init(locale: "de-DE", name: "Meine App")
+            ),
+            links: .init(this: "")
+        ))
+
+        let repo = SDKAppInfoRepository(client: stub)
+        let result = try await repo.updateLocalization(id: "loc-2", name: "Meine App", subtitle: nil, privacyPolicyUrl: nil)
+
+        #expect(result.appInfoId == "")
+    }
 }

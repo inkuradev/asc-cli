@@ -43,4 +43,28 @@ struct SDKVersionRepositoryCreateTests {
 
         #expect(result.platform == .macOS)
     }
+
+    @Test func `createVersion throws for unsupported platform`() async throws {
+        let repo = SDKVersionRepository(client: StubAPIClient())
+        await #expect(throws: (any Error).self) {
+            try await repo.createVersion(appId: "app-1", versionString: "1.0.0", platform: .watchOS)
+        }
+    }
+
+    @Test func `createVersion throws when mapped version has unknown platform`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppStoreVersionResponse(
+            data: AppStoreVersion(
+                type: .appStoreVersions,
+                id: "v-bad",
+                attributes: .init(platform: nil, versionString: "1.0.0", appStoreState: .prepareForSubmission)
+            ),
+            links: .init(this: "")
+        ))
+
+        let repo = SDKVersionRepository(client: stub)
+        await #expect(throws: (any Error).self) {
+            try await repo.createVersion(appId: "app-1", versionString: "1.0.0", platform: .iOS)
+        }
+    }
 }

@@ -63,4 +63,30 @@ struct AppStoreVersionTests {
     func `unknown platform cliArgument returns nil`() {
         #expect(AppStorePlatform(cliArgument: "unknown") == nil)
     }
+
+    // MARK: - Codable round-trip
+
+    @Test
+    func `decode round-trip preserves all fields`() throws {
+        let original = AppStoreVersion(
+            id: "v-1", appId: "app-42", versionString: "2.0.0",
+            platform: .macOS, state: .prepareForSubmission, buildId: "build-99"
+        )
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(AppStoreVersion.self, from: data)
+        #expect(decoded.id == "v-1")
+        #expect(decoded.appId == "app-42")
+        #expect(decoded.versionString == "2.0.0")
+        #expect(decoded.platform == .macOS)
+        #expect(decoded.state == .prepareForSubmission)
+        #expect(decoded.buildId == "build-99")
+    }
+
+    @Test
+    func `decode round-trip omits buildId when nil`() throws {
+        let original = AppStoreVersion(id: "v-2", appId: "app-1", versionString: "1.0.0", platform: .iOS, state: .readyForSale)
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(AppStoreVersion.self, from: data)
+        #expect(decoded.buildId == nil)
+    }
 }

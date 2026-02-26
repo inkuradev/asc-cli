@@ -33,4 +33,21 @@ struct BetaBuildLocalizationTests {
         #expect(json.contains("whatsNew"))
         #expect(json.contains("New feature added"))
     }
+
+    @Test func `decode round-trip preserves all fields`() throws {
+        let original = BetaBuildLocalization(id: "bbl-1", buildId: "build-42", locale: "en-US", whatsNew: "Bug fixes")
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(BetaBuildLocalization.self, from: data)
+        #expect(decoded.id == "bbl-1")
+        #expect(decoded.buildId == "build-42")
+        #expect(decoded.locale == "en-US")
+        #expect(decoded.whatsNew == "Bug fixes")
+    }
+
+    @Test func `decode round-trip omits whats new when nil`() throws {
+        let original = BetaBuildLocalization(id: "bbl-2", buildId: "build-1", locale: "fr-FR", whatsNew: nil)
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(BetaBuildLocalization.self, from: data)
+        #expect(decoded.whatsNew == nil)
+    }
 }

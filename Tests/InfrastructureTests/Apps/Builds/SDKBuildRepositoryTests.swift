@@ -50,4 +50,59 @@ struct SDKBuildRepositoryTests {
             #expect(result.data[0].processingState == domainState)
         }
     }
+
+    @Test func `listBuilds with appId filter returns matching builds`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(BuildsResponse(
+            data: [
+                AppStoreConnect_Swift_SDK.Build(
+                    type: .builds, id: "build-app-1",
+                    attributes: .init(version: "5", processingState: .valid)
+                ),
+            ],
+            links: .init(this: "")
+        ))
+
+        let repo = SDKBuildRepository(client: stub)
+        let result = try await repo.listBuilds(appId: "app-42", limit: nil)
+
+        #expect(result.data.count == 1)
+        #expect(result.data[0].id == "build-app-1")
+    }
+
+    // MARK: - getBuild
+
+    @Test func `getBuild maps build id version and processingState`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(BuildResponse(
+            data: AppStoreConnect_Swift_SDK.Build(
+                type: .builds, id: "build-99",
+                attributes: .init(version: "100", processingState: .valid)
+            ),
+            links: .init(this: "")
+        ))
+
+        let repo = SDKBuildRepository(client: stub)
+        let result = try await repo.getBuild(id: "build-99")
+
+        #expect(result.id == "build-99")
+        #expect(result.version == "100")
+        #expect(result.processingState == .valid)
+    }
+
+    // MARK: - addBetaGroups / removeBetaGroups
+
+    @Test func `addBetaGroups succeeds without error`() async throws {
+        let stub = StubAPIClient()
+        let repo = SDKBuildRepository(client: stub)
+        try await repo.addBetaGroups(buildId: "build-1", betaGroupIds: ["bg-1", "bg-2"])
+        #expect(stub.voidRequestCalled)
+    }
+
+    @Test func `removeBetaGroups succeeds without error`() async throws {
+        let stub = StubAPIClient()
+        let repo = SDKBuildRepository(client: stub)
+        try await repo.removeBetaGroups(buildId: "build-1", betaGroupIds: ["bg-1"])
+        #expect(stub.voidRequestCalled)
+    }
 }

@@ -35,6 +35,14 @@ struct BundleIDTests {
         #expect(BundleIDPlatform(cliArgument: "ios") == .iOS)
         #expect(BundleIDPlatform(cliArgument: "macos") == .macOS)
         #expect(BundleIDPlatform(cliArgument: "universal") == .universal)
+        #expect(BundleIDPlatform(cliArgument: "services") == .services)
         #expect(BundleIDPlatform(cliArgument: "invalid") == nil)
+    }
+
+    @Test func `bundle id platform displayName is human readable`() {
+        #expect(BundleIDPlatform.iOS.displayName == "iOS")
+        #expect(BundleIDPlatform.macOS.displayName == "macOS")
+        #expect(BundleIDPlatform.universal.displayName == "Universal")
+        #expect(BundleIDPlatform.services.displayName == "Services")
     }
 }

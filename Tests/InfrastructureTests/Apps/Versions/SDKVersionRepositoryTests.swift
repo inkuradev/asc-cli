@@ -50,4 +50,83 @@ struct SDKVersionRepositoryTests {
         #expect(result[0].versionString == "2.3.0")
         #expect(result[0].platform == .iOS)
     }
+
+    // MARK: - getVersion
+
+    @Test func `getVersion injects appId and buildId from relationships`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppStoreVersionResponse(
+            data: AppStoreVersion(
+                type: .appStoreVersions,
+                id: "v-1",
+                attributes: .init(platform: .ios, versionString: "1.0.0", appStoreState: .readyForSale),
+                relationships: .init(
+                    app: .init(data: .init(type: .apps, id: "app-42")),
+                    build: .init(data: .init(type: .builds, id: "build-99"))
+                )
+            ),
+            links: .init(this: "")
+        ))
+
+        let repo = SDKVersionRepository(client: stub)
+        let result = try await repo.getVersion(id: "v-1")
+
+        #expect(result.id == "v-1")
+        #expect(result.appId == "app-42")
+        #expect(result.buildId == "build-99")
+        #expect(result.platform == .iOS)
+    }
+
+    @Test func `getVersion defaults appId to empty string when no app relationship`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppStoreVersionResponse(
+            data: AppStoreVersion(
+                type: .appStoreVersions,
+                id: "v-2",
+                attributes: .init(platform: .macOs, versionString: "2.0.0", appStoreState: .prepareForSubmission)
+            ),
+            links: .init(this: "")
+        ))
+
+        let repo = SDKVersionRepository(client: stub)
+        let result = try await repo.getVersion(id: "v-2")
+
+        #expect(result.appId == "")
+        #expect(result.buildId == nil)
+    }
+
+    @Test func `getVersion throws when platform cannot be mapped`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppStoreVersionResponse(
+            data: AppStoreVersion(
+                type: .appStoreVersions,
+                id: "v-bad",
+                attributes: .init(platform: nil, versionString: "1.0.0", appStoreState: .readyForSale)
+            ),
+            links: .init(this: "")
+        ))
+
+        let repo = SDKVersionRepository(client: stub)
+        await #expect(throws: (any Error).self) {
+            try await repo.getVersion(id: "v-bad")
+        }
+    }
+
+    // MARK: - setBuild
+
+    @Test func `setBuild succeeds without error`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppStoreVersionResponse(
+            data: AppStoreVersion(
+                type: .appStoreVersions,
+                id: "v-1",
+                attributes: .init(platform: .ios, versionString: "1.0.0", appStoreState: .prepareForSubmission)
+            ),
+            links: .init(this: "")
+        ))
+
+        let repo = SDKVersionRepository(client: stub)
+        try await repo.setBuild(versionId: "v-1", buildId: "build-42")
+        // No error thrown = success
+    }
 }

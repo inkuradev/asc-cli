@@ -85,4 +85,24 @@ struct BuildUploadTests {
         #expect(!json.contains("warnings"))
         #expect(!json.contains("infos"))
     }
+
+    @Test func `decode round-trip preserves all fields`() throws {
+        let original = BuildUpload(
+            id: "up-1", appId: "app-1", version: "2.0", buildNumber: "99",
+            platform: .macOS, state: .failed,
+            errors: [BuildUploadStateDetail(code: "ERR", description: "Something broke")]
+        )
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(BuildUpload.self, from: data)
+        #expect(decoded.id == "up-1")
+        #expect(decoded.appId == "app-1")
+        #expect(decoded.version == "2.0")
+        #expect(decoded.buildNumber == "99")
+        #expect(decoded.platform == .macOS)
+        #expect(decoded.state == .failed)
+        #expect(decoded.errors.count == 1)
+        #expect(decoded.errors[0].code == "ERR")
+        #expect(decoded.warnings.isEmpty)
+        #expect(decoded.infos.isEmpty)
+    }
 }
