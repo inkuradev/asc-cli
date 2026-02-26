@@ -40,6 +40,20 @@ struct ProfilesListTests {
         """)
     }
 
+    @Test func `table output includes all row fields`() async throws {
+        let mockRepo = MockProfileRepository()
+        given(mockRepo).listProfiles(bundleIdId: .any, profileType: .any).willReturn([
+            Profile(id: "prof-1", name: "My Profile", profileType: .iosAppStore, profileState: .active, bundleIdId: "bid-1"),
+        ])
+
+        let cmd = try ProfilesList.parse(["--output", "table"])
+        let output = try await cmd.execute(repo: mockRepo)
+
+        #expect(output.contains("prof-1"))
+        #expect(output.contains("IOS_APP_STORE"))
+        #expect(output.contains("ACTIVE"))
+    }
+
     @Test func `invalid profile state renders in output`() async throws {
         let mockRepo = MockProfileRepository()
         given(mockRepo).listProfiles(bundleIdId: .any, profileType: .any).willReturn([

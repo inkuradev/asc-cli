@@ -33,6 +33,20 @@ struct BundleIDsListTests {
         """)
     }
 
+    @Test func `table output includes all row fields`() async throws {
+        let mockRepo = MockBundleIDRepository()
+        given(mockRepo).listBundleIDs(platform: .any, identifier: .any).willReturn([
+            BundleID(id: "bid-1", name: "My App", identifier: "com.example.app", platform: .iOS),
+        ])
+
+        let cmd = try BundleIDsList.parse(["--output", "table"])
+        let output = try await cmd.execute(repo: mockRepo)
+
+        #expect(output.contains("bid-1"))
+        #expect(output.contains("com.example.app"))
+        #expect(output.contains("iOS"))
+    }
+
     @Test func `seed id is omitted from output when not set`() async throws {
         let mockRepo = MockBundleIDRepository()
         given(mockRepo).listBundleIDs(platform: .any, identifier: .any).willReturn([

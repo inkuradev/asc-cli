@@ -35,6 +35,22 @@ struct BuildsListTests {
         """)
     }
 
+    @Test func `table output includes all row fields`() async throws {
+        let mockRepo = MockBuildRepository()
+        given(mockRepo).listBuilds(appId: .any, limit: .any).willReturn(
+            PaginatedResponse(data: [
+                Build(id: "b-1", version: "10", expired: false, processingState: .valid),
+            ], nextCursor: nil)
+        )
+
+        let cmd = try BuildsList.parse(["--output", "table"])
+        let output = try await cmd.execute(repo: mockRepo)
+
+        #expect(output.contains("b-1"))
+        #expect(output.contains("VALID"))
+        #expect(output.contains("No"))
+    }
+
     @Test func `expired build has no affordances`() async throws {
         let mockRepo = MockBuildRepository()
         given(mockRepo).listBuilds(appId: .any, limit: .any).willReturn(
