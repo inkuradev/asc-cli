@@ -33,6 +33,14 @@ struct ScreenshotSetsCreateTests {
         """)
     }
 
+    @Test func `unknown display type throws validation error`() async throws {
+        let mockRepo = MockScreenshotRepository()
+        let cmd = try ScreenshotSetsCreate.parse(["--localization-id", "loc-1", "--display-type", "INVALID_TYPE"])
+        await #expect(throws: (any Error).self) {
+            try await cmd.execute(repo: mockRepo)
+        }
+    }
+
     @Test func `created iPad Pro 3gen11 set returns correct display type`() async throws {
         let mockRepo = MockScreenshotRepository()
         given(mockRepo).createScreenshotSet(localizationId: .any, displayType: .any).willReturn(

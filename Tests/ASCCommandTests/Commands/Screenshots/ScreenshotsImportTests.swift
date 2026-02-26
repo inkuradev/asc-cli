@@ -151,6 +151,32 @@ struct ScreenshotsImportTests {
         #expect(output.isEmpty == false)
     }
 
+    @Test func `table output includes all row fields`() async throws {
+        let mockLocRepo = MockVersionLocalizationRepository()
+        let mockSsRepo = MockScreenshotRepository()
+        given(mockLocRepo).listLocalizations(versionId: .any).willReturn([
+            AppStoreVersionLocalization(id: "loc-1", versionId: "v1", locale: "en-US"),
+        ])
+        given(mockSsRepo).listScreenshotSets(localizationId: .any).willReturn([
+            AppScreenshotSet(id: "set-1", localizationId: "loc-1", screenshotDisplayType: .iphone67, repo: mockSsRepo),
+        ])
+        given(mockSsRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(
+            AppScreenshot(id: "img-1", setId: "set-1", fileName: "1.png", fileSize: 1_048_576, assetState: .complete)
+        )
+
+        let cmd = try ScreenshotsImport.parse(["--version-id", "v1", "--from", "/fake.zip", "--output", "table"])
+        let output = try await cmd.execute(
+            localizationRepo: mockLocRepo,
+            screenshotRepo: mockSsRepo,
+            manifest: makeManifest(),
+            imageURLs: makeImageURLs(["en-US/1.png"])
+        )
+
+        #expect(output.contains("img-1"))
+        #expect(output.contains("1.png"))
+        #expect(output.contains("Complete"))
+    }
+
     @Test func `import creates screenshot set when display type is not found`() async throws {
         let mockLocRepo = MockVersionLocalizationRepository()
         let mockSsRepo = MockScreenshotRepository()

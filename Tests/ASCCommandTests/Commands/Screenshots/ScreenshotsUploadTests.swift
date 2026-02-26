@@ -34,4 +34,18 @@ struct ScreenshotsUploadTests {
         }
         """)
     }
+
+    @Test func `table output includes all row fields`() async throws {
+        let mockRepo = MockScreenshotRepository()
+        given(mockRepo).uploadScreenshot(setId: .any, fileURL: .any).willReturn(
+            AppScreenshot(id: "img-1", setId: "set-1", fileName: "screen.png", fileSize: 1_048_576, assetState: .complete, imageWidth: 390, imageHeight: 844)
+        )
+
+        let cmd = try ScreenshotsUpload.parse(["--set-id", "set-1", "--file", "/tmp/screen.png", "--output", "table"])
+        let output = try await cmd.execute(repo: mockRepo)
+
+        #expect(output.contains("img-1"))
+        #expect(output.contains("screen.png"))
+        #expect(output.contains("Complete"))
+    }
 }
