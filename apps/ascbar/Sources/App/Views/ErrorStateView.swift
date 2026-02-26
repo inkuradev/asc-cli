@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 /// Error / no-auth popover state — matches the prototype's state 3 exactly.
 /// Red-tinted error box with the auth command, plus a "Set up credentials" row below.
@@ -79,34 +80,41 @@ struct ErrorStateView: View {
     // MARK: - 🔑 Set up credentials row
 
     private var credentialsRow: some View {
-        HStack(spacing: 8) {
-            Text("🔑")
-                .font(.system(size: 13))
-                .padding(6)
-                .background(
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(BaseColors.systemBlue.opacity(0.15))
-                )
+        Button(action: {
+            if let url = URL(string: "https://github.com/tddworks/asc-cli#authentication") {
+                NSWorkspace.shared.open(url)
+            }
+        }) {
+            HStack(spacing: 8) {
+                Text("🔑")
+                    .font(.system(size: 13))
+                    .padding(6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(BaseColors.systemBlue.opacity(0.15))
+                    )
 
-            Text("Set up credentials")
-                .font(.system(size: 12, weight: .medium, design: theme.fontDesign))
-                .foregroundStyle(theme.textPrimary)
+                Text("Set up credentials")
+                    .font(.system(size: 12, weight: .medium, design: theme.fontDesign))
+                    .foregroundStyle(theme.textPrimary)
 
-            Spacer()
+                Spacer()
 
-            Text("Guide ›")
-                .font(.system(size: 12, design: theme.fontDesign))
-                .foregroundStyle(theme.accentPrimary)
+                Text("Guide ›")
+                    .font(.system(size: 12, design: theme.fontDesign))
+                    .foregroundStyle(theme.accentPrimary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(theme.glassBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(theme.glassBorder, lineWidth: 1)
+                    )
+            )
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(theme.glassBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(theme.glassBorder, lineWidth: 1)
-                )
-        )
+        .buttonStyle(.plain)
     }
 }

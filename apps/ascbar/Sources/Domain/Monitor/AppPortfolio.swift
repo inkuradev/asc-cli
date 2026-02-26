@@ -2,15 +2,16 @@ import Foundation
 import Observation
 
 /// Manages the developer's portfolio of App Store Connect apps.
-/// Fetches apps and their versions on demand via the `asc` CLI,
-/// holds selection state, and orders versions by urgency (CAEOAS pattern).
+///
+/// On every refresh, versions for **all** apps are fetched in parallel so that
+/// every app pill can show its own status-coloured dot — not just the selected one.
 @Observable
 public final class AppPortfolio: @unchecked Sendable {
 
     // MARK: - State
 
     public var apps: [ASCApp] = []
-    public var versions: [ASCVersion] = []
+    public var versions: [ASCVersion] = []       // all versions for all apps
     public var selectedAppId: String? = nil
     public var isSyncing: Bool = false
     public var lastError: String? = nil
@@ -33,7 +34,7 @@ public final class AppPortfolio: @unchecked Sendable {
         apps.first { $0.id == selectedAppId }
     }
 
-    /// Versions for the selected app, ordered by urgency:
+    /// Versions for the selected app ordered by urgency:
     /// editable (action needed) → pending (in review) → live → everything else.
     public var selectedVersions: [ASCVersion] {
         guard let appId = selectedAppId else { return [] }
@@ -42,10 +43,17 @@ public final class AppPortfolio: @unchecked Sendable {
             .sorted { urgencyScore($0) > urgencyScore($1) }
     }
 
-    /// Most time-critical status across all selected app versions (drives pill dot + menu bar icon).
-    /// Priority: pending (In Review — Apple is deciding NOW) > editable > live.
+    /// Most time-critical status for the selected app (drives the menu bar icon).
     public var overallStatus: AppStatus {
-        let active = selectedVersions.filter { $0.appStatus != .removed }
+        guard let id = selectedAppId else { return .processing }
+        return statusFor(appId: id)
+    }
+
+    /// Most time-critical status for any app in the portfolio.
+    /// Priority: pending (In Review — Apple is deciding NOW) > editable > live.
+    /// Used to colour every pill dot independently.
+    public func statusFor(appId: String) -> AppStatus {
+        let active = versions.filter { $0.appId == appId && $0.appStatus != .removed }
         if active.isEmpty { return .processing }
         if active.contains(where: { $0.appStatus == .pending })  { return .pending }
         if active.contains(where: { $0.appStatus == .editable }) { return .editable }
@@ -62,7 +70,7 @@ public final class AppPortfolio: @unchecked Sendable {
 
     // MARK: - Operations
 
-    /// Fetches apps list and versions for the selected app.
+    /// Fetches the app list then fetches versions for **all** apps in parallel.
     public func refresh() async {
         isSyncing = true
         lastError = nil
@@ -73,29 +81,30 @@ public final class AppPortfolio: @unchecked Sendable {
             if selectedAppId == nil || !apps.contains(where: { $0.id == selectedAppId }) {
                 selectedAppId = apps.first?.id
             }
-            if let appId = selectedAppId {
-                versions = try await repository.fetchVersions(appId: appId)
+
+            // Parallel fetch — every app gets its versions so every pill has a colour.
+            var allVersions: [ASCVersion] = []
+            await withTaskGroup(of: [ASCVersion].self) { group in
+                for app in fetched {
+                    group.addTask { [repository] in
+                        (try? await repository.fetchVersions(appId: app.id)) ?? []
+                    }
+                }
+                for await appVersions in group {
+                    allVersions.append(contentsOf: appVersions)
+                }
             }
+            versions = allVersions
             lastSyncDate = Date()
         } catch {
             lastError = error.localizedDescription
         }
     }
 
-    /// Switches to a different app and fetches its versions.
+    /// Switches the selected app. No API call needed — all versions are already loaded.
     public func selectApp(_ appId: String) {
         guard appId != selectedAppId else { return }
         selectedAppId = appId
-        Task {
-            isSyncing = true
-            defer { isSyncing = false }
-            do {
-                versions = try await repository.fetchVersions(appId: appId)
-                lastSyncDate = Date()
-            } catch {
-                lastError = error.localizedDescription
-            }
-        }
     }
 
     /// Starts periodic background auto-refresh at the given interval.

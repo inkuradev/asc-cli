@@ -11,6 +11,7 @@ struct MenuContentView: View {
     let portfolio: AppPortfolio
 
     @Environment(\.appTheme) private var theme
+    @State private var settings = AppSettings.shared
     @State private var showSettings = false
     @State private var animateIn = false
     @State private var lastCopiedCommand: String? = nil
@@ -48,23 +49,25 @@ struct MenuContentView: View {
             // --bg-base: #1e1e20
             Color(red: 0.118, green: 0.118, blue: 0.125)
 
-            // Orb 1 — purple top-left  (--orb1: rgba(120,60,220,.35))
-            // CSS: top:-80px; left:-60px; width:220px → centre at (50, 30)
-            Circle()
-                .fill(RadialGradient(
-                    colors: [Color(red: 120/255, green: 60/255, blue: 220/255).opacity(0.35), .clear],
-                    center: .center, startRadius: 0, endRadius: 110))
-                .frame(width: 220, height: 220)
-                .position(x: 50, y: 30)
+            if settings.backgroundOrbs {
+                // Orb 1 — purple top-left  (--orb1: rgba(120,60,220,.35))
+                // CSS: top:-80px; left:-60px; width:220px → centre at (50, 30)
+                Circle()
+                    .fill(RadialGradient(
+                        colors: [Color(red: 120/255, green: 60/255, blue: 220/255).opacity(0.35), .clear],
+                        center: .center, startRadius: 0, endRadius: 110))
+                    .frame(width: 220, height: 220)
+                    .position(x: 50, y: 30)
 
-            // Orb 2 — pink bottom-right  (--orb2: rgba(220,60,120,.28))
-            // CSS: bottom:-60px; right:-40px; width:180px → centre at (w-50, h-30)
-            Circle()
-                .fill(RadialGradient(
-                    colors: [Color(red: 220/255, green: 60/255, blue: 120/255).opacity(0.28), .clear],
-                    center: .center, startRadius: 0, endRadius: 90))
-                .frame(width: 180, height: 180)
-                .position(x: proxy.size.width - 50, y: proxy.size.height - 30)
+                // Orb 2 — pink bottom-right  (--orb2: rgba(220,60,120,.28))
+                // CSS: bottom:-60px; right:-40px; width:180px → centre at (w-50, h-30)
+                Circle()
+                    .fill(RadialGradient(
+                        colors: [Color(red: 220/255, green: 60/255, blue: 120/255).opacity(0.28), .clear],
+                        center: .center, startRadius: 0, endRadius: 90))
+                    .frame(width: 180, height: 180)
+                    .position(x: proxy.size.width - 50, y: proxy.size.height - 30)
+            }
         }
     }
 
@@ -192,9 +195,8 @@ struct MenuContentView: View {
                     AppPillView(
                         app: app,
                         isSelected: portfolio.selectedAppId == app.id,
-                        statusColor: app.id == portfolio.selectedAppId
-                            ? theme.statusColor(for: portfolio.overallStatus)
-                            : theme.textTertiary,
+                        // Every pill gets its own status colour — all versions are pre-loaded.
+                        statusColor: theme.statusColor(for: portfolio.statusFor(appId: app.id)),
                         onTap: { portfolio.selectApp(app.id) }
                     )
                 }

@@ -39,6 +39,28 @@ struct AppStoreMonitorTests {
         #expect(monitor.overallStatus == .live)
     }
 
+    @Test func `statusFor returns correct status for each app independently`() async throws {
+        let mockRepo = MockAppStoreRepository()
+        given(mockRepo).fetchApps().willReturn([
+            ASCApp(id: "app1", name: "App One", bundleId: "com.example.one"),
+            ASCApp(id: "app2", name: "App Two", bundleId: "com.example.two"),
+        ])
+        // fetchVersions is called once per app — both stubs share the .any wildcard,
+        // so Mockable returns the queued values in order.
+        given(mockRepo).fetchVersions(appId: .value("app1")).willReturn([
+            ASCVersion(id: "v1", appId: "app1", versionString: "1.0", platform: "IOS", state: "WAITING_FOR_REVIEW"),
+        ])
+        given(mockRepo).fetchVersions(appId: .value("app2")).willReturn([
+            ASCVersion(id: "v2", appId: "app2", versionString: "2.0", platform: "IOS", state: "READY_FOR_SALE"),
+        ])
+        let monitor = AppPortfolio(repository: mockRepo)
+
+        await monitor.refresh()
+
+        #expect(monitor.statusFor(appId: "app1") == .pending)
+        #expect(monitor.statusFor(appId: "app2") == .live)
+    }
+
     @Test func `overallStatus is pending when both IN_REVIEW and PREPARE_FOR_SUBMISSION`() async throws {
         let mockRepo = MockAppStoreRepository()
         given(mockRepo).fetchApps().willReturn([

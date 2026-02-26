@@ -30,6 +30,12 @@ public final class AppSettings {
         }
     }
 
+    // MARK: - Notifications
+
+    public var showNotifications: Bool {
+        didSet { UserDefaults.standard.set(showNotifications, forKey: Keys.showNotifications) }
+    }
+
     // MARK: - Background Sync
 
     public var backgroundSyncEnabled: Bool {
@@ -40,6 +46,12 @@ public final class AppSettings {
         didSet { UserDefaults.standard.set(backgroundSyncInterval, forKey: Keys.backgroundSyncInterval) }
     }
 
+    // MARK: - Background Orbs
+
+    public var backgroundOrbs: Bool {
+        didSet { UserDefaults.standard.set(backgroundOrbs, forKey: Keys.backgroundOrbs) }
+    }
+
     // MARK: - Init
 
     private var isInitializing = true
@@ -47,8 +59,10 @@ public final class AppSettings {
     private init() {
         self.themeMode = UserDefaults.standard.string(forKey: Keys.themeMode) ?? "dark"
         self.launchAtLogin = SMAppService.mainApp.status == .enabled
+        self.showNotifications = UserDefaults.standard.object(forKey: Keys.showNotifications) as? Bool ?? false
         self.backgroundSyncEnabled = UserDefaults.standard.object(forKey: Keys.backgroundSyncEnabled) as? Bool ?? false
         self.backgroundSyncInterval = UserDefaults.standard.object(forKey: Keys.backgroundSyncInterval) as? TimeInterval ?? 60
+        self.backgroundOrbs = UserDefaults.standard.object(forKey: Keys.backgroundOrbs) as? Bool ?? true
         self.isInitializing = false
     }
 }
@@ -58,7 +72,9 @@ public final class AppSettings {
 private extension AppSettings {
     enum Keys {
         static let themeMode = "ascbar.themeMode"
+        static let showNotifications = "ascbar.showNotifications"
         static let backgroundSyncEnabled = "ascbar.backgroundSyncEnabled"
         static let backgroundSyncInterval = "ascbar.backgroundSyncInterval"
+        static let backgroundOrbs = "ascbar.backgroundOrbs"
     }
 }
