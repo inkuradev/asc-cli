@@ -29,7 +29,8 @@ struct IAPListTests {
             {
               "affordances" : {
                 "createLocalization" : "asc iap-localizations create --iap-id iap-1 --locale en-US --name <name>",
-                "listLocalizations" : "asc iap-localizations list --iap-id iap-1"
+                "listLocalizations" : "asc iap-localizations list --iap-id iap-1",
+                "listPricePoints" : "asc iap price-points list --iap-id iap-1"
               },
               "appId" : "app-1",
               "id" : "iap-1",

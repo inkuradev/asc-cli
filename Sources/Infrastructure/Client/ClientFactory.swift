@@ -116,6 +116,16 @@ public struct ClientFactory: Sendable {
         return SDKSubscriptionLocalizationRepository(client: provider)
     }
 
+    public func makeInAppPurchaseSubmissionRepository(authProvider: any AuthProvider) throws -> any InAppPurchaseSubmissionRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKInAppPurchaseSubmissionRepository(client: provider)
+    }
+
+    public func makeInAppPurchasePriceRepository(authProvider: any AuthProvider) throws -> any InAppPurchasePriceRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKInAppPurchasePriceRepository(client: provider)
+    }
+
     private func makeProvider(authProvider: any AuthProvider) throws -> APIProvider {
         let credentials = try authProvider.resolve()
         let strippedKey = credentials.privateKeyPEM

@@ -366,6 +366,30 @@ struct MockRepositoryFactory {
         )
     }
 
+    static func makeInAppPurchaseSubmission(
+        id: String = "sub-1",
+        iapId: String = "iap-1"
+    ) -> InAppPurchaseSubmission {
+        InAppPurchaseSubmission(id: id, iapId: iapId)
+    }
+
+    static func makeInAppPurchasePricePoint(
+        id: String = "pp-1",
+        iapId: String = "iap-1",
+        territory: String? = "USA",
+        customerPrice: String? = "0.99",
+        proceeds: String? = "0.70"
+    ) -> InAppPurchasePricePoint {
+        InAppPurchasePricePoint(id: id, iapId: iapId, territory: territory, customerPrice: customerPrice, proceeds: proceeds)
+    }
+
+    static func makeInAppPurchasePriceSchedule(
+        id: String = "sched-1",
+        iapId: String = "iap-1"
+    ) -> InAppPurchasePriceSchedule {
+        InAppPurchasePriceSchedule(id: id, iapId: iapId)
+    }
+
     static func makeInAppPurchaseLocalization(
         id: String = "iap-loc-1",
         iapId: String = "iap-1",

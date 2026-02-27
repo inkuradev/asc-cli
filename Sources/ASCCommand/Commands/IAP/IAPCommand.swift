@@ -7,6 +7,9 @@ struct IAPCommand: AsyncParsableCommand {
         subcommands: [
             IAPList.self,
             IAPCreate.self,
+            IAPSubmit.self,
+            IAPPricePointsCommand.self,
+            IAPPricesCommand.self,
         ]
     )
 }

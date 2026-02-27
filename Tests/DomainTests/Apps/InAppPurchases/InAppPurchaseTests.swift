@@ -40,6 +40,18 @@ struct InAppPurchaseTests {
         #expect(InAppPurchaseType(cliArgument: "unknown") == nil)
     }
 
+    @Test func `iap affordances include listPricePoints always`() {
+        let iap = MockRepositoryFactory.makeInAppPurchase(id: "iap-1")
+        #expect(iap.affordances["listPricePoints"] == "asc iap price-points list --iap-id iap-1")
+    }
+
+    @Test func `iap affordances include submit only when readyToSubmit`() {
+        let ready = MockRepositoryFactory.makeInAppPurchase(id: "iap-1", state: .readyToSubmit)
+        let missing = MockRepositoryFactory.makeInAppPurchase(id: "iap-2", state: .missingMetadata)
+        #expect(ready.affordances["submit"] == "asc iap submit --iap-id iap-1")
+        #expect(missing.affordances["submit"] == nil)
+    }
+
     @Test func `iap localization affordances include listSiblings`() {
         let loc = MockRepositoryFactory.makeInAppPurchaseLocalization(id: "loc-1", iapId: "iap-1")
         #expect(loc.affordances["listSiblings"] == "asc iap-localizations list --iap-id iap-1")

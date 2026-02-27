@@ -91,6 +91,75 @@ asc iap-localizations create --iap-id iap-1 --locale zh-Hans --name "金币"
 
 ---
 
+### `asc iap submit`
+
+Submit an in-app purchase for App Store review.
+
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--iap-id` | ✓ | IAP ID |
+
+```bash
+asc iap submit --iap-id iap-1
+```
+
+---
+
+### `asc iap price-points list`
+
+List available price points for an in-app purchase, optionally filtered by territory.
+
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--iap-id` | ✓ | IAP ID |
+| `--territory` | | Filter by territory code (e.g. `USA`) |
+| `--output` | | `json` (default) or `table` |
+| `--pretty` | | Pretty-print JSON |
+
+```bash
+asc iap price-points list --iap-id iap-1
+asc iap price-points list --iap-id iap-1 --territory USA --pretty
+```
+
+**JSON output:**
+```json
+{
+  "data": [
+    {
+      "affordances": {
+        "listPricePoints": "asc iap price-points list --iap-id iap-1",
+        "setPrice": "asc iap prices set --iap-id iap-1 --base-territory USA --price-point-id pp-tier1"
+      },
+      "customerPrice": "0.99",
+      "iapId": "iap-1",
+      "id": "pp-tier1",
+      "proceeds": "0.70",
+      "territory": "USA"
+    }
+  ]
+}
+```
+
+---
+
+### `asc iap prices set`
+
+Set the price schedule for an in-app purchase (base territory + auto-pricing for all other territories).
+
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--iap-id` | ✓ | IAP ID |
+| `--base-territory` | ✓ | Base territory code (e.g. `USA`) |
+| `--price-point-id` | ✓ | Price point ID from `asc iap price-points list` |
+
+```bash
+PRICE_ID=$(asc iap price-points list --iap-id iap-1 --territory USA \
+  | jq -r '.data[] | select(.customerPrice == "0.99") | .id')
+asc iap prices set --iap-id iap-1 --base-territory USA --price-point-id "$PRICE_ID"
+```
+
+---
+
 ### `asc subscription-groups list`
 
 List subscription groups for an app.
