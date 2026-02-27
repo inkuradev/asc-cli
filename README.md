@@ -298,6 +298,7 @@ Detailed documentation for each feature area:
 - [Code Signing](docs/features/code-signing.md) — bundle IDs, certificates, devices, profiles
 - [Version Check-Readiness](docs/features/version-check-readiness.md) — pre-flight submission checks
 - [In-App Purchases & Subscriptions](docs/features/iap-subscriptions.md) — IAPs (consumable, non-consumable, non-renewing); subscription groups, tiers, submit, introductory offers; per-locale metadata and pricing
+- [App Wall](docs/features/app-wall.md) — community showcase on the homepage; `apps.json` format, iTunes pre-fetch architecture, display logic
 
 ## Development
 
