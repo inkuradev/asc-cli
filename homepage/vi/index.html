@@ -276,8 +276,8 @@
           <div class="code-snippet" id="readiness-demo"></div>
         </div>
         <div class="feature-card-content">
-          <h3 class="feature-card-title">Pre-flight Check Readiness</h3>
-          <p class="feature-card-description">Run all submission checks in one command before you hit submit. Catches missing builds, unconfigured pricing, and incomplete localizations — with MUST FIX vs SHOULD FIX severity. The submit affordance only appears when everything is green.</p>
+          <h3 class="feature-card-title">Kiểm tra trước khi gửi</h3>
+          <p class="feature-card-description">Chạy tất cả kiểm tra trước khi gửi bằng một lệnh. Phát hiện bản build thiếu, giá chưa cấu hình và bản địa hóa chưa hoàn chỉnh — với mức độ MUST FIX và SHOULD FIX. Hành động gửi chỉ xuất hiện khi mọi thứ đều xanh.</p>
         </div>
       </div>
     </div>
@@ -559,7 +559,7 @@
       const loading = document.getElementById('app-wall-loading');
       if (!scroller) return;
       try {
-        const res = await fetch('apps.json');
+        const res = await fetch('../apps.json');
         if (!res.ok) throw new Error('not found');
         const data = await res.json();
 

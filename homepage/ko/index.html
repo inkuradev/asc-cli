@@ -276,8 +276,8 @@
           <div class="code-snippet" id="readiness-demo"></div>
         </div>
         <div class="feature-card-content">
-          <h3 class="feature-card-title">Pre-flight Check Readiness</h3>
-          <p class="feature-card-description">Run all submission checks in one command before you hit submit. Catches missing builds, unconfigured pricing, and incomplete localizations — with MUST FIX vs SHOULD FIX severity. The submit affordance only appears when everything is green.</p>
+          <h3 class="feature-card-title">사전 제출 확인</h3>
+          <p class="feature-card-description">제출 전에 한 명령으로 모든 검사를 실행하세요. 누락된 빌드, 미설정 가격, 불완전한 현지화를 탐지합니다 — MUST FIX와 SHOULD FIX 심각도로 구분. 모든 검사 통과 시에만 제출 기능이 활성화됩니다.</p>
         </div>
       </div>
     </div>
@@ -559,7 +559,7 @@
       const loading = document.getElementById('app-wall-loading');
       if (!scroller) return;
       try {
-        const res = await fetch('apps.json');
+        const res = await fetch('../apps.json');
         if (!res.ok) throw new Error('not found');
         const data = await res.json();
 
