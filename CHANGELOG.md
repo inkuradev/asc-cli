@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `asc iap list` — list in-app purchases (consumable, non-consumable, non-renewing subscription) for an app
+- `asc iap create` — create a new in-app purchase with reference name, product ID, and type
+- `asc iap-localizations list` — list localizations for an in-app purchase
+- `asc iap-localizations create` — create a per-locale name and description for an in-app purchase
+- `asc subscription-groups list` — list subscription groups for an app
+- `asc subscription-groups create` — create a new subscription group
+- `asc subscriptions list` — list subscriptions within a group
+- `asc subscriptions create` — create a subscription with period (ONE_WEEK–ONE_YEAR), family sharing, and group level
+- `asc subscription-localizations list` — list per-locale metadata for a subscription
+- `asc subscription-localizations create` — create a per-locale name and description for a subscription
+- `InAppPurchaseState` and `SubscriptionState` enums with semantic booleans (`isApproved`, `isLive`, `isEditable`, `isPendingReview`)
+- CAEOAS affordances on all new models linking to sibling and child commands
 - `asc app-preview-sets list` — list App Store video preview sets for a version localization
 - `asc app-preview-sets create` — create a new preview set for a specific device type
 - `asc app-previews list` — list video previews in a preview set
