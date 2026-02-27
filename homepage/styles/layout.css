@@ -727,12 +727,39 @@
 .app-wall-section {
   border-top: 1px solid var(--color-border);
 }
-.app-wall-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+.app-wall-scroller {
+  overflow: hidden;
+  width: 100%;
+  margin-bottom: 40px;
+  /* padding gives cards room to lift on hover without being clipped */
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* fade edges left/right only */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+/* Pause both rows when hovering anywhere in the scroller */
+.app-wall-scroller:hover .app-wall-track {
+  animation-play-state: paused;
+}
+.app-wall-track {
+  display: flex;
   gap: 16px;
-  max-width: 920px;
-  margin: 0 auto 40px;
+  width: max-content;
+  animation: app-wall-scroll-fwd 60s linear infinite;
+}
+.app-wall-track--rev {
+  animation-name: app-wall-scroll-rev;
+}
+@keyframes app-wall-scroll-fwd {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes app-wall-scroll-rev {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
 }
 .app-card {
   display: flex;
@@ -766,16 +793,38 @@
   line-height: 1.3;
 }
 .app-card-dev {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-size: 11px;
   font-family: var(--font-mono);
+  flex-wrap: wrap;
 }
-.app-card-dev a {
+.app-card-dev-name {
+  color: var(--color-text-tertiary);
+}
+.app-card-dev-profiles {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.app-card-profile-link {
+  display: inline-flex;
+  align-items: center;
   color: var(--color-text-tertiary);
   text-decoration: none;
   transition: color 0.2s ease;
+  line-height: 1;
 }
-.app-card-dev a:hover {
+.app-card-profile-link:hover {
   color: var(--color-accent);
+}
+.app-card-dev-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  opacity: 0.7;
 }
 .app-card-category {
   font-size: 10px;
@@ -802,7 +851,7 @@
   align-items: center;
   gap: 8px;
   padding: 48px;
-  grid-column: 1 / -1;
+  width: 100%;
 }
 .app-wall-loading-dot {
   width: 6px;
@@ -818,8 +867,8 @@
   40% { opacity: 1; transform: scale(1); }
 }
 .app-wall-empty {
-  grid-column: 1 / -1;
   text-align: center;
+  width: 100%;
   padding: 48px 20px;
   color: var(--color-text-tertiary);
   font-size: 14px;

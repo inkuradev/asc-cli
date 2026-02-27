@@ -347,12 +347,14 @@ Apps published on the App Store using asc CLI. Your app could be here!
 
 To add your app, edit [`homepage/apps.json`](homepage/apps.json) and open a pull request. Two formats are supported:
 
-**Option A — Developer ID (recommended):** Provide your Apple developer ID and all your apps are loaded automatically from the App Store.
+**Option A — Developer ID (recommended):** Provide your Apple developer ID and all your apps load automatically.
 
 ```json
 {
   "developer": "your-github-handle",
-  "developerId": "1234567890"
+  "developerId": "1234567890",
+  "github": "your-github-handle",
+  "x": "your-x-handle"
 }
 ```
 
@@ -364,13 +366,21 @@ Find your developer ID on your App Store developer page:
 ```json
 {
   "developer": "your-github-handle",
+  "github": "your-github-handle",
   "apps": [
     "https://apps.apple.com/us/app/your-app/idXXXXXXXXX"
   ]
 }
 ```
 
-Both fields can be combined. App Wall entries are displayed live at [asccli.app/#app-wall](https://asccli.app/#app-wall).
+Fields:
+- `developer` — display handle (required)
+- `developerId` — Apple developer ID, auto-loads all your apps (optional)
+- `github` — GitHub username, links the card to your GitHub profile (optional)
+- `x` — X/Twitter handle, links the card to your X profile (optional)
+- `apps` — explicit App Store URLs (optional, used if no `developerId` or to supplement it)
+
+App Wall entries are displayed live at [asccli.app/#app-wall](https://asccli.app/#app-wall).
 
 ## License
 
