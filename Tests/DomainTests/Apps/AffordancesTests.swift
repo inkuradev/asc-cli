@@ -175,9 +175,9 @@ struct AffordancesTests {
     @Test
     func `beta group affordances include listTesters importTesters and exportTesters`() {
         let group = MockRepositoryFactory.makeBetaGroup(id: "g-1", appId: "app-1")
-        #expect(group.affordances["listTesters"] == "asc testflight testers list --group-id g-1")
-        #expect(group.affordances["importTesters"] == "asc testflight testers import --group-id g-1 --file testers.csv")
-        #expect(group.affordances["exportTesters"] == "asc testflight testers export --group-id g-1")
+        #expect(group.affordances["listTesters"] == "asc testflight testers list --beta-group-id g-1")
+        #expect(group.affordances["importTesters"] == "asc testflight testers import --beta-group-id g-1 --file testers.csv")
+        #expect(group.affordances["exportTesters"] == "asc testflight testers export --beta-group-id g-1")
     }
 
     // MARK: - BetaTester affordances
@@ -185,8 +185,8 @@ struct AffordancesTests {
     @Test
     func `beta tester affordances include remove and listTesters`() {
         let tester = MockRepositoryFactory.makeBetaTester(id: "t-1", groupId: "g-1")
-        #expect(tester.affordances["remove"] == "asc testflight testers remove --group-id g-1 --tester-id t-1")
-        #expect(tester.affordances["listTesters"] == "asc testflight testers list --group-id g-1")
+        #expect(tester.affordances["remove"] == "asc testflight testers remove --beta-group-id g-1 --tester-id t-1")
+        #expect(tester.affordances["listTesters"] == "asc testflight testers list --beta-group-id g-1")
     }
 
     // MARK: - BetaBuildLocalization affordances

@@ -23,9 +23,9 @@ struct BetaGroupsListTests {
           "data" : [
             {
               "affordances" : {
-                "exportTesters" : "asc testflight testers export --group-id g-1",
-                "importTesters" : "asc testflight testers import --group-id g-1 --file testers.csv",
-                "listTesters" : "asc testflight testers list --group-id g-1"
+                "exportTesters" : "asc testflight testers export --beta-group-id g-1",
+                "importTesters" : "asc testflight testers import --beta-group-id g-1 --file testers.csv",
+                "listTesters" : "asc testflight testers list --beta-group-id g-1"
               },
               "appId" : "app-1",
               "id" : "g-1",
@@ -35,9 +35,9 @@ struct BetaGroupsListTests {
             },
             {
               "affordances" : {
-                "exportTesters" : "asc testflight testers export --group-id g-2",
-                "importTesters" : "asc testflight testers import --group-id g-2 --file testers.csv",
-                "listTesters" : "asc testflight testers list --group-id g-2"
+                "exportTesters" : "asc testflight testers export --beta-group-id g-2",
+                "importTesters" : "asc testflight testers import --beta-group-id g-2 --file testers.csv",
+                "listTesters" : "asc testflight testers list --beta-group-id g-2"
               },
               "appId" : "app-2",
               "id" : "g-2",
@@ -62,7 +62,7 @@ struct BetaTestersListTests {
             ], nextCursor: nil)
         )
 
-        let cmd = try BetaTestersList.parse(["--group-id", "g-1", "--pretty"])
+        let cmd = try BetaTestersList.parse(["--beta-group-id", "g-1", "--pretty"])
         let output = try await cmd.execute(repo: mockRepo)
 
         #expect(output == """
@@ -70,8 +70,8 @@ struct BetaTestersListTests {
           "data" : [
             {
               "affordances" : {
-                "listTesters" : "asc testflight testers list --group-id g-1",
-                "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-1"
+                "listTesters" : "asc testflight testers list --beta-group-id g-1",
+                "remove" : "asc testflight testers remove --beta-group-id g-1 --tester-id t-1"
               },
               "email" : "jane@example.com",
               "firstName" : "Jane",
@@ -93,7 +93,7 @@ struct BetaTestersListTests {
             ], nextCursor: nil)
         )
 
-        let cmd = try BetaTestersList.parse(["--group-id", "g-1", "--pretty"])
+        let cmd = try BetaTestersList.parse(["--beta-group-id", "g-1", "--pretty"])
         let output = try await cmd.execute(repo: mockRepo)
 
         #expect(output == """
@@ -101,8 +101,8 @@ struct BetaTestersListTests {
           "data" : [
             {
               "affordances" : {
-                "listTesters" : "asc testflight testers list --group-id g-1",
-                "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-1"
+                "listTesters" : "asc testflight testers list --beta-group-id g-1",
+                "remove" : "asc testflight testers remove --beta-group-id g-1 --tester-id t-1"
               },
               "firstName" : "Unknown",
               "groupId" : "g-1",
@@ -123,7 +123,7 @@ struct BetaTestersAddTests {
             BetaTester(id: "t-new", groupId: "g-1", firstName: "New", lastName: nil, email: "new@example.com", inviteType: .email)
         )
 
-        let cmd = try BetaTestersAdd.parse(["--group-id", "g-1", "--email", "new@example.com", "--first-name", "New", "--pretty"])
+        let cmd = try BetaTestersAdd.parse(["--beta-group-id", "g-1", "--email", "new@example.com", "--first-name", "New", "--pretty"])
         let output = try await cmd.execute(repo: mockRepo)
 
         #expect(output == """
@@ -131,8 +131,8 @@ struct BetaTestersAddTests {
           "data" : [
             {
               "affordances" : {
-                "listTesters" : "asc testflight testers list --group-id g-1",
-                "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-new"
+                "listTesters" : "asc testflight testers list --beta-group-id g-1",
+                "remove" : "asc testflight testers remove --beta-group-id g-1 --tester-id t-new"
               },
               "email" : "new@example.com",
               "firstName" : "New",
@@ -153,7 +153,7 @@ struct BetaTestersRemoveTests {
         let mockRepo = MockTestFlightRepository()
         given(mockRepo).removeBetaTester(groupId: .any, testerId: .any).willReturn()
 
-        let cmd = try BetaTestersRemove.parse(["--group-id", "g-1", "--tester-id", "t-1"])
+        let cmd = try BetaTestersRemove.parse(["--beta-group-id", "g-1", "--tester-id", "t-1"])
         let output = try await cmd.execute(repo: mockRepo)
 
         #expect(output == "Removed tester t-1 from group g-1")
@@ -176,7 +176,7 @@ struct BetaTestersImportTests {
         john@example.com,John,
         """
 
-        let cmd = try BetaTestersImport.parse(["--group-id", "g-1", "--file", "ignored.csv", "--pretty"])
+        let cmd = try BetaTestersImport.parse(["--beta-group-id", "g-1", "--file", "ignored.csv", "--pretty"])
         let output = try await cmd.execute(repo: mockRepo, csvContent: csvContent)
 
         #expect(output == """
@@ -184,8 +184,8 @@ struct BetaTestersImportTests {
           "data" : [
             {
               "affordances" : {
-                "listTesters" : "asc testflight testers list --group-id g-1",
-                "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-1"
+                "listTesters" : "asc testflight testers list --beta-group-id g-1",
+                "remove" : "asc testflight testers remove --beta-group-id g-1 --tester-id t-1"
               },
               "email" : "jane@example.com",
               "firstName" : "Jane",
@@ -195,8 +195,8 @@ struct BetaTestersImportTests {
             },
             {
               "affordances" : {
-                "listTesters" : "asc testflight testers list --group-id g-1",
-                "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-2"
+                "listTesters" : "asc testflight testers list --beta-group-id g-1",
+                "remove" : "asc testflight testers remove --beta-group-id g-1 --tester-id t-2"
               },
               "email" : "john@example.com",
               "firstName" : "John",
@@ -219,7 +219,7 @@ struct BetaTestersImportTests {
 
         """
 
-        let cmd = try BetaTestersImport.parse(["--group-id", "g-1", "--file", "ignored.csv", "--pretty"])
+        let cmd = try BetaTestersImport.parse(["--beta-group-id", "g-1", "--file", "ignored.csv", "--pretty"])
         let output = try await cmd.execute(repo: mockRepo, csvContent: csvContent)
 
         #expect(output == """
@@ -227,8 +227,8 @@ struct BetaTestersImportTests {
           "data" : [
             {
               "affordances" : {
-                "listTesters" : "asc testflight testers list --group-id g-1",
-                "remove" : "asc testflight testers remove --group-id g-1 --tester-id t-1"
+                "listTesters" : "asc testflight testers list --beta-group-id g-1",
+                "remove" : "asc testflight testers remove --beta-group-id g-1 --tester-id t-1"
               },
               "email" : "single@example.com",
               "groupId" : "g-1",
@@ -252,7 +252,7 @@ struct BetaTestersExportTests {
             ], nextCursor: nil)
         )
 
-        let cmd = try BetaTestersExport.parse(["--group-id", "g-1"])
+        let cmd = try BetaTestersExport.parse(["--beta-group-id", "g-1"])
         let output = try await cmd.execute(repo: mockRepo)
 
         #expect(output == """
@@ -270,7 +270,7 @@ struct BetaTestersExportTests {
             ], nextCursor: nil)
         )
 
-        let cmd = try BetaTestersExport.parse(["--group-id", "g-1"])
+        let cmd = try BetaTestersExport.parse(["--beta-group-id", "g-1"])
         let output = try await cmd.execute(repo: mockRepo)
 
         #expect(output == """

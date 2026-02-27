@@ -75,7 +75,7 @@ struct BetaTestersList: AsyncParsableCommand {
     @OptionGroup var globals: GlobalOptions
 
     @Option(name: .long, help: "Beta group ID")
-    var groupId: String
+    var betaGroupId: String
 
     @Option(name: .long, help: "Maximum number of testers to return")
     var limit: Int?
@@ -86,7 +86,7 @@ struct BetaTestersList: AsyncParsableCommand {
     }
 
     func execute(repo: any TestFlightRepository) async throws -> String {
-        let response = try await repo.listBetaTesters(groupId: groupId, limit: limit)
+        let response = try await repo.listBetaTesters(groupId: betaGroupId, limit: limit)
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
         return try formatter.formatAgentItems(
             response.data,
@@ -105,7 +105,7 @@ struct BetaTestersAdd: AsyncParsableCommand {
     @OptionGroup var globals: GlobalOptions
 
     @Option(name: .long, help: "Beta group ID")
-    var groupId: String
+    var betaGroupId: String
 
     @Option(name: .long, help: "Tester email address")
     var email: String
@@ -122,7 +122,7 @@ struct BetaTestersAdd: AsyncParsableCommand {
     }
 
     func execute(repo: any TestFlightRepository) async throws -> String {
-        let tester = try await repo.addBetaTester(groupId: groupId, email: email, firstName: firstName, lastName: lastName)
+        let tester = try await repo.addBetaTester(groupId: betaGroupId, email: email, firstName: firstName, lastName: lastName)
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
         return try formatter.formatAgentItems(
             [tester],
@@ -141,7 +141,7 @@ struct BetaTestersRemove: AsyncParsableCommand {
     @OptionGroup var globals: GlobalOptions
 
     @Option(name: .long, help: "Beta group ID")
-    var groupId: String
+    var betaGroupId: String
 
     @Option(name: .long, help: "Tester ID to remove")
     var testerId: String
@@ -152,8 +152,8 @@ struct BetaTestersRemove: AsyncParsableCommand {
     }
 
     func execute(repo: any TestFlightRepository) async throws -> String {
-        try await repo.removeBetaTester(groupId: groupId, testerId: testerId)
-        return "Removed tester \(testerId) from group \(groupId)"
+        try await repo.removeBetaTester(groupId: betaGroupId, testerId: testerId)
+        return "Removed tester \(testerId) from group \(betaGroupId)"
     }
 }
 
@@ -166,7 +166,7 @@ struct BetaTestersImport: AsyncParsableCommand {
     @OptionGroup var globals: GlobalOptions
 
     @Option(name: .long, help: "Beta group ID")
-    var groupId: String
+    var betaGroupId: String
 
     @Option(name: .long, help: "Path to CSV file with columns: email,firstName,lastName")
     var file: String
@@ -183,7 +183,7 @@ struct BetaTestersImport: AsyncParsableCommand {
         var added: [BetaTester] = []
         for entry in entries {
             let tester = try await repo.addBetaTester(
-                groupId: groupId,
+                groupId: betaGroupId,
                 email: entry.email,
                 firstName: entry.firstName,
                 lastName: entry.lastName
@@ -232,7 +232,7 @@ struct BetaTestersExport: AsyncParsableCommand {
     @OptionGroup var globals: GlobalOptions
 
     @Option(name: .long, help: "Beta group ID")
-    var groupId: String
+    var betaGroupId: String
 
     @Option(name: .long, help: "Maximum number of testers to export")
     var limit: Int?
@@ -243,7 +243,7 @@ struct BetaTestersExport: AsyncParsableCommand {
     }
 
     func execute(repo: any TestFlightRepository) async throws -> String {
-        let response = try await repo.listBetaTesters(groupId: groupId, limit: limit)
+        let response = try await repo.listBetaTesters(groupId: betaGroupId, limit: limit)
         return formatCSV(response.data)
     }
 

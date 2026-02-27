@@ -28,9 +28,9 @@ public struct BetaGroup: Sendable, Codable, Equatable, Identifiable {
 extension BetaGroup: AffordanceProviding {
     public var affordances: [String: String] {
         [
-            "exportTesters": "asc testflight testers export --group-id \(id)",
-            "importTesters": "asc testflight testers import --group-id \(id) --file testers.csv",
-            "listTesters": "asc testflight testers list --group-id \(id)",
+            "exportTesters": "asc testflight testers export --beta-group-id \(id)",
+            "importTesters": "asc testflight testers import --beta-group-id \(id) --file testers.csv",
+            "listTesters": "asc testflight testers list --beta-group-id \(id)",
         ]
     }
 }

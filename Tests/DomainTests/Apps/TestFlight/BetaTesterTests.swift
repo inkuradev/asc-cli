@@ -53,12 +53,12 @@ struct BetaTesterTests {
 
     @Test func `beta tester affordances include remove with groupId and testerId`() {
         let tester = MockRepositoryFactory.makeBetaTester(id: "t-1", groupId: "g-1")
-        #expect(tester.affordances["remove"] == "asc testflight testers remove --group-id g-1 --tester-id t-1")
+        #expect(tester.affordances["remove"] == "asc testflight testers remove --beta-group-id g-1 --tester-id t-1")
     }
 
     @Test func `beta tester affordances include listTesters with groupId`() {
         let tester = MockRepositoryFactory.makeBetaTester(id: "t-1", groupId: "g-1")
-        #expect(tester.affordances["listTesters"] == "asc testflight testers list --group-id g-1")
+        #expect(tester.affordances["listTesters"] == "asc testflight testers list --beta-group-id g-1")
     }
 
     // MARK: - Codable round-trip

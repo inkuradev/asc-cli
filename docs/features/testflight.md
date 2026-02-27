@@ -37,9 +37,9 @@ asc testflight groups list --app-id 6450406024 --pretty
       "isInternalGroup": false,
       "publicLinkEnabled": false,
       "affordances": {
-        "exportTesters": "asc testflight testers export --group-id g-abc123",
-        "importTesters": "asc testflight testers import --group-id g-abc123 --file testers.csv",
-        "listTesters": "asc testflight testers list --group-id g-abc123"
+        "exportTesters": "asc testflight testers export --beta-group-id g-abc123",
+        "importTesters": "asc testflight testers import --beta-group-id g-abc123 --file testers.csv",
+        "listTesters": "asc testflight testers list --beta-group-id g-abc123"
       }
     }
   ]
@@ -51,14 +51,14 @@ asc testflight groups list --app-id 6450406024 --pretty
 ### List Beta Testers
 
 ```bash
-asc testflight testers list --group-id <GROUP_ID> [--limit N]
+asc testflight testers list --beta-group-id <GROUP_ID> [--limit N]
 ```
 
 **Options:**
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--group-id` | *(required)* | Beta group ID |
+| `--beta-group-id` | *(required)* | Beta group ID |
 | `--limit` | *(optional)* | Maximum testers to return |
 | `--output` | `json` | Output format |
 | `--pretty` | `false` | Pretty-print JSON |
@@ -66,7 +66,7 @@ asc testflight testers list --group-id <GROUP_ID> [--limit N]
 **Example:**
 
 ```bash
-asc testflight testers list --group-id g-abc123 --pretty
+asc testflight testers list --beta-group-id g-abc123 --pretty
 ```
 
 **JSON output:**
@@ -82,8 +82,8 @@ asc testflight testers list --group-id g-abc123 --pretty
       "lastName": "Doe",
       "inviteType": "EMAIL",
       "affordances": {
-        "listSiblings": "asc testflight testers list --group-id g-abc123",
-        "remove": "asc testflight testers remove --group-id g-abc123 --tester-id t-xyz789"
+        "listSiblings": "asc testflight testers list --beta-group-id g-abc123",
+        "remove": "asc testflight testers remove --beta-group-id g-abc123 --tester-id t-xyz789"
       }
     }
   ]
@@ -97,7 +97,7 @@ asc testflight testers list --group-id g-abc123 --pretty
 Invite a new tester by email and immediately add them to the group.
 
 ```bash
-asc testflight testers add --group-id <GROUP_ID> --email <EMAIL> \
+asc testflight testers add --beta-group-id <GROUP_ID> --email <EMAIL> \
   [--first-name <NAME>] [--last-name <NAME>]
 ```
 
@@ -105,7 +105,7 @@ asc testflight testers add --group-id <GROUP_ID> --email <EMAIL> \
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--group-id` | *(required)* | Beta group ID |
+| `--beta-group-id` | *(required)* | Beta group ID |
 | `--email` | *(required)* | Tester email address |
 | `--first-name` | *(optional)* | Tester first name |
 | `--last-name` | *(optional)* | Tester last name |
@@ -114,7 +114,7 @@ asc testflight testers add --group-id <GROUP_ID> --email <EMAIL> \
 
 ```bash
 asc testflight testers add \
-  --group-id g-abc123 \
+  --beta-group-id g-abc123 \
   --email jane@example.com \
   --first-name Jane \
   --last-name Doe \
@@ -130,20 +130,20 @@ asc testflight testers add \
 Remove a tester from a group (does not delete their account).
 
 ```bash
-asc testflight testers remove --group-id <GROUP_ID> --tester-id <TESTER_ID>
+asc testflight testers remove --beta-group-id <GROUP_ID> --tester-id <TESTER_ID>
 ```
 
 **Options:**
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--group-id` | *(required)* | Beta group ID |
+| `--beta-group-id` | *(required)* | Beta group ID |
 | `--tester-id` | *(required)* | Tester ID (from `testers list`) |
 
 **Example:**
 
 ```bash
-asc testflight testers remove --group-id g-abc123 --tester-id t-xyz789
+asc testflight testers remove --beta-group-id g-abc123 --tester-id t-xyz789
 ```
 
 **Output:**
@@ -159,14 +159,14 @@ Removed tester t-xyz789 from group g-abc123
 Bulk-add testers from a CSV file. The file must have a header row with columns `email,firstName,lastName`.
 
 ```bash
-asc testflight testers import --group-id <GROUP_ID> --file <PATH>
+asc testflight testers import --beta-group-id <GROUP_ID> --file <PATH>
 ```
 
 **Options:**
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--group-id` | *(required)* | Beta group ID |
+| `--beta-group-id` | *(required)* | Beta group ID |
 | `--file` | *(required)* | Path to CSV file |
 | `--output` | `json` | Output format |
 | `--pretty` | `false` | Pretty-print JSON |
@@ -184,7 +184,7 @@ anon@example.com,,
 
 ```bash
 asc testflight testers import \
-  --group-id g-abc123 \
+  --beta-group-id g-abc123 \
   --file testers.csv \
   --pretty
 ```
@@ -198,20 +198,20 @@ asc testflight testers import \
 Export all testers in a group to CSV format (suitable for re-importing to another group).
 
 ```bash
-asc testflight testers export --group-id <GROUP_ID> [--limit N]
+asc testflight testers export --beta-group-id <GROUP_ID> [--limit N]
 ```
 
 **Options:**
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--group-id` | *(required)* | Beta group ID |
+| `--beta-group-id` | *(required)* | Beta group ID |
 | `--limit` | *(optional)* | Maximum testers to export |
 
 **Example:**
 
 ```bash
-asc testflight testers export --group-id g-abc123 > testers.csv
+asc testflight testers export --beta-group-id g-abc123 > testers.csv
 ```
 
 **Output:**
@@ -231,23 +231,23 @@ john@example.com,John,Smith
 asc testflight groups list --app-id 6450406024 --pretty
 
 # 2. List testers in a group (use affordance from step 1)
-asc testflight testers list --group-id g-abc123 --pretty
+asc testflight testers list --beta-group-id g-abc123 --pretty
 
 # 3. Add a new tester
 asc testflight testers add \
-  --group-id g-abc123 \
+  --beta-group-id g-abc123 \
   --email newbeta@example.com \
   --first-name Alex
 
 # 4. Bulk add testers from CSV
-asc testflight testers import --group-id g-abc123 --file new-testers.csv
+asc testflight testers import --beta-group-id g-abc123 --file new-testers.csv
 
 # 5. Export to seed a new group
-asc testflight testers export --group-id g-abc123 > testers.csv
-asc testflight testers import --group-id g-new456 --file testers.csv
+asc testflight testers export --beta-group-id g-abc123 > testers.csv
+asc testflight testers import --beta-group-id g-new456 --file testers.csv
 
 # 6. Remove a specific tester (use affordance "remove" from tester JSON)
-asc testflight testers remove --group-id g-abc123 --tester-id t-xyz789
+asc testflight testers remove --beta-group-id g-abc123 --tester-id t-xyz789
 ```
 
 ---
@@ -397,10 +397,10 @@ Tests/ASCCommandTests/Commands/TestFlight/
         ], nextCursor: nil)
     )
 
-    let cmd = try BetaTestersList.parse(["--group-id", "g-1", "--pretty"])
+    let cmd = try BetaTestersList.parse(["--beta-group-id", "g-1", "--pretty"])
     let output = try await cmd.execute(repo: mockRepo)
 
-    #expect(output.contains("\"remove\" : \"asc testflight testers remove --group-id g-1 --tester-id t-1\""))
+    #expect(output.contains("\"remove\" : \"asc testflight testers remove --beta-group-id g-1 --tester-id t-1\""))
 }
 ```
 
