@@ -148,17 +148,20 @@ function getCanonicalUrl(lang) {
 
 function generateHreflangLinks(currentLang) {
   const links = Object.entries(config.languages).map(([lang, cfg]) => {
-    let href;
-    if (currentLang === config.defaultLang) {
-      href = lang === config.defaultLang ? 'index.html' : cfg.output;
-    } else {
-      href = lang === config.defaultLang ? '../index.html' : `../${cfg.output}`;
-    }
-    return `<link rel="alternate" hreflang="${cfg.htmlLang}" href="${href}">`;
+    return `<link rel="alternate" hreflang="${cfg.htmlLang}" href="${getCanonicalUrl(lang)}">`;
   });
-  const defaultHref = currentLang === config.defaultLang ? 'index.html' : '../index.html';
-  links.push(`<link rel="alternate" hreflang="x-default" href="${defaultHref}">`);
+  links.push(`<link rel="alternate" hreflang="x-default" href="${config.baseUrl}/">`);
   return links.join('\n  ');
+}
+
+function generateSitemap() {
+  const today = new Date().toISOString().split('T')[0];
+  const urls = Object.entries(config.languages).map(([lang]) => {
+    const loc = getCanonicalUrl(lang);
+    const priority = lang === config.defaultLang ? '1.0' : '0.8';
+    return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+  });
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
 }
 
 function adjustAssetPaths(html, lang) {
@@ -210,6 +213,10 @@ function build() {
     fs.writeFileSync(outputPath, html, 'utf8');
     console.log(`  ✓ Created: ${langConfig.output}`);
   }
+
+  const sitemapPath = path.join(OUTPUT_DIR, 'sitemap.xml');
+  fs.writeFileSync(sitemapPath, generateSitemap(), 'utf8');
+  console.log('  ✓ Created: sitemap.xml');
 
   console.log('\nBuild complete!');
   console.log('  Preview: open homepage/index.html');

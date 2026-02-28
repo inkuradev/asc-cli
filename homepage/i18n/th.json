@@ -2,7 +2,7 @@
   "lang": "th",
   "appName": "asc",
   "meta": {
-    "title": "asc — CLI สำหรับ App Store Connect",
+    "title": "asc — ส่ง อัปโหลด และจัดการเวอร์ชัน | App Store Connect CLI",
     "description": "เครื่องมือบรรทัดคำสั่งโอเพนซอร์สสำหรับ App Store Connect ส่งแอป จัดการเวอร์ชัน อัปโหลดภาพหน้าจอ — ทั้งหมดจาก terminal รองรับ AI agent ด้วย CAEOAS",
     "keywords": "app store connect cli, asc, swift cli, ส่งแอป, homebrew, โอเพนซอร์ส",
     "ogImage": "https://asccli.app/static/og-image.png",

@@ -2,7 +2,7 @@
   "lang": "ko",
   "appName": "asc",
   "meta": {
-    "title": "asc — App Store Connect CLI",
+    "title": "asc — 버전 제출, 업로드 및 관리 | App Store Connect CLI",
     "description": "App Store Connect용 오픈소스 커맨드라인 도구. 앱 제출, 버전 관리, 스크린샷 업로드를 터미널에서. CAEOAS로 AI 에이전트 지원.",
     "keywords": "App Store Connect CLI, asc, Swift CLI, 앱 제출, Homebrew, 오픈소스",
     "ogImage": "https://asccli.app/static/og-image.png",

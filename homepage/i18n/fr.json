@@ -2,7 +2,7 @@
   "lang": "fr",
   "appName": "asc",
   "meta": {
-    "title": "asc — CLI pour App Store Connect",
+    "title": "asc — Soumettez, Uploadez et Gérez les Versions | App Store Connect CLI",
     "description": "Outil en ligne de commande open source pour App Store Connect. Soumettez des apps, gérez les versions, uploadez des captures — depuis votre terminal. Prêt pour les agents IA avec CAEOAS.",
     "keywords": "app store connect cli, asc, swift cli, soumettre app, homebrew, open source",
     "ogImage": "https://asccli.app/static/og-image.png",

@@ -2,7 +2,7 @@
   "lang": "zh-TW",
   "appName": "asc",
   "meta": {
-    "title": "asc — App Store Connect 命令列工具",
+    "title": "asc — 提交、上傳和管理版本 | App Store Connect CLI",
     "description": "開源的 App Store Connect 命令列工具。提交應用程式、管理版本、上傳截圖——全部在終端機完成。內建 CAEOAS 可供 AI 智能體調用。",
     "keywords": "App Store Connect 命令列, asc, Swift CLI, 提交應用程式, Homebrew, 開源",
     "ogImage": "https://asccli.app/static/og-image.png",

@@ -2,7 +2,7 @@
   "lang": "ru",
   "appName": "asc",
   "meta": {
-    "title": "asc — CLI для App Store Connect",
+    "title": "asc — Отправка, Загрузка и Управление Версиями | App Store Connect CLI",
     "description": "Инструмент командной строки с открытым исходным кодом для App Store Connect. Отправляйте приложения, управляйте версиями, загружайте скриншоты — всё из терминала. Поддержка ИИ-агентов через CAEOAS.",
     "keywords": "app store connect cli, asc, swift cli, отправка приложений, homebrew, открытый исходный код",
     "ogImage": "https://asccli.app/static/og-image.png",

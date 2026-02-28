@@ -2,7 +2,7 @@
   "lang": "vi",
   "appName": "asc",
   "meta": {
-    "title": "asc — CLI cho App Store Connect",
+    "title": "asc — Gửi, Tải lên và Quản lý Phiên bản | App Store Connect CLI",
     "description": "Công cụ dòng lệnh mã nguồn mở cho App Store Connect. Gửi ứng dụng, quản lý phiên bản, tải ảnh chụp màn hình — tất cả từ terminal. Sẵn sàng cho tác nhân AI với CAEOAS.",
     "keywords": "app store connect cli, asc, swift cli, gửi ứng dụng, homebrew, mã nguồn mở",
     "ogImage": "https://asccli.app/static/og-image.png",

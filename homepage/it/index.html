@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>asc — CLI per App Store Connect</title>
+  <title>asc — Invia, Carica e Gestisci Versioni | App Store Connect CLI</title>
   <meta name="description" content="Strumento da riga di comando open source per App Store Connect. Invia app, gestisci versioni, carica screenshot — tutto dal terminale. Pronto per agenti AI con CAEOAS.">
   <link rel="canonical" href="https://asccli.app/it/">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -14,7 +14,7 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://asccli.app/it/">
-  <meta property="og:title" content="asc — CLI per App Store Connect">
+  <meta property="og:title" content="asc — Invia, Carica e Gestisci Versioni | App Store Connect CLI">
   <meta property="og:description" content="Strumento da riga di comando open source per App Store Connect. Invia app, gestisci versioni, carica screenshot — tutto dal terminale. Pronto per agenti AI con CAEOAS.">
   <meta property="og:image" content="https://asccli.app/static/og-image.png">
   <meta property="og:image:alt" content="asc — Strumento CLI per App Store Connect">
@@ -27,7 +27,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://asccli.app/it/">
-  <meta name="twitter:title" content="asc — CLI per App Store Connect">
+  <meta name="twitter:title" content="asc — Invia, Carica e Gestisci Versioni | App Store Connect CLI">
   <meta name="twitter:description" content="Strumento da riga di comando open source per App Store Connect. Invia app, gestisci versioni, carica screenshot — tutto dal terminale. Pronto per agenti AI con CAEOAS.">
   <meta name="twitter:image" content="https://asccli.app/static/og-image.png">
   <meta name="twitter:image:alt" content="asc — Strumento CLI per App Store Connect">
@@ -37,19 +37,19 @@
 
   <meta name="keywords" content="app store connect cli, asc, swift cli, inviare app, homebrew, open source">
   <meta name="robots" content="index, follow">
-  <link rel="alternate" hreflang="en" href="../index.html">
-  <link rel="alternate" hreflang="zh-Hans" href="../zh/index.html">
-  <link rel="alternate" hreflang="zh-Hant" href="../zh-TW/index.html">
-  <link rel="alternate" hreflang="ja" href="../ja/index.html">
-  <link rel="alternate" hreflang="ko" href="../ko/index.html">
-  <link rel="alternate" hreflang="es" href="../es/index.html">
-  <link rel="alternate" hreflang="fr" href="../fr/index.html">
-  <link rel="alternate" hreflang="it" href="../it/index.html">
-  <link rel="alternate" hreflang="pt" href="../pt/index.html">
-  <link rel="alternate" hreflang="ru" href="../ru/index.html">
-  <link rel="alternate" hreflang="vi" href="../vi/index.html">
-  <link rel="alternate" hreflang="th" href="../th/index.html">
-  <link rel="alternate" hreflang="x-default" href="../index.html">
+  <link rel="alternate" hreflang="en" href="https://asccli.app/">
+  <link rel="alternate" hreflang="zh-Hans" href="https://asccli.app/zh/">
+  <link rel="alternate" hreflang="zh-Hant" href="https://asccli.app/zh-TW/">
+  <link rel="alternate" hreflang="ja" href="https://asccli.app/ja/">
+  <link rel="alternate" hreflang="ko" href="https://asccli.app/ko/">
+  <link rel="alternate" hreflang="es" href="https://asccli.app/es/">
+  <link rel="alternate" hreflang="fr" href="https://asccli.app/fr/">
+  <link rel="alternate" hreflang="it" href="https://asccli.app/it/">
+  <link rel="alternate" hreflang="pt" href="https://asccli.app/pt/">
+  <link rel="alternate" hreflang="ru" href="https://asccli.app/ru/">
+  <link rel="alternate" hreflang="vi" href="https://asccli.app/vi/">
+  <link rel="alternate" hreflang="th" href="https://asccli.app/th/">
+  <link rel="alternate" hreflang="x-default" href="https://asccli.app/">
 
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -936,7 +936,7 @@
           }
 
           card.innerHTML =
-            '<img class="app-card-icon" src="' + info.artworkUrl100 + '" alt="" loading="lazy">' +
+            '<img class="app-card-icon" src="' + info.artworkUrl100 + '" alt="' + info.name + ' app icon" loading="lazy" width="60" height="60">' +
             '<div class="app-card-name">' + name + '</div>' +
             '<div class="app-card-dev"><span class="app-card-dev-name">' + devDisplay + '</span><span class="app-card-dev-profiles">' + profileLinks + '</span></div>' +
             (info.primaryGenreName ? '<div class="app-card-category">' + info.primaryGenreName + '</div>' : '');
