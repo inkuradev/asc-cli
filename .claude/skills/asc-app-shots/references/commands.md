@@ -75,18 +75,26 @@ echo "Keywords: $KEYWORDS"
 ## Generate screenshots (English)
 
 ```bash
-# Zero-argument happy path — reads .asc/app-shots/app-shots-plan.json automatically
+# Zero-argument happy path — outputs at 1320×2868 (iPhone 6.9" required) by default
 asc app-shots generate
 
-# Explicit paths
+# Different App Store sizes
+asc app-shots generate --output-width 1290 --output-height 2796  # iPhone 6.7" required
+asc app-shots generate --output-width 1242 --output-height 2688  # iPhone 6.5"
+asc app-shots generate --output-width 2048 --output-height 2732  # iPad 13"
+
+# Explicit paths + size
 asc app-shots generate \
   --plan .asc/app-shots/app-shots-plan.json \
   --output-dir .asc/app-shots/output \
+  --output-width 1320 --output-height 2868 \
   screen1.png screen2.png
 
 # With explicit API key
 asc app-shots generate --gemini-api-key AIzaSy...
 ```
+
+**Output size note:** Gemini returns images at ~704×1520. The CLI automatically upscales to `--output-width` × `--output-height` using CoreGraphics with `.high` interpolation before saving.
 
 ## Translate screenshots to other locales
 
@@ -117,6 +125,8 @@ asc app-shots translate --to fr
 | `--to` | *(required, repeatable)* | Target locale(s) |
 | `--source-dir` | `.asc/app-shots/output` | Dir with existing `screen-*.png` files |
 | `--output-dir` | `.asc/app-shots/output` | Base output dir; locale subdirs created automatically |
+| `--output-width` | `1320` | Output PNG width in pixels |
+| `--output-height` | `2868` | Output PNG height in pixels |
 | `--gemini-api-key` | — | API key (flag → env var → config file) |
 | `--model` | `gemini-3.1-flash-image-preview` | Gemini model |
 

@@ -232,10 +232,10 @@ asc profiles delete --profile-id <id>
 
 # App Shots (AI Screenshot Generation & Translation)
 asc app-shots config --gemini-api-key KEY                    # save key once
-asc app-shots generate                                        # generate English PNGs (zero args)
-asc app-shots generate --plan plan.json screen1.png screen2.png  # explicit paths
-asc app-shots translate --to zh --to ja                      # translate to Chinese + Japanese
-asc app-shots translate --to ko --source-dir ./output --output-dir ./output  # explicit
+asc app-shots generate                                        # generate English PNGs at 1320×2868
+asc app-shots generate --output-width 1290 --output-height 2796  # iPhone 6.7"
+asc app-shots translate --to zh --to ja                      # localize all screens in parallel
+asc app-shots translate --to ko --output-width 1320 --output-height 2868
 
 # Interactive
 asc tui                                                               # interactive browser
