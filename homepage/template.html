@@ -16,16 +16,71 @@
   <meta property="og:title" content="{{meta.title}}">
   <meta property="og:description" content="{{meta.description}}">
   <meta property="og:image" content="{{meta.ogImage}}">
+  <meta property="og:image:alt" content="{{meta.ogImageAlt}}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:site_name" content="asc CLI">
+  <meta property="og:locale" content="{{OG_LOCALE}}">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="{{CANONICAL_URL}}">
   <meta name="twitter:title" content="{{meta.title}}">
   <meta name="twitter:description" content="{{meta.description}}">
   <meta name="twitter:image" content="{{meta.ogImage}}">
+  <meta name="twitter:image:alt" content="{{meta.ogImageAlt}}">
+
+  <meta name="apple-mobile-web-app-title" content="asc CLI">
+  <meta name="theme-color" content="#0a0a0a">
 
   <meta name="keywords" content="{{meta.keywords}}">
   <meta name="robots" content="index, follow">
   {{HREFLANG_LINKS}}
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "asc",
+    "description": "Open-source command-line tool for App Store Connect. Submit apps, manage versions, upload screenshots, manage in-app purchases, subscriptions, and code signing — all from your terminal. AI-agent ready with CAEOAS affordances.",
+    "url": "{{CANONICAL_URL}}",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "macOS, Linux",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "tddworks",
+      "url": "https://github.com/tddworks"
+    },
+    "softwareVersion": "0.1.3",
+    "license": "https://opensource.org/licenses/MIT",
+    "screenshot": "{{meta.ogImage}}",
+    "downloadUrl": "https://github.com/tddworks/asc-cli/releases",
+    "installUrl": "https://github.com/tddworks/asc-cli#installation",
+    "featureList": [
+      "AI-Agent Ready with CAEOAS affordances",
+      "App Store Connect Integration",
+      "One-Command App Submission",
+      "Pre-flight Readiness Checks",
+      "Screenshot and App Preview Management",
+      "AI Screenshot Generator",
+      "Build Upload and Distribution",
+      "TestFlight Beta Management",
+      "In-App Purchase Management",
+      "Auto-Renewable Subscriptions",
+      "Code Signing Management",
+      "Version Localization",
+      "Multiple Output Formats (JSON, Table, Markdown)",
+      "Interactive TUI Mode"
+    ]
+  }
+  </script>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

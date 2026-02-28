@@ -20,65 +20,77 @@ const config = {
     en: {
       output: 'index.html',
       htmlLang: 'en',
+      ogLocale: 'en_US',
       fontFamily: "'JetBrains Mono', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif"
     },
     zh: {
       output: 'zh/index.html',
       htmlLang: 'zh-Hans',
+      ogLocale: 'zh_CN',
       fontFamily: "'JetBrains Mono', 'Outfit', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif",
       extraFonts: 'family=Noto+Sans+SC:wght@300;400;500;600;700&'
     },
     'zh-TW': {
       output: 'zh-TW/index.html',
       htmlLang: 'zh-Hant',
+      ogLocale: 'zh_TW',
       fontFamily: "'JetBrains Mono', 'Outfit', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif",
       extraFonts: 'family=Noto+Sans+TC:wght@300;400;500;600;700&'
     },
     ja: {
       output: 'ja/index.html',
       htmlLang: 'ja',
+      ogLocale: 'ja_JP',
       fontFamily: "'JetBrains Mono', 'Outfit', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif",
       extraFonts: 'family=Noto+Sans+JP:wght@300;400;500;600;700&'
     },
     ko: {
       output: 'ko/index.html',
       htmlLang: 'ko',
+      ogLocale: 'ko_KR',
       fontFamily: "'JetBrains Mono', 'Outfit', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
       extraFonts: 'family=Noto+Sans+KR:wght@300;400;500;600;700&'
     },
     es: {
       output: 'es/index.html',
       htmlLang: 'es',
+      ogLocale: 'es_ES',
       fontFamily: "'JetBrains Mono', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif"
     },
     fr: {
       output: 'fr/index.html',
       htmlLang: 'fr',
+      ogLocale: 'fr_FR',
       fontFamily: "'JetBrains Mono', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif"
     },
     it: {
       output: 'it/index.html',
       htmlLang: 'it',
+      ogLocale: 'it_IT',
       fontFamily: "'JetBrains Mono', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif"
     },
     pt: {
       output: 'pt/index.html',
       htmlLang: 'pt',
+      ogLocale: 'pt_BR',
       fontFamily: "'JetBrains Mono', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif"
     },
     ru: {
       output: 'ru/index.html',
       htmlLang: 'ru',
+      ogLocale: 'ru_RU',
       fontFamily: "'JetBrains Mono', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif"
     },
     vi: {
       output: 'vi/index.html',
       htmlLang: 'vi',
+      ogLocale: 'vi_VN',
       fontFamily: "'JetBrains Mono', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif"
     },
     th: {
       output: 'th/index.html',
       htmlLang: 'th',
+      ogLocale: 'th_TH',
       fontFamily: "'JetBrains Mono', 'Outfit', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif",
       extraFonts: 'family=Noto+Sans+Thai:wght@300;400;500;600;700&'
     }
@@ -186,6 +198,7 @@ function build() {
     html = html.replace(/\{\{CANONICAL_URL\}\}/g, getCanonicalUrl(lang));
     html = html.replace('{{FONT_FAMILY}}', langConfig.fontFamily);
     html = html.replace('{{EXTRA_FONTS}}', langConfig.extraFonts || '');
+    html = html.replace('{{OG_LOCALE}}', langConfig.ogLocale || 'en_US');
 
     html = interpolate(html, translations, lang);
     html = adjustAssetPaths(html, lang);

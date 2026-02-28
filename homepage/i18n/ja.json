@@ -5,7 +5,8 @@
     "title": "asc — App Store Connect CLI",
     "description": "App Store Connect 用オープンソース CLI ツール。ターミナルからアプリの提出、バージョン管理、スクリーンショットのアップロードが可能。CAEOAS で AI エージェントにも対応。",
     "keywords": "App Store Connect CLI, asc, Swift CLI, アプリ提出, Homebrew, オープンソース",
-    "ogImage": "static/og-image.png"
+    "ogImage": "https://asccli.app/static/og-image.png",
+    "ogImageAlt": "asc — App Store Connect CLIツール"
   },
   "nav": {
     "features": "機能",

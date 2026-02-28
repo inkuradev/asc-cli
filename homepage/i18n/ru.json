@@ -5,7 +5,8 @@
     "title": "asc — CLI для App Store Connect",
     "description": "Инструмент командной строки с открытым исходным кодом для App Store Connect. Отправляйте приложения, управляйте версиями, загружайте скриншоты — всё из терминала. Поддержка ИИ-агентов через CAEOAS.",
     "keywords": "app store connect cli, asc, swift cli, отправка приложений, homebrew, открытый исходный код",
-    "ogImage": "static/og-image.png"
+    "ogImage": "https://asccli.app/static/og-image.png",
+    "ogImageAlt": "asc — Инструмент командной строки для App Store Connect"
   },
   "nav": {
     "features": "Возможности",

@@ -5,7 +5,8 @@
     "title": "asc — App Store Connect CLI",
     "description": "Open-source command-line tool for App Store Connect. Submit apps, manage versions, upload screenshots, and more — all from your terminal. AI-agent ready with CAEOAS affordances.",
     "keywords": "app store connect cli, asc, swift cli, appstoreconnect, submit app, homebrew, open source",
-    "ogImage": "static/og-image.png"
+    "ogImage": "https://asccli.app/static/og-image.png",
+    "ogImageAlt": "asc — App Store Connect CLI terminal tool"
   },
   "nav": {
     "features": "Features",

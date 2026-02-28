@@ -5,7 +5,8 @@
     "title": "asc — CLI สำหรับ App Store Connect",
     "description": "เครื่องมือบรรทัดคำสั่งโอเพนซอร์สสำหรับ App Store Connect ส่งแอป จัดการเวอร์ชัน อัปโหลดภาพหน้าจอ — ทั้งหมดจาก terminal รองรับ AI agent ด้วย CAEOAS",
     "keywords": "app store connect cli, asc, swift cli, ส่งแอป, homebrew, โอเพนซอร์ส",
-    "ogImage": "static/og-image.png"
+    "ogImage": "https://asccli.app/static/og-image.png",
+    "ogImageAlt": "asc — เครื่องมือบรรทัดคำสั่ง App Store Connect"
   },
   "nav": {
     "features": "คุณสมบัติ",

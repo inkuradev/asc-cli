@@ -5,7 +5,8 @@
     "title": "asc — App Store Connect 命令行工具",
     "description": "开源的 App Store Connect 命令行工具。提交应用、管理版本、上传截图——全部在终端完成。内置 CAEOAS 可供 AI 智能体调用。",
     "keywords": "App Store Connect 命令行, asc, Swift CLI, 提交应用, Homebrew, 开源",
-    "ogImage": "static/og-image.png"
+    "ogImage": "https://asccli.app/static/og-image.png",
+    "ogImageAlt": "asc — App Store Connect 命令行工具"
   },
   "nav": {
     "features": "功能",
