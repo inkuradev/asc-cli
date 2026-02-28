@@ -112,11 +112,11 @@ struct AppShotsTranslate: AsyncParsableCommand {
 
 
 LOCALIZATION REQUIREMENT: Recreate this image in \(targetLocale).
-Translate all visible text:
-  - Heading: "\(screen.heading)" → translate to \(targetLocale)
-  - Subheading: "\(screen.subheading)" → translate to \(targetLocale)
-  - Tagline: "\(plan.tagline)" → translate to \(targetLocale)
-Keep identical layout, colors, device mockup, and visual design. Only text changes.
+ONLY translate the two text overlays outside the device mockup:
+  - Heading overlay: "\(screen.heading)" → translate to \(targetLocale)
+  - Subheading overlay: "\(screen.subheading)" → translate to \(targetLocale)
+Do NOT translate any text inside the device mockup (app UI, labels, data).
+Keep identical layout, colors, device mockup, and visual design.
 """
             return ScreenConfig(
                 index: screen.index,

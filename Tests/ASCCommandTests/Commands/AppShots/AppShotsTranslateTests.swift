@@ -155,7 +155,7 @@ struct AppShotsTranslateTests {
         try? FileManager.default.removeItem(atPath: outputBase)
     }
 
-    @Test func `translate includes heading and tagline in translation instruction`() async throws {
+    @Test func `translate includes heading and subheading in instruction and guards device UI`() async throws {
         let plan = makePlan(screens: [makeScreen(index: 0)])
         let planPath = try writePlanFile(plan)
         let sourceDir = try makeSourceDir(count: 1)
@@ -179,7 +179,8 @@ struct AppShotsTranslateTests {
         let prompt = capturedPlan?.screens[0].imagePrompt ?? ""
         #expect(prompt.contains("Great Feature"))
         #expect(prompt.contains("Makes life easier"))
-        #expect(prompt.contains("Your best app"))
+        // Must NOT instruct Gemini to translate device UI content
+        #expect(prompt.contains("Do NOT translate"))
 
         try? FileManager.default.removeItem(atPath: planPath)
         try? FileManager.default.removeItem(atPath: sourceDir)
