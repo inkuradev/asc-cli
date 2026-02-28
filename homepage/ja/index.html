@@ -332,14 +332,17 @@
                 <div class="t-blank"></div>
                 <div class="t-line"><span class="t-dim"># PNG を .asc/app-shots/ に置く → 実行</span></div>
                 <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">asc app-shots generate</span></div>
+                <div class="t-line"><span class="t-dim"># 一括ローカライズ</span></div>
+                <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">asc app-shots translate \</span></div>
+                <div class="t-line"><span class="t-dim">&nbsp;&nbsp;--to zh --to ja</span></div>
                 <div class="t-blank"></div>
-                <div class="t-line"><span class="t-success">✓</span> <span class="t-dim">screen-0.png  ← hero</span></div>
-                <div class="t-line"><span class="t-success">✓</span> <span class="t-dim">screen-1.png  ← standard</span></div>
+                <div class="t-line"><span class="t-success">✓</span> <span class="t-dim">screen-0.png · 1320×2868</span></div>
+                <div class="t-line"><span class="t-success">✓</span> <span class="t-dim">zh/  ja/  ← localized</span></div>
               </div>
             </div>
             <div class="feature-card-content">
               <h3 class="feature-card-title">AIスクリーンショット生成器</h3>
-              <p class="feature-card-description">.asc/app-shots/ にスクリーンショットを置き、asc app-shots generate を実行 — Gemini AI がヒーローと標準マーケティング画像を並列生成します。asc app-shots config で Gemini キーを一度だけ保存してください。</p>
+              <p class="feature-card-description">Gemini AI で 1320×2868（iPhone 6.9"）の App Store スクリーンショットを生成。asc app-shots translate --to zh --to ja で一括ローカライズ。正確なサイズを保証します。</p>
             </div>
           </div>
 

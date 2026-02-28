@@ -131,9 +131,10 @@
     "feature17": {
       "icon": "<svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z\"/></svg>",
       "title": "AI 截圖產生器",
-      "description": "將截圖放入 .asc/app-shots/，執行 asc app-shots generate — Gemini AI 平行產生精美的主打和標準行銷圖片。透過 asc app-shots config 一次性儲存 Gemini 金鑰。",
+      "description": "使用 Gemini AI 生成 1320×2868（iPhone 6.9\"）App Store 截圖。一條指令完成本地化 — asc app-shots translate --to zh --to ja。輸出尺寸精確。",
       "comment1": "# 一次性儲存金鑰",
-      "comment2": "# 將 PNG 放入 .asc/app-shots/ → 執行"
+      "comment2": "# 將 PNG 放入 .asc/app-shots/ → 執行",
+      "comment3": "# 一條指令完成本地化"
     }
   },
   "howItWorks": {
