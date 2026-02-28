@@ -1,10 +1,11 @@
 # App Shots
 
-AI-powered App Store screenshot generation. The `asc app-shots` command uses Gemini AI to produce polished marketing PNG images from your raw app screenshots and a `ScreenPlan` JSON file.
+AI-powered App Store screenshot generation and localization. The `asc app-shots` command uses Gemini AI to produce polished marketing PNG images from your raw app screenshots and a `ScreenPlan` JSON file, and can translate them into any locale in one step.
 
-Two-step workflow:
+Three-step workflow:
 1. **`asc-app-shots` skill** — Claude fetches App Store metadata, analyzes screenshots with vision, and writes `.asc/app-shots/app-shots-plan.json`
 2. **`asc app-shots generate`** — reads the plan + screenshots, calls Gemini image generation API in parallel, writes `screen-{index}.png` to `.asc/app-shots/output/`
+3. **`asc app-shots translate`** *(optional)* — reads the English plan + generated screenshots, recreates them with translated text for each `--to` locale
 
 ---
 
@@ -57,6 +58,50 @@ asc app-shots generate --model gemini-2.0-flash-exp
 
 ---
 
+### `asc app-shots translate`
+
+Translate already-generated screenshots into one or more locales. The command modifies each screen's `imagePrompt` to include translation instructions, then calls the same Gemini generation pipeline. The existing `screen-{n}.png` files are sent as visual reference so Gemini keeps layout, colors, and device mockup identical — only text changes.
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--plan` | `.asc/app-shots/app-shots-plan.json` | Source ScreenPlan JSON |
+| `--from` | `en` | Source locale label (informational) |
+| `--to` | *(required, repeatable)* | Target locale(s): `--to zh --to ja --to ko` |
+| `--source-dir` | `.asc/app-shots/output` | Directory containing existing `screen-*.png` files |
+| `--output-dir` | `.asc/app-shots/output` | Base output directory; locale subdirs are created automatically |
+| `--gemini-api-key` | — | Gemini API key (same 3-level resolution as `generate`) |
+| `--model` | `gemini-3.1-flash-image-preview` | Gemini image generation model |
+| `--output` | `json` | Output format: `json`, `table`, `markdown` |
+
+```bash
+# Translate to Chinese and Japanese in one command
+asc app-shots translate --to zh --to ja
+
+# Explicit paths
+asc app-shots translate \
+  --plan .asc/app-shots/app-shots-plan.json \
+  --source-dir .asc/app-shots/output \
+  --output-dir .asc/app-shots/output \
+  --to zh --to ja --to ko
+```
+
+**JSON output:**
+```json
+{"data": [
+  {"locale": "ja", "screens": 2, "outputDir": ".asc/app-shots/output/ja", "affordances": {}},
+  {"locale": "zh", "screens": 2, "outputDir": ".asc/app-shots/output/zh", "affordances": {}}
+]}
+```
+
+**Table output:**
+
+| Locale | Screens | Output Dir |
+|--------|---------|------------|
+| ja | 2 | .asc/app-shots/output/ja |
+| zh | 2 | .asc/app-shots/output/zh |
+
+---
+
 ### `asc app-shots config`
 
 Manage the Gemini API key. Saves to `~/.asc/app-shots-config.json` so you never need to pass `--gemini-api-key` again.
@@ -102,11 +147,16 @@ cp ~/Screenshots/screen2.png .asc/app-shots/
 #    → Claude fetches metadata, analyzes screenshots, writes:
 #       .asc/app-shots/app-shots-plan.json
 
-# 4. Generate marketing images — zero arguments needed
+# 4. Generate English marketing images — zero arguments needed
 asc app-shots generate
 
-# 5. Find output images
+# 5. Translate to Chinese and Japanese in one command
+asc app-shots translate --to zh --to ja
+
+# 6. Find output images
 ls .asc/app-shots/output/
+# screen-0.png  screen-1.png  ja/  zh/
+ls .asc/app-shots/output/zh/
 # screen-0.png  screen-1.png
 ```
 
@@ -119,8 +169,14 @@ project/
         ├── screen2.png
         ├── app-shots-plan.json      ← written by asc-app-shots skill
         └── output/
-            ├── screen-0.png         ← generated marketing images
-            └── screen-1.png
+            ├── screen-0.png         ← English marketing images
+            ├── screen-1.png
+            ├── zh/
+            │   ├── screen-0.png     ← Chinese translations
+            │   └── screen-1.png
+            └── ja/
+                ├── screen-0.png     ← Japanese translations
+                └── screen-1.png
 ```
 
 ---
@@ -136,15 +192,20 @@ ASCCommand                     Infrastructure                   Domain
 |     --output-dir       |     |   (native Gemini API)       |  | LayoutMode                |
 |     auto-discover      |     +-----------------------------+  | ScreenColors              |
 |                        |     | FileAppShotsConfigStorage   |  | AppShotsConfig            |
-|   AppShotsConfig       |---->|   ~/.asc/app-shots-         |  | AppShotsConfigStorage     |
-|     --gemini-api-key   |     |   config.json               |  | ScreenshotGenerationRepo  |
-|     --remove           |     +-----------------------------+  +---------------------------+
+|   AppShotsTranslate    |---->|   ~/.asc/app-shots-         |  | AppShotsConfigStorage     |
+|     --to (repeatable)  |     |   config.json               |  | ScreenshotGenerationRepo  |
+|     --source-dir       |     +-----------------------------+  +---------------------------+
+|     --output-dir       |
+|                        |
+|   AppShotsConfig       |
+|     --gemini-api-key   |
+|     --remove           |
 +------------------------+
 ```
 
 - **Domain**: Pure value types (`ScreenPlan`, `ScreenConfig`, `AppShotsConfig`) and `@Mockable` protocols (`ScreenshotGenerationRepository`, `AppShotsConfigStorage`)
 - **Infrastructure**: `GeminiScreenshotGenerationRepository` calls the native Gemini `generateContent` API (`?key=` query param, `responseModalities: ["TEXT","IMAGE"]`, parallel `TaskGroup`). `FileAppShotsConfigStorage` reads/writes JSON to `~/.asc/app-shots-config.json`
-- **ASCCommand**: `AppShotsGenerate` auto-discovers screenshots from the plan directory when none are provided; `AppShotsConfig` mirrors the `asc auth login` pattern
+- **ASCCommand**: `AppShotsGenerate` auto-discovers screenshots from the plan directory when none are provided; `AppShotsTranslate` modifies each screen's `imagePrompt` with a translation instruction and processes locales in parallel; `AppShotsConfig` mirrors the `asc auth login` pattern
 
 ---
 
@@ -258,6 +319,7 @@ Sources/
 └── ASCCommand/Commands/AppShots/
     ├── AppShotsCommand.swift
     ├── AppShotsGenerate.swift
+    ├── AppShotsTranslate.swift
     └── AppShotsConfig.swift
 ```
 
@@ -273,6 +335,7 @@ Tests/
 │   └── FileAppShotsConfigStorageTests.swift
 └── ASCCommandTests/Commands/AppShots/
     ├── AppShotsGenerateTests.swift
+    ├── AppShotsTranslateTests.swift
     └── AppShotsConfigTests.swift
 ```
 
@@ -332,8 +395,9 @@ Run tests:
 ```bash
 swift test --filter 'AppShotsConfigTests'     # Domain + command config tests (21)
 swift test --filter 'AppShotsGenerateTests'   # Command generate tests (7)
+swift test --filter 'AppShotsTranslateTests'  # Command translate tests (8)
 swift test --filter 'GeminiScreenshot'        # Infrastructure tests (8)
-swift test --filter 'AppShots'               # All app-shots tests (36)
+swift test --filter 'AppShots'               # All app-shots tests (44)
 ```
 
 ---
