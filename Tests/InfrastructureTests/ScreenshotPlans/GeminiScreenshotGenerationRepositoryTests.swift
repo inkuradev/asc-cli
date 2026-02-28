@@ -147,7 +147,7 @@ struct GeminiScreenshotGenerationRepositoryTests {
 
         let bodyData = stub.lastRequest?.httpBody ?? Data()
         let bodyJSON = try JSONSerialization.jsonObject(with: bodyData) as? [String: Any]
-        #expect(bodyJSON?["model"] as? String == "gemini-2.0-flash-preview-image-generation")
+        #expect(bodyJSON?["model"] as? String == "gemini-3.1-flash-image-preview")
     }
 
     @Test func `generateImages throws on HTTP error`() async throws {
