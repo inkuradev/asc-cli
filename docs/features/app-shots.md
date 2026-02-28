@@ -21,17 +21,29 @@ Generate marketing PNG images using Gemini AI. Reads a `ScreenPlan` JSON file, d
 | `--gemini-api-key` | — | Gemini API key (falls back to `GEMINI_API_KEY` env var, then stored config) |
 | `--model` | `gemini-3.1-flash-image-preview` | Gemini image generation model |
 | `--output-dir` | `.asc/app-shots/output` | Directory to write generated PNG files |
-| `--output-width` | `1320` | Output PNG width in pixels (iPhone 6.9" required) |
-| `--output-height` | `2868` | Output PNG height in pixels (iPhone 6.9" required) |
+| `--output-width` | `1320` | Output PNG width in pixels — see [Device Sizes](#device-sizes) |
+| `--output-height` | `2868` | Output PNG height in pixels — see [Device Sizes](#device-sizes) |
 | `<screenshots>` | *(auto-discovered)* | Screenshot files; omit to auto-discover `*.png/*.jpg` from plan directory |
 | `--output` | `json` | Output format: `json`, `table`, `markdown` |
 | `--pretty` | — | Pretty-print JSON output |
 
 ```bash
-# Zero-argument happy path (screenshots in .asc/app-shots/)
+# Zero-argument happy path — iPhone 6.9" (APP_IPHONE_69) at 1320×2868 by default
 asc app-shots generate
 
-# Explicit paths
+# iPhone 6.7" (APP_IPHONE_67) — also Required
+asc app-shots generate --output-width 1290 --output-height 2796
+
+# iPhone 6.5" (APP_IPHONE_65)
+asc app-shots generate --output-width 1242 --output-height 2688
+
+# iPhone 5.5" (APP_IPHONE_55)
+asc app-shots generate --output-width 1242 --output-height 2208
+
+# iPad 13" (APP_IPAD_PRO_129)
+asc app-shots generate --output-width 2048 --output-height 2732
+
+# Explicit plan + screenshots
 asc app-shots generate \
   --plan .asc/app-shots/app-shots-plan.json \
   --output-dir .asc/app-shots/output \
@@ -71,8 +83,8 @@ Translate already-generated screenshots into one or more locales. The command mo
 | `--to` | *(required, repeatable)* | Target locale(s): `--to zh --to ja --to ko` |
 | `--source-dir` | `.asc/app-shots/output` | Directory containing existing `screen-*.png` files |
 | `--output-dir` | `.asc/app-shots/output` | Base output directory; locale subdirs are created automatically |
-| `--output-width` | `1320` | Output PNG width in pixels |
-| `--output-height` | `2868` | Output PNG height in pixels |
+| `--output-width` | `1320` | Output PNG width in pixels — see [Device Sizes](#device-sizes) |
+| `--output-height` | `2868` | Output PNG height in pixels — see [Device Sizes](#device-sizes) |
 | `--gemini-api-key` | — | Gemini API key (same 3-level resolution as `generate`) |
 | `--model` | `gemini-3.1-flash-image-preview` | Gemini image generation model |
 | `--output` | `json` | Output format: `json`, `table`, `markdown` |
@@ -133,6 +145,52 @@ asc app-shots config --remove
 2. `$GEMINI_API_KEY` environment variable
 3. `~/.asc/app-shots-config.json` (set via `asc app-shots config`)
 4. Error with instructions
+
+---
+
+## Device Sizes
+
+`--output-width` and `--output-height` control the final PNG dimensions. Gemini returns images at ~704×1520; the CLI upscales to the target size using CoreGraphics before writing.
+
+**Required sizes** must be present for App Store submission. Optional sizes cover older or additional devices.
+
+### iPhone
+
+| Display Type | Device | `--output-width` | `--output-height` | App Store |
+|---|---|---|---|---|
+| `APP_IPHONE_69` | iPhone 6.9" | `1320` | `2868` | ✅ Required |
+| `APP_IPHONE_67` | iPhone 6.7" | `1290` | `2796` | ✅ Required |
+| `APP_IPHONE_65` | iPhone 6.5" | `1242` | `2688` | Optional |
+| `APP_IPHONE_61` | iPhone 6.1" | `1179` | `2556` | Optional |
+| `APP_IPHONE_58` | iPhone 5.8" | `1125` | `2436` | Optional |
+| `APP_IPHONE_55` | iPhone 5.5" | `1242` | `2208` | Optional |
+| `APP_IPHONE_47` | iPhone 4.7" | `750` | `1334` | Optional |
+| `APP_IPHONE_40` | iPhone 4.0" | `640` | `1136` | Optional |
+| `APP_IPHONE_35` | iPhone 3.5" | `640` | `960` | Optional |
+
+### iPad
+
+| Display Type | Device | `--output-width` | `--output-height` | App Store |
+|---|---|---|---|---|
+| `APP_IPAD_PRO_129` | iPad 13" (12.9") | `2048` | `2732` | ✅ Required |
+| `APP_IPAD_PRO_3GEN_11` | iPad 11" | `1668` | `2388` | Optional |
+| `APP_IPAD_105` | iPad 10.5" | `1668` | `2224` | Optional |
+| `APP_IPAD_97` | iPad 9.7" | `1536` | `2048` | Optional |
+
+### Other Platforms
+
+| Display Type | Device | `--output-width` | `--output-height` |
+|---|---|---|---|
+| `APP_APPLE_TV` | Apple TV | `1920` | `1080` |
+| `APP_DESKTOP` | Mac | `2560` | `1600` |
+| `APP_APPLE_VISION_PRO` | Apple Vision Pro | `3840` | `2160` |
+
+> **Tip:** Generate each size in sequence — same plan, different `--output-dir`:
+> ```bash
+> asc app-shots generate --output-width 1320 --output-height 2868 --output-dir .asc/app-shots/output/iphone-69
+> asc app-shots generate --output-width 1290 --output-height 2796 --output-dir .asc/app-shots/output/iphone-67
+> asc app-shots generate --output-width 2048 --output-height 2732 --output-dir .asc/app-shots/output/ipad-13
+> ```
 
 ---
 
@@ -407,6 +465,48 @@ swift test --filter 'AppShots'               # All app-shots tests (44)
 ---
 
 ## Extending
+
+**Add `--device-type` flag that resolves dimensions automatically:**
+
+Map the display type constant to `(width, height)` so users write `--device-type APP_IPHONE_69` instead of `--output-width 1320 --output-height 2868`:
+
+```swift
+// In AppShotsGenerate.swift
+enum AppShotsDeviceType: String, CaseIterable, ExpressibleByArgument {
+    case iphone69 = "APP_IPHONE_69"
+    case iphone67 = "APP_IPHONE_67"
+    case iphone65 = "APP_IPHONE_65"
+    case iphone55 = "APP_IPHONE_55"
+    case ipadPro129 = "APP_IPAD_PRO_129"
+    // …
+
+    var dimensions: (width: Int, height: Int) {
+        switch self {
+        case .iphone69:   return (1320, 2868)
+        case .iphone67:   return (1290, 2796)
+        case .iphone65:   return (1242, 2688)
+        case .iphone55:   return (1242, 2208)
+        case .ipadPro129: return (2048, 2732)
+        }
+    }
+}
+
+@Option(name: .long) var deviceType: AppShotsDeviceType?
+
+// Resolve: --device-type overrides explicit width/height
+if let device = deviceType {
+    outputWidth  = device.dimensions.width
+    outputHeight = device.dimensions.height
+}
+```
+
+Usage:
+```bash
+asc app-shots generate --device-type APP_IPHONE_69
+asc app-shots generate --device-type APP_IPAD_PRO_129
+```
+
+---
 
 **Add `--locale` to fetch from a localized plan:**
 
