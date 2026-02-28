@@ -26,7 +26,7 @@ let project = Project(
             name: "Domain",
             destinations: .macOS,
             product: .staticFramework,
-            bundleId: "com.hanrenwei.ascbar.domain",
+            bundleId: "com.tddworks.ascbar.domain",
             deploymentTargets: .macOS("15.0"),
             sources: ["Sources/Domain/**"],
             dependencies: [
@@ -45,7 +45,7 @@ let project = Project(
             name: "Infrastructure",
             destinations: .macOS,
             product: .staticFramework,
-            bundleId: "com.hanrenwei.ascbar.infrastructure",
+            bundleId: "com.tddworks.ascbar.infrastructure",
             deploymentTargets: .macOS("15.0"),
             sources: ["Sources/Infrastructure/**"],
             dependencies: [
@@ -65,7 +65,7 @@ let project = Project(
             name: "ASCBar",
             destinations: .macOS,
             product: .app,
-            bundleId: "com.hanrenwei.ascbar",
+            bundleId: "com.tddworks.ascbar",
             deploymentTargets: .macOS("15.0"),
             infoPlist: .file(path: "Sources/App/Info.plist"),
             sources: ["Sources/App/**"],
@@ -91,7 +91,7 @@ let project = Project(
             name: "DomainTests",
             destinations: .macOS,
             product: .unitTests,
-            bundleId: "com.hanrenwei.ascbar.domain-tests",
+            bundleId: "com.tddworks.ascbar.domain-tests",
             deploymentTargets: .macOS("15.0"),
             sources: ["Tests/DomainTests/**"],
             dependencies: [

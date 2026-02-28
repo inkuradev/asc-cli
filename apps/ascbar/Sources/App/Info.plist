@@ -7,7 +7,7 @@
     <key>CFBundleExecutable</key>
     <string>ASCBar</string>
     <key>CFBundleIdentifier</key>
-    <string>com.hanrenwei.ascbar</string>
+    <string>com.tddworks.ascbar</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
