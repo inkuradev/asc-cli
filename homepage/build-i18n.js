@@ -169,8 +169,11 @@ function adjustAssetPaths(html, lang) {
   return html
     .replace(/href="static\//g, 'href="../static/')
     .replace(/src="static\//g, 'src="../static/')
+    .replace(/srcset="static\//g, 'srcset="../static/')
     .replace(/href="styles\//g, 'href="../styles/')
-    .replace(/src="components\//g, 'src="../components/');
+    .replace(/src="components\//g, 'src="../components/')
+    .replace(/href="favicon\.ico"/g, 'href="../favicon.ico"')
+    .replace(/href="manifest\.json"/g, 'href="../manifest.json"');
 }
 
 function build() {
