@@ -8,7 +8,8 @@ The `ScreenPlan` is the core data structure written by the `asc-app-shots` skill
 {
   "appId": "string — App Store app ID (e.g. '6736834466')",
   "appName": "string — localized app name from AppInfoLocalization",
-  "tagline": "string — 5-8 word marketing tagline for the app",
+  "tagline": "string — subtitle from AppInfoLocalization (or a 5-8 word marketing tagline)",
+  "appDescription": "string (optional) — 2-3 sentence summary of app purpose + target audience, ≤200 chars. Summarized from AppStoreVersionLocalization.description. Omit if unavailable.",
   "tone": "string — one of: minimal | playful | professional | bold | elegant",
   "colors": {
     "primary": "string — hex color for background (e.g. '#0a0a0a')",
@@ -89,6 +90,7 @@ Bold [color] heading '[EXACT heading text]' [placement], with [color] subtext '[
   "appId": "6736834466",
   "appName": "TaskFlow",
   "tagline": "Organize your life, effortlessly",
+  "appDescription": "TaskFlow helps professionals manage tasks, projects, and deadlines in one place. Built for teams and individuals who want focus without the clutter.",
   "tone": "minimal",
   "colors": {
     "primary": "#0a0a0a",
