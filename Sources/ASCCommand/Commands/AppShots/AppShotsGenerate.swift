@@ -11,8 +11,8 @@ struct AppShotsGenerate: AsyncParsableCommand {
 
     @OptionGroup var globals: GlobalOptions
 
-    @Option(name: .long, help: "Path to plan.json written by the asc-app-shots skill")
-    var plan: String
+    @Option(name: .long, help: "Path to plan.json (default: .asc/app-shots/app-shots-plan.json)")
+    var plan: String = ".asc/app-shots/app-shots-plan.json"
 
     @Option(name: .long, help: "Gemini API key (falls back to GEMINI_API_KEY env var)")
     var geminiApiKey: String?
@@ -20,10 +20,10 @@ struct AppShotsGenerate: AsyncParsableCommand {
     @Option(name: .long, help: "Gemini image generation model to use")
     var model: String = "gemini-3.1-flash-image-preview"
 
-    @Option(name: .long, help: "Directory to write generated PNG images (created if needed)")
-    var outputDir: String = "app-shots-output"
+    @Option(name: .long, help: "Directory to write generated PNG images (default: .asc/app-shots/output)")
+    var outputDir: String = ".asc/app-shots/output"
 
-    @Argument(help: "Screenshot files matched to screens by filename or index order")
+    @Argument(help: "Screenshot files — omit to auto-discover *.png/*.jpg from the plan's directory")
     var screenshots: [String] = []
 
     func run() async throws {
@@ -48,9 +48,22 @@ struct AppShotsGenerate: AsyncParsableCommand {
         let planData = try Data(contentsOf: planURL)
         let loadedPlan = try JSONDecoder().decode(ScreenPlan.self, from: planData)
 
+        // Resolve screenshots — auto-discover from plan directory if none given
+        let resolvedScreenshots: [String]
+        if screenshots.isEmpty {
+            let planDir = planURL.deletingLastPathComponent()
+            let contents = (try? FileManager.default.contentsOfDirectory(at: planDir, includingPropertiesForKeys: nil)) ?? []
+            resolvedScreenshots = contents
+                .filter { ["png", "jpg", "jpeg"].contains($0.pathExtension.lowercased()) }
+                .sorted { $0.lastPathComponent < $1.lastPathComponent }
+                .map { $0.path }
+        } else {
+            resolvedScreenshots = screenshots
+        }
+
         // Build screenshot URLs, validate they exist
         var screenshotURLs: [URL] = []
-        for path in screenshots {
+        for path in resolvedScreenshots {
             let fileURL = URL(fileURLWithPath: path)
             guard FileManager.default.fileExists(atPath: fileURL.path) else {
                 throw ValidationError("Screenshot file not found: \(path)")

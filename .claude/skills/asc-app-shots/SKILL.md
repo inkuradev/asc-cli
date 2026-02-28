@@ -41,7 +41,7 @@ Ask the user for (skip if already provided):
 - **App ID** — e.g. `6736834466`; if unknown, run `asc apps list` and let user pick
 - **Version ID** — if unknown, run `asc versions list --app-id <APP_ID>` and use the first result
 - **Locale** — default: `en-US`
-- **Screenshot files** — paths to PNG/JPG files to plan
+- **Screenshot files** — check `.asc/app-shots/` in the current directory first; if `*.png` or `*.jpg` files are present there, use them automatically without asking. Only ask the user if no files are found there.
 
 ---
 
@@ -155,7 +155,7 @@ Combine metadata + vision analysis into `app-shots-plan.json`.
 
 **CRITICAL: The root JSON key is `appId` (not `id`).** See `references/plan-schema.md` for the full schema.
 
-Use the Write tool to save the file alongside the screenshots.
+Use the Write tool to save the plan to **`.asc/app-shots/app-shots-plan.json`** (create the directory if needed). This is the default location that `asc app-shots generate` reads automatically.
 
 ---
 
@@ -168,13 +168,20 @@ Resolve the Gemini API key (in order):
 2. The CLI will automatically fall back to `~/.asc/app-shots-config.json` (set via `asc app-shots config`)
 3. If neither is set, ask the user once: "Please provide your Gemini API key (or save it with: `asc app-shots config --gemini-api-key KEY`)"
 
-Then run (omit `--gemini-api-key` if the user has already saved it with `asc app-shots config`):
+If the plan was written to `.asc/app-shots/app-shots-plan.json` (the default), run with **no arguments** — everything is discovered automatically:
+
+```bash
+asc app-shots generate
+```
+
+This reads `.asc/app-shots/app-shots-plan.json`, discovers `*.png/*.jpg` from `.asc/app-shots/`, and writes output to `.asc/app-shots/output/`.
+
+Only pass explicit paths if files are in non-default locations:
 ```bash
 asc app-shots generate \
-  --plan <plan-file-path> \
-  --model gemini-3.1-flash-image-preview \
-  --output-dir <screenshots-dir>/output \
-  <screenshot files...>
+  --plan path/to/plan.json \
+  --output-dir path/to/output \
+  path/to/screen1.png path/to/screen2.png
 ```
 
 (Use `swift run asc` if `asc` is not installed globally, as detected in Step 1.)
@@ -208,7 +215,8 @@ Claude:
 3. `swift run asc app-info-localizations list ...` → appName, tagline
 4. `swift run asc version-localizations list ...` → description
 5. Summarizes description → appDescription
-6. Reads screen1.png, screen2.png with vision → colors + per-screen configs
-7. Writes `app-shots-plan.json` with `appId` key
-8. Checks `$GEMINI_API_KEY` → set → runs generate immediately
-9. Shows generated PNG paths
+6. Checks `.asc/app-shots/` → finds screen1.png, screen2.png automatically
+7. Reads them with vision → colors + per-screen configs
+8. Writes `.asc/app-shots/app-shots-plan.json` with `appId` key
+9. Checks `$GEMINI_API_KEY` → set → runs `asc app-shots generate` (no args needed)
+10. Shows generated PNG paths in `.asc/app-shots/output/`

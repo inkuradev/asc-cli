@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `asc app-shots generate` — AI-powered App Store screenshot generation using Gemini; reads a `ScreenPlan` JSON + screenshot images, calls Gemini image generation API, writes `screen-{index}.png` files
+- `asc app-shots generate` — AI-powered App Store screenshot generation using Gemini; reads a `ScreenPlan` JSON + screenshot images, calls Gemini image generation API, writes `screen-{index}.png` files; `--plan` defaults to `.asc/app-shots/app-shots-plan.json`, `--output-dir` defaults to `.asc/app-shots/output`, screenshots auto-discovered from plan directory when not provided — zero-argument happy path: `asc app-shots generate`
 - `asc app-shots config` — persistent Gemini API key management; `--gemini-api-key` saves to `~/.asc/app-shots-config.json`, bare invocation shows current key + source (file/env), `--remove` deletes it; `generate` resolves key from flag → env var → stored config
 - `ScreenPlan`, `ScreenConfig`, `ScreenTone`, `LayoutMode`, `ScreenColors`, `AppShotsConfig` domain models
 - `ScreenshotGenerationRepository` + `AppShotsConfigStorage` `@Mockable` protocols

@@ -143,6 +143,36 @@ struct AppShotsGenerateTests {
         }
     }
 
+    @Test func `generate auto-discovers screenshots from plan directory when none provided`() async throws {
+        let tmpDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("app-shots-autodiscover-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: tmpDir) }
+
+        let plan = makePlan(screens: [makeScreen(index: 0), makeScreen(index: 1)])
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let planData = try encoder.encode(plan)
+        let planURL = tmpDir.appendingPathComponent("app-shots-plan.json")
+        try planData.write(to: planURL)
+
+        // Place two fake PNGs in the same directory
+        try Self.fakePNG.write(to: tmpDir.appendingPathComponent("screen1.png"))
+        try Self.fakePNG.write(to: tmpDir.appendingPathComponent("screen2.png"))
+
+        let outputDir = tmpDir.appendingPathComponent("output").path
+        let mockRepo = MockScreenshotGenerationRepository()
+        given(mockRepo).generateImages(plan: .any, screenshotURLs: .any)
+            .willReturn([0: Self.fakePNG, 1: Self.fakePNG])
+
+        // No screenshots argument — auto-discovery should find screen1.png and screen2.png
+        let cmd = try AppShotsGenerate.parse(["--plan", planURL.path, "--output-dir", outputDir])
+        let output = try await cmd.execute(repo: mockRepo)
+
+        #expect(output.contains("screen-0.png"))
+        #expect(output.contains("screen-1.png"))
+    }
+
     @Test func `generate throws when screenshot file not found`() async throws {
         let plan = makePlan()
         let planPath = try writePlanFile(plan)
