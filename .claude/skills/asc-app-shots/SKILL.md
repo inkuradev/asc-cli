@@ -20,17 +20,32 @@ Two-step workflow:
 
 ---
 
-## Step 1 — Gather inputs
+## Step 1 — Detect CLI command
+
+Before running any `asc` commands, determine which command to use:
+
+```bash
+which asc
+```
+
+- **If found** → use `asc` directly (installed via Homebrew or binary)
+- **If not found** → use `swift run asc` (running from the asc-swift source repo)
+
+Use whichever works for all subsequent commands. In examples below, `asc` represents whichever form is correct.
+
+---
+
+## Step 2 — Gather inputs
 
 Ask the user for (skip if already provided):
-- **App ID** — e.g. `6736834466`
-- **Version ID** — from `asc versions list --app-id <id>`
+- **App ID** — e.g. `6736834466`; if unknown, run `asc apps list` and let user pick
+- **Version ID** — if unknown, run `asc versions list --app-id <APP_ID>` and use the first result
 - **Locale** — default: `en-US`
 - **Screenshot files** — paths to PNG/JPG files to plan
 
 ---
 
-## Step 2 — Fetch App Store metadata
+## Step 3 — Fetch App Store metadata
 
 Run these commands and extract the fields:
 
@@ -53,7 +68,7 @@ asc version-localizations list --version-id <VERSION_ID>
 
 ---
 
-## Step 3 — Analyze screenshots with vision
+## Step 4 — Analyze screenshots with vision
 
 Read each screenshot file. For each one, determine:
 
@@ -121,7 +136,7 @@ Choose based on app category + metadata:
 
 ---
 
-## Step 4 — Write plan file
+## Step 5 — Write plan file
 
 Combine metadata + vision analysis into `app-shots-plan.json` (see `references/plan-schema.md` for schema).
 
@@ -129,7 +144,9 @@ Use the Write tool to save the file in the current directory (or alongside the s
 
 ---
 
-## Step 5 — Print next step
+## Step 6 — Print next step
+
+Use the correct `asc` command form detected in Step 1:
 
 ```
 ✅ Plan written to app-shots-plan.json
@@ -144,6 +161,8 @@ Next step — generate marketing screenshots with Gemini:
 Generated PNGs → app-shots-output/screen-0.png, screen-1.png, ...
 ```
 
+(Replace `asc` with `swift run asc` if the CLI is not installed globally.)
+
 ---
 
 ## Example invocation
@@ -151,11 +170,12 @@ Generated PNGs → app-shots-output/screen-0.png, screen-1.png, ...
 User: "Plan App Store screenshots for app 6736834466, version v123. Screenshots: screen1.png screen2.png"
 
 Claude:
-1. Runs `asc app-infos list --app-id 6736834466` → gets `appInfoId`
-2. Runs `asc app-info-localizations list --app-info-id <id>` → `appName`, `tagline`
-3. Runs `asc version-localizations list --version-id v123` → full `description`
-4. Summarizes description → `appDescription` (2-3 sentences, ≤200 chars)
-5. Reads `screen1.png`, `screen2.png` with vision → extracts `colors`, builds per-screen configs
-6. Generates `ScreenPlan` JSON with 2 screens
-7. Writes `app-shots-plan.json`
-8. Prints generate command
+1. Runs `which asc` → not found → will use `swift run asc` for all commands
+2. Runs `swift run asc app-infos list --app-id 6736834466` → gets `appInfoId`
+3. Runs `swift run asc app-info-localizations list --app-info-id <id>` → `appName`, `tagline`
+4. Runs `swift run asc version-localizations list --version-id v123` → full `description`
+5. Summarizes description → `appDescription` (2-3 sentences, ≤200 chars)
+6. Reads `screen1.png`, `screen2.png` with vision → extracts `colors`, builds per-screen configs
+7. Generates `ScreenPlan` JSON with 2 screens (index 0 = hero, index 1 = standard)
+8. Writes `app-shots-plan.json`
+9. Prints generate command with correct `asc` / `swift run asc` form
