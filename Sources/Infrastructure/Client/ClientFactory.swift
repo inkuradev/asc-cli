@@ -41,6 +41,11 @@ public struct ClientFactory: Sendable {
         return SDKAppInfoRepository(client: provider)
     }
 
+    public func makeAppCategoryRepository(authProvider: any AuthProvider) throws -> any AppCategoryRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKAppCategoryRepository(client: provider)
+    }
+
     public func makeSubmissionRepository(authProvider: any AuthProvider) throws -> any SubmissionRepository {
         let provider = try makeProvider(authProvider: authProvider)
         return OpenAPISubmissionRepository(client: provider)

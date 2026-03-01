@@ -116,7 +116,7 @@ struct SDKAppInfoRepositoryTests {
 
         let repo = SDKAppInfoRepository(client: stub)
         let result = try await repo.updateLocalization(
-            id: "loc-1", name: "Updated App", subtitle: "New subtitle", privacyPolicyUrl: nil
+            id: "loc-1", name: "Updated App", subtitle: "New subtitle", privacyPolicyUrl: nil, privacyChoicesUrl: nil, privacyPolicyText: nil
         )
 
         #expect(result.id == "loc-1")
@@ -137,8 +137,51 @@ struct SDKAppInfoRepositoryTests {
         ))
 
         let repo = SDKAppInfoRepository(client: stub)
-        let result = try await repo.updateLocalization(id: "loc-2", name: "Meine App", subtitle: nil, privacyPolicyUrl: nil)
+        let result = try await repo.updateLocalization(id: "loc-2", name: "Meine App", subtitle: nil, privacyPolicyUrl: nil, privacyChoicesUrl: nil, privacyPolicyText: nil)
 
         #expect(result.appInfoId == "")
+    }
+
+    @Test func `listAppInfos maps primary category id from relationships`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppInfosResponse(
+            data: [
+                AppInfo(
+                    type: .appInfos,
+                    id: "info-1",
+                    relationships: .init(primaryCategory: .init(data: .init(type: .appCategories, id: "6014")))
+                ),
+            ],
+            links: .init(this: "")
+        ))
+
+        let repo = SDKAppInfoRepository(client: stub)
+        let result = try await repo.listAppInfos(appId: "app-1")
+
+        #expect(result[0].primaryCategoryId == "6014")
+    }
+
+    @Test func `listLocalizations maps privacyChoicesUrl and privacyPolicyText from SDK attributes`() async throws {
+        let stub = StubAPIClient()
+        stub.willReturn(AppInfoLocalizationsResponse(
+            data: [
+                AppInfoLocalization(
+                    type: .appInfoLocalizations,
+                    id: "loc-1",
+                    attributes: .init(
+                        locale: "en-US",
+                        privacyChoicesURL: "https://example.com/choices",
+                        privacyPolicyText: "Our privacy policy"
+                    )
+                ),
+            ],
+            links: .init(this: "")
+        ))
+
+        let repo = SDKAppInfoRepository(client: stub)
+        let result = try await repo.listLocalizations(appInfoId: "info-1")
+
+        #expect(result[0].privacyChoicesUrl == "https://example.com/choices")
+        #expect(result[0].privacyPolicyText == "Our privacy policy")
     }
 }

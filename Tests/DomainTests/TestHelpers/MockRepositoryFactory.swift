@@ -178,9 +178,19 @@ struct MockRepositoryFactory {
 
     static func makeAppInfo(
         id: String = "info-1",
-        appId: String = "app-1"
+        appId: String = "app-1",
+        primaryCategoryId: String? = nil,
+        secondaryCategoryId: String? = nil
     ) -> AppInfo {
-        AppInfo(id: id, appId: appId)
+        AppInfo(id: id, appId: appId, primaryCategoryId: primaryCategoryId, secondaryCategoryId: secondaryCategoryId)
+    }
+
+    static func makeAppCategory(
+        id: String = "6014",
+        platforms: [String] = ["IOS"],
+        parentId: String? = nil
+    ) -> AppCategory {
+        AppCategory(id: id, platforms: platforms, parentId: parentId)
     }
 
     static func makeAppInfoLocalization(

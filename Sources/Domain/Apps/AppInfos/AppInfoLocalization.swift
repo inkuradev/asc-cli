@@ -33,6 +33,7 @@ public struct AppInfoLocalization: Sendable, Equatable, Identifiable, Codable {
 extension AppInfoLocalization: AffordanceProviding {
     public var affordances: [String: String] {
         [
+            "delete": "asc app-info-localizations delete --localization-id \(id)",
             "listLocalizations": "asc app-info-localizations list --app-info-id \(appInfoId)",
             "updateLocalization": "asc app-info-localizations update --localization-id \(id)",
         ]

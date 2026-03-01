@@ -18,4 +18,21 @@ struct AppInfoTests {
         let info = AppInfo(id: "info-1", appId: "app-42")
         #expect(info.affordances["listAppInfos"] == "asc app-infos list --app-id app-42")
     }
+
+    @Test func `appInfo category ids default to nil`() {
+        let info = AppInfo(id: "info-1", appId: "app-1")
+        #expect(info.primaryCategoryId == nil)
+        #expect(info.secondaryCategoryId == nil)
+    }
+
+    @Test func `appInfo carries primary and secondary category ids`() {
+        let info = AppInfo(id: "info-1", appId: "app-1", primaryCategoryId: "6014", secondaryCategoryId: "6005")
+        #expect(info.primaryCategoryId == "6014")
+        #expect(info.secondaryCategoryId == "6005")
+    }
+
+    @Test func `appInfo affordances include updateCategories command`() {
+        let info = AppInfo(id: "info-42", appId: "app-1")
+        #expect(info.affordances["updateCategories"] == "asc app-infos update --app-info-id info-42")
+    }
 }

@@ -32,17 +32,44 @@ public struct SDKAppInfoRepository: AppInfoRepository, @unchecked Sendable {
         return mapLocalization(response.data, appInfoId: appInfoId)
     }
 
-    public func updateLocalization(id: String, name: String?, subtitle: String?, privacyPolicyUrl: String?) async throws -> Domain.AppInfoLocalization {
+    public func updateLocalization(id: String, name: String?, subtitle: String?, privacyPolicyUrl: String?, privacyChoicesUrl: String?, privacyPolicyText: String?) async throws -> Domain.AppInfoLocalization {
         let body = AppInfoLocalizationUpdateRequest(
             data: .init(
                 type: .appInfoLocalizations,
                 id: id,
-                attributes: .init(name: name, subtitle: subtitle, privacyPolicyURL: privacyPolicyUrl)
+                attributes: .init(name: name, subtitle: subtitle, privacyPolicyURL: privacyPolicyUrl, privacyChoicesURL: privacyChoicesUrl, privacyPolicyText: privacyPolicyText)
             )
         )
         let response = try await client.request(APIEndpoint.v1.appInfoLocalizations.id(id).patch(body))
         let appInfoId = response.data.relationships?.appInfo?.data?.id ?? ""
         return mapLocalization(response.data, appInfoId: appInfoId)
+    }
+
+    public func deleteLocalization(id: String) async throws {
+        try await client.request(APIEndpoint.v1.appInfoLocalizations.id(id).delete)
+    }
+
+    public func updateCategories(
+        id: String,
+        primaryCategoryId: String?,
+        primarySubcategoryOneId: String?,
+        primarySubcategoryTwoId: String?,
+        secondaryCategoryId: String?,
+        secondarySubcategoryOneId: String?,
+        secondarySubcategoryTwoId: String?
+    ) async throws -> Domain.AppInfo {
+        let relationships = AppInfoUpdateRequest.Data.Relationships(
+            primaryCategory: primaryCategoryId.map { .init(data: .init(type: .appCategories, id: $0)) },
+            primarySubcategoryOne: primarySubcategoryOneId.map { .init(data: .init(type: .appCategories, id: $0)) },
+            primarySubcategoryTwo: primarySubcategoryTwoId.map { .init(data: .init(type: .appCategories, id: $0)) },
+            secondaryCategory: secondaryCategoryId.map { .init(data: .init(type: .appCategories, id: $0)) },
+            secondarySubcategoryOne: secondarySubcategoryOneId.map { .init(data: .init(type: .appCategories, id: $0)) },
+            secondarySubcategoryTwo: secondarySubcategoryTwoId.map { .init(data: .init(type: .appCategories, id: $0)) }
+        )
+        let body = AppInfoUpdateRequest(data: .init(type: .appInfos, id: id, relationships: relationships))
+        let response = try await client.request(APIEndpoint.v1.appInfos.id(id).patch(body))
+        let appId = response.data.relationships?.app?.data?.id ?? ""
+        return mapAppInfo(response.data, appId: appId)
     }
 
     // MARK: - Mappers
@@ -51,7 +78,16 @@ public struct SDKAppInfoRepository: AppInfoRepository, @unchecked Sendable {
         _ sdkInfo: AppStoreConnect_Swift_SDK.AppInfo,
         appId: String
     ) -> Domain.AppInfo {
-        Domain.AppInfo(id: sdkInfo.id, appId: appId)
+        Domain.AppInfo(
+            id: sdkInfo.id,
+            appId: appId,
+            primaryCategoryId: sdkInfo.relationships?.primaryCategory?.data?.id,
+            primarySubcategoryOneId: sdkInfo.relationships?.primarySubcategoryOne?.data?.id,
+            primarySubcategoryTwoId: sdkInfo.relationships?.primarySubcategoryTwo?.data?.id,
+            secondaryCategoryId: sdkInfo.relationships?.secondaryCategory?.data?.id,
+            secondarySubcategoryOneId: sdkInfo.relationships?.secondarySubcategoryOne?.data?.id,
+            secondarySubcategoryTwoId: sdkInfo.relationships?.secondarySubcategoryTwo?.data?.id
+        )
     }
 
     private func mapLocalization(

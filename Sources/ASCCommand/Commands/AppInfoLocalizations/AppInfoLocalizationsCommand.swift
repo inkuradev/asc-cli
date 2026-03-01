@@ -9,6 +9,7 @@ struct AppInfoLocalizationsCommand: AsyncParsableCommand {
             AppInfoLocalizationsList.self,
             AppInfoLocalizationsCreate.self,
             AppInfoLocalizationsUpdate.self,
+            AppInfoLocalizationsDelete.self,
         ]
     )
 }
@@ -93,6 +94,12 @@ struct AppInfoLocalizationsUpdate: AsyncParsableCommand {
     @Option(name: .long, help: "Privacy policy URL")
     var privacyPolicyUrl: String?
 
+    @Option(name: .long, help: "Privacy choices URL")
+    var privacyChoicesUrl: String?
+
+    @Option(name: .long, help: "Privacy policy text")
+    var privacyPolicyText: String?
+
     func run() async throws {
         let repo = try ClientProvider.makeAppInfoRepository()
         print(try await execute(repo: repo))
@@ -103,7 +110,9 @@ struct AppInfoLocalizationsUpdate: AsyncParsableCommand {
             id: localizationId,
             name: name,
             subtitle: subtitle,
-            privacyPolicyUrl: privacyPolicyUrl
+            privacyPolicyUrl: privacyPolicyUrl,
+            privacyChoicesUrl: privacyChoicesUrl,
+            privacyPolicyText: privacyPolicyText
         )
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
         return try formatter.formatAgentItems(
@@ -111,5 +120,27 @@ struct AppInfoLocalizationsUpdate: AsyncParsableCommand {
             headers: ["ID", "Locale", "Name", "Subtitle"],
             rowMapper: { [$0.id, $0.locale, $0.name ?? "-", $0.subtitle ?? "-"] }
         )
+    }
+}
+
+struct AppInfoLocalizationsDelete: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "delete",
+        abstract: "Delete an app info localization"
+    )
+
+    @OptionGroup var globals: GlobalOptions
+
+    @Option(name: .long, help: "Localization ID")
+    var localizationId: String
+
+    func run() async throws {
+        let repo = try ClientProvider.makeAppInfoRepository()
+        try await execute(repo: repo)
+    }
+
+    func execute(repo: any AppInfoRepository) async throws {
+        try await repo.deleteLocalization(id: localizationId)
+        print("{\"deleted\": \"\(localizationId)\"}")
     }
 }

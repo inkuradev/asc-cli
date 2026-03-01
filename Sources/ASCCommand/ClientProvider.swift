@@ -44,6 +44,12 @@ struct ClientProvider {
         return try factory.makeAppInfoRepository(authProvider: authProvider)
     }
 
+    static func makeAppCategoryRepository() throws -> any AppCategoryRepository {
+        let authProvider = CompositeAuthProvider()
+        let factory = ClientFactory()
+        return try factory.makeAppCategoryRepository(authProvider: authProvider)
+    }
+
     static func makeSubmissionRepository() throws -> any SubmissionRepository {
         let authProvider = CompositeAuthProvider()
         let factory = ClientFactory()
