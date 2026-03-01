@@ -80,16 +80,16 @@ public struct GeminiScreenshotGenerationRepository: ScreenshotGenerationReposito
     // MARK: - Prompt builders
 
     /// When a style reference image is provided, all visual design is driven by the reference.
-    /// Only the heading and subheading text are specified — colors, layout, device angle, and
-    /// effects are all copied from the reference image, not from the plan's imagePrompt.
+    /// The prompt addresses images by position so Gemini knows which is which.
+    /// Parts order: [style reference image] [app screenshot image] [this text]
     private func buildStyleReferencePrompt(screen: ScreenConfig) -> String {
         """
-        Recreate this App Store marketing screenshot in the EXACT visual style of the reference image above.
-        - Show the provided app UI inside a device mockup
+        Recreate this App Store marketing screenshot in the EXACT visual style of the FIRST image (style reference).
+        - Use the SECOND image (app UI) as the device screen content
         - Heading text: '\(screen.heading)'
         - Subheading text: '\(screen.subheading)'
-        - Copy the reference exactly: layout composition, background colors, typography, device angle, visual effects
-        - Do NOT apply any design choices from the app UI — follow the reference style completely
+        - Replicate the reference faithfully: background, colors, layout composition, device angle, typography, and all visual effects
+        - Do NOT invent a new design — the first image defines the entire look
         """
     }
 
@@ -140,13 +140,14 @@ public struct GeminiScreenshotGenerationRepository: ScreenshotGenerationReposito
             throw APIError.unknown("Could not build Gemini URL")
         }
 
-        // Build parts: optional style reference + optional screenshot + text prompt
+        // Build parts: [style reference image] [app screenshot image] [text prompt]
+        // The prompt references images by position ("first image", "second image") so no
+        // intermediate instruction text is needed between them.
         var parts: [[String: Any]] = []
         if let styleReferenceURL, let refData = try? Data(contentsOf: styleReferenceURL) {
             let ext = styleReferenceURL.pathExtension.lowercased()
             let mimeType = (ext == "jpg" || ext == "jpeg") ? "image/jpeg" : "image/png"
             parts.append(["inlineData": ["mimeType": mimeType, "data": refData.base64EncodedString()]])
-            parts.append(["text": "Use the above image as a STYLE GUIDE only — match its colors, typography, background gradients, and visual composition. Do NOT copy its content."])
         }
         if let screenshotURL, let imageData = try? Data(contentsOf: screenshotURL) {
             let ext = screenshotURL.pathExtension.lowercased()
@@ -218,6 +219,8 @@ public struct GeminiScreenshotGenerationRepository: ScreenshotGenerationReposito
             throw APIError.unknown("Invalid URL: \(urlString)")
         }
 
+        // Build message parts: [style reference image] [app screenshot image] [text prompt]
+        // The prompt references images by position so no intermediate instruction text needed.
         var messageContent: [[String: Any]] = []
         if let styleReferenceURL, let refData = try? Data(contentsOf: styleReferenceURL) {
             let ext = styleReferenceURL.pathExtension.lowercased()
@@ -227,7 +230,6 @@ public struct GeminiScreenshotGenerationRepository: ScreenshotGenerationReposito
                 "type": "image_url",
                 "image_url": ["url": "data:\(mimeType);base64,\(base64)"]
             ])
-            messageContent.append(["type": "text", "text": "Use the above image as a STYLE GUIDE only — match its colors, typography, background gradients, and visual composition. Do NOT copy its content."])
         }
         if let screenshotURL, let imageData = try? Data(contentsOf: screenshotURL) {
             let ext = screenshotURL.pathExtension.lowercased()

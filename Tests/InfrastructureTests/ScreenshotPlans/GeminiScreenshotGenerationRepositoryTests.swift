@@ -273,24 +273,21 @@ struct GeminiScreenshotGenerationRepositoryTests {
         let bodyData = try #require(stub.lastRequest?.httpBody)
         let actualJSON = try #require(JSONSerialization.jsonObject(with: bodyData) as? [String: Any])
 
-        // Expected: [ref image inlineData, style-guide text, style-reference prompt text]
-        // When styleReferenceURL is set:
-        //   • appContext prefix is suppressed
-        //   • imagePrompt from the plan is replaced by buildStyleReferencePrompt(screen:)
-        //     which only carries heading + subheading — visual design is driven by the reference
+        // Expected parts: [style reference inlineData] [text prompt]
+        // No intermediate instruction text — the prompt addresses images by position.
+        // screenshotURLs is empty so no app screenshot inlineData part.
         let stylePrompt = """
-        Recreate this App Store marketing screenshot in the EXACT visual style of the reference image above.
-        - Show the provided app UI inside a device mockup
+        Recreate this App Store marketing screenshot in the EXACT visual style of the FIRST image (style reference).
+        - Use the SECOND image (app UI) as the device screen content
         - Heading text: 'Work Smarter'
         - Subheading text: 'Organize your tasks'
-        - Copy the reference exactly: layout composition, background colors, typography, device angle, visual effects
-        - Do NOT apply any design choices from the app UI — follow the reference style completely
+        - Replicate the reference faithfully: background, colors, layout composition, device angle, typography, and all visual effects
+        - Do NOT invent a new design — the first image defines the entire look
         """
         let expectedJSON: [String: Any] = [
             "contents": [[
                 "parts": [
                     ["inlineData": ["mimeType": "image/png", "data": fakePNGData.base64EncodedString()]],
-                    ["text": "Use the above image as a STYLE GUIDE only — match its colors, typography, background gradients, and visual composition. Do NOT copy its content."],
                     ["text": stylePrompt]
                 ]
             ]],
