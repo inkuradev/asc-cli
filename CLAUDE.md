@@ -74,6 +74,7 @@ Commands mirror the App Store Connect API hierarchy exactly:
 ```
 App → AppStoreVersion → AppStoreVersionLocalization → AppScreenshotSet → AppScreenshot
 App → AppInfo → AppInfoLocalization
+App → AppInfo → AgeRatingDeclaration
 App → Build → BetaBuildLocalization
 App → BuildUpload
 App → TestFlight (BetaGroup → BetaTester)
@@ -91,7 +92,8 @@ Domain/
 │   │   └── Localizations/         → AppStoreVersionLocalization, VersionLocalizationRepository
 │   │       └── ScreenshotSets/    → AppScreenshotSet, ScreenshotDisplayType, ScreenshotRepository
 │   │           └── Screenshots/   → AppScreenshot
-│   ├── AppInfos/                  → AppInfo, AppInfoLocalization, AppInfoRepository
+│   ├── AppInfos/                  → AppInfo, AppInfoLocalization, AppInfoRepository,
+│   │                                AgeRatingDeclaration, AgeRatingDeclarationRepository
 │   ├── Builds/                    → Build, BuildUpload, BetaBuildLocalization,
 │   │                                BuildRepository, BuildUploadRepository, BetaBuildLocalizationRepository
 │   ├── Pricing/                   → PricingRepository
