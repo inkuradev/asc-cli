@@ -230,4 +230,28 @@ struct AffordancesTests {
         #expect(decl.affordances["update"] == "asc age-rating update --declaration-id decl-1")
         #expect(decl.affordances["getAgeRating"] == "asc age-rating get --app-info-id info-42")
     }
+
+    // MARK: - AppInfo updateCategories affordance
+
+    @Test
+    func `app info affordances include updateCategories command`() {
+        let info = MockRepositoryFactory.makeAppInfo(id: "info-1", appId: "app-abc")
+        #expect(info.affordances["updateCategories"] == "asc app-infos update --app-info-id info-1")
+    }
+
+    // MARK: - AppInfoLocalization delete affordance
+
+    @Test
+    func `app info localization affordances include delete command`() {
+        let loc = MockRepositoryFactory.makeAppInfoLocalization(id: "loc-1", appInfoId: "info-abc")
+        #expect(loc.affordances["delete"] == "asc app-info-localizations delete --localization-id loc-1")
+    }
+
+    // MARK: - AppCategory affordances
+
+    @Test
+    func `app category affordances include listCategories command`() {
+        let category = MockRepositoryFactory.makeAppCategory(id: "6014")
+        #expect(category.affordances["listCategories"] == "asc app-categories list")
+    }
 }

@@ -25,6 +25,7 @@ struct AppInfoLocalizationsCreateTests {
           "data" : [
             {
               "affordances" : {
+                "delete" : "asc app-info-localizations delete --localization-id loc-1",
                 "listLocalizations" : "asc app-info-localizations list --app-info-id info-1",
                 "updateLocalization" : "asc app-info-localizations update --localization-id loc-1"
               },
