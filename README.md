@@ -155,6 +155,8 @@ asc versions create --app-id <id> --version <v> --platform ios        # create v
 asc versions check-readiness --version-id <id>                        # pre-flight check
 asc versions set-build --version-id <id> --build-id <id>             # link build
 asc versions submit --version-id <id>                                 # submit for review
+asc version-review-detail get --version-id <id>                       # get review contact info
+asc version-review-detail update --version-id <id> --contact-first-name Jane --contact-email dev@example.com  # set review info
 
 # Version Localizations
 asc version-localizations list --version-id <id>

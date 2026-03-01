@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `asc version-review-detail get --version-id <id>` — fetch the App Store review contact info and demo account settings for a version
+- `asc version-review-detail update --version-id <id> [flags]` — upsert review info (creates if none exists, patches if already set); supports `--contact-first-name`, `--contact-last-name`, `--contact-phone`, `--contact-email`, `--demo-account-required`, `--demo-account-name`, `--demo-account-password`, `--notes`
+- `notes` field added to `AppStoreReviewDetail` domain model
+- `getReviewDetail` affordance added to `AppStoreVersion` for agent navigation
+
 ---
 
 ## [0.1.30] - 2026-03-01
