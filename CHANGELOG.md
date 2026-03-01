@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.31] - 2026-03-01
+
 ### Added
 - `asc version-review-detail get --version-id <id>` — fetch the App Store review contact info and demo account settings for a version
 - `asc version-review-detail update --version-id <id> [flags]` — upsert review info (creates if none exists, patches if already set); supports `--contact-first-name`, `--contact-last-name`, `--contact-phone`, `--contact-email`, `--demo-account-required`, `--demo-account-name`, `--demo-account-password`, `--notes`
@@ -253,7 +257,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.30...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.31...HEAD
+[0.1.31]: https://github.com/tddworks/asc-cli/compare/v0.1.30...v0.1.31
 [0.1.30]: https://github.com/tddworks/asc-cli/compare/v0.1.29...v0.1.30
 [0.1.29]: https://github.com/tddworks/asc-cli/compare/v0.1.28...v0.1.29
 [0.1.28]: https://github.com/tddworks/asc-cli/compare/v0.1.27...v0.1.28
