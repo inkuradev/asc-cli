@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.30] - 2026-03-01
+
 ### Added
 - `asc age-rating get --app-info-id <id>` — fetch the full age rating declaration for an app info, including all content intensity ratings, boolean flags, kids age band, and region overrides
 - `asc age-rating update --declaration-id <id> [flags]` — update individual age rating fields via PATCH; supports all 9 boolean flags (`--advertising`, `--gambling`, `--loot-box`, etc.) and 13 intensity ratings (`--violence-realistic`, `--profanity`, `--sexual-content`, etc.) plus `--kids-age-band`, `--age-rating-override`, and `--korea-age-rating-override`
@@ -243,7 +247,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.29...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.30...HEAD
+[0.1.30]: https://github.com/tddworks/asc-cli/compare/v0.1.29...v0.1.30
 [0.1.29]: https://github.com/tddworks/asc-cli/compare/v0.1.28...v0.1.29
 [0.1.28]: https://github.com/tddworks/asc-cli/compare/v0.1.27...v0.1.28
 [0.1.27]: https://github.com/tddworks/asc-cli/compare/v0.1.25...v0.1.27
