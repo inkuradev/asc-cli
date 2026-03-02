@@ -125,7 +125,7 @@ struct AppShotsTranslateTests {
         try? FileManager.default.removeItem(atPath: outputBase)
     }
 
-    @Test func `translate modifies imagePrompt to include localization requirement`() async throws {
+    @Test func `translate replaces imagePrompt with text-only instruction and drops original design spec`() async throws {
         let plan = makePlan(screens: [makeScreen(index: 0)])
         let planPath = try writePlanFile(plan)
         let sourceDir = try makeSourceDir(count: 1)
@@ -146,9 +146,16 @@ struct AppShotsTranslateTests {
         ])
         _ = try await cmd.execute(repo: mockRepo)
 
-        #expect(capturedPlan?.screens[0].imagePrompt.contains("LOCALIZATION REQUIREMENT") == true)
-        #expect(capturedPlan?.screens[0].imagePrompt.contains("zh") == true)
-        #expect(capturedPlan?.screens[0].imagePrompt.contains("Modern app showcase") == true)
+        let prompt = capturedPlan?.screens[0].imagePrompt ?? ""
+        // New prompt asks for text-only translation
+        #expect(prompt.contains("ONLY translate"))
+        #expect(prompt.contains("zh"))
+        // Original imagePrompt must NOT be forwarded — it contains design specs that
+        // cause Gemini to regenerate the background/colors instead of just editing text
+        #expect(!prompt.contains("Modern app showcase"))
+        // Plan tagline/appDescription must be cleared so buildAppContext returns ""
+        #expect(capturedPlan?.tagline == "")
+        #expect(capturedPlan?.appDescription == nil)
 
         try? FileManager.default.removeItem(atPath: planPath)
         try? FileManager.default.removeItem(atPath: sourceDir)
@@ -179,12 +186,49 @@ struct AppShotsTranslateTests {
         let prompt = capturedPlan?.screens[0].imagePrompt ?? ""
         #expect(prompt.contains("Great Feature"))
         #expect(prompt.contains("Makes life easier"))
-        // Must NOT instruct Gemini to translate device UI content
-        #expect(prompt.contains("Do NOT translate"))
+        // Must NOT instruct Gemini to change text inside the device mockup
+        #expect(prompt.contains("Do NOT change any text inside the device mockup"))
 
         try? FileManager.default.removeItem(atPath: planPath)
         try? FileManager.default.removeItem(atPath: sourceDir)
         try? FileManager.default.removeItem(atPath: outputBase)
+    }
+
+    @Test func `translate omits subheading line from prompt when subheading is empty`() async throws {
+        let emptySubheadingScreen = ScreenConfig(
+            index: 0,
+            screenshotFile: "screen0.png",
+            heading: "Great Feature",
+            subheading: "",
+            layoutMode: .center,
+            visualDirection: "Dark background",
+            imagePrompt: "Some design spec"
+        )
+        let plan = makePlan(screens: [emptySubheadingScreen])
+        let planPath = try writePlanFile(plan)
+        let sourceDir = try makeSourceDir(count: 1)
+        let outputBase = makeTempDir()
+        defer {
+            try? FileManager.default.removeItem(atPath: planPath)
+            try? FileManager.default.removeItem(atPath: sourceDir)
+            try? FileManager.default.removeItem(atPath: outputBase)
+        }
+
+        var capturedPlan: ScreenPlan?
+        let mockRepo = MockScreenshotGenerationRepository()
+        given(mockRepo).generateImages(plan: .any, screenshotURLs: .any, styleReferenceURL: .any).willProduce { p, _, _ in
+            capturedPlan = p
+            return [0: Self.fakePNG]
+        }
+
+        let cmd = try AppShotsTranslate.parse([
+            "--plan", planPath, "--to", "ko", "--source-dir", sourceDir, "--output-dir", outputBase
+        ])
+        _ = try await cmd.execute(repo: mockRepo)
+
+        let prompt = capturedPlan?.screens[0].imagePrompt ?? ""
+        #expect(prompt.contains("Heading: \"Great Feature\""))
+        #expect(!prompt.contains("Subheading"))
     }
 
     @Test func `translate throws when no existing screenshots found`() async throws {
