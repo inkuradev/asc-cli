@@ -161,16 +161,23 @@ struct AppShotsTranslate: AsyncParsableCommand {
 
     private func buildTranslationPlan(plan: ScreenPlan, targetLocale: String) -> ScreenPlan {
         let translatedScreens = plan.screens.map { screen in
-            let translationInstruction = """
+            var textLines = ["  - Heading: \"\(screen.heading)\""]
+            if !screen.subheading.isEmpty {
+                textLines.append("  - Subheading: \"\(screen.subheading)\"")
+            }
+            let textList = textLines.joined(separator: "\n")
 
-
-LOCALIZATION REQUIREMENT: Recreate this image in \(targetLocale).
-ONLY translate the two text overlays outside the device mockup:
-  - Heading overlay: "\(screen.heading)" → translate to \(targetLocale)
-  - Subheading overlay: "\(screen.subheading)" → translate to \(targetLocale)
-Do NOT translate any text inside the device mockup (app UI, labels, data).
-Keep identical layout, colors, device mockup, and visual design.
-"""
+            // Replace imagePrompt entirely — do NOT forward the original design-spec prompt,
+            // which would cause Gemini to regenerate the design rather than edit the text.
+            let prompt = """
+            You are given a finished App Store screenshot as the source image.
+            Reproduce it EXACTLY — preserve every visual element: background, colors, gradients, \
+            device mockup position and angle, layout, typography style, decorative effects, and spacing.
+            ONLY translate these text overlays outside the device mockup to \(targetLocale):
+            \(textList)
+            Do NOT change any text inside the device mockup (app UI content, labels, data).
+            Do NOT alter any other visual element.
+            """
             return ScreenConfig(
                 index: screen.index,
                 screenshotFile: screen.screenshotFile,
@@ -178,14 +185,16 @@ Keep identical layout, colors, device mockup, and visual design.
                 subheading: screen.subheading,
                 layoutMode: screen.layoutMode,
                 visualDirection: screen.visualDirection,
-                imagePrompt: screen.imagePrompt + translationInstruction
+                imagePrompt: prompt
             )
         }
+        // Clear tagline and appDescription so buildAppContext in generateImages returns ""
+        // and no design-spec context is prepended to the translation prompt.
         return ScreenPlan(
             appId: plan.appId,
             appName: plan.appName,
-            tagline: plan.tagline,
-            appDescription: plan.appDescription,
+            tagline: "",
+            appDescription: nil,
             tone: plan.tone,
             colors: plan.colors,
             screens: translatedScreens

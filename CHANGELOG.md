@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `asc app-shots translate` — no longer regenerates the visual design (background, colors, device mockup, layout) from the original plan specs; now sends a simple "edit this image, translate only the text overlays" prompt so the existing generated screenshot is preserved exactly
+
 ---
 
 ## [0.1.33] - 2026-03-02
