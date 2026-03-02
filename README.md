@@ -5,93 +5,45 @@
 [![Swift](https://img.shields.io/badge/Swift-6.2-orange)](https://swift.org)
 [![Platform](https://img.shields.io/badge/macOS-15%2B-blue)](https://www.apple.com/macos/)
 
-A Swift CLI and interactive TUI for [App Store Connect](https://appstoreconnect.apple.com), designed **agent-first** — structured for AI agents and automation, usable by humans too.
+A CLI for App Store Connect — automate builds, releases, TestFlight, subscriptions, and screenshots from your terminal or CI pipeline. Outputs structured JSON so AI agents can drive the full release workflow.
 
-## Design Principles
+## Quick Start
 
-### Agent-First Output
+```bash
+brew install tddworks/tap/asccli
 
-JSON is the default output format. Every response is complete: parent IDs, full state, and semantic booleans so agents can make decisions without extra round-trips.
+asc auth login \
+  --key-id YOUR_KEY_ID \
+  --issuer-id YOUR_ISSUER_ID \
+  --private-key-path ~/.asc/AuthKey_XXXXXX.p8
 
-```json
-{
-  "id": "v1",
-  "appId": "app-abc",
-  "versionString": "2.1.0",
-  "platform": "IOS",
-  "state": "READY_FOR_SALE",
-  "isLive": true,
-  "isEditable": false,
-  "isPending": false
-}
+asc apps list          # find your app ID
+asc init --app-id <id> # pin it — skip --app-id on every future command
 ```
-
-### CAEOAS — Commands As the Engine Of Application State
-
-REST has **HATEOAS**: responses embed URLs so clients navigate without knowing the API upfront.
-This CLI has **CAEOAS**: responses embed ready-to-run commands so agents navigate without memorising the command tree.
-
-| | REST HATEOAS | CLI CAEOAS |
-|---|---|---|
-| Embed | `_links` with URLs | `affordances` with CLI commands |
-| Client action | Follow a URL | Execute a command |
-| Drives | HTTP state transitions | CLI navigation |
-
-Every response includes an `affordances` field. Agents read it and execute — no API knowledge required:
-
-```shell
-$ asc versions list --app-id app-abc
-```
-
-```jsonc
-{
-  "id": "v1",
-  "appId": "app-abc",
-  "versionString": "2.1.0",
-  "platform": "IOS",
-  "state": "PREPARE_FOR_SUBMISSION",
-  "isEditable": true,
-  "affordances": {
-    "listLocalizations": "asc version-localizations list --version-id v1",  // navigate down → localizations
-    "listVersions":      "asc versions list --app-id app-abc",              // navigate up → sibling versions
-    "checkReadiness":    "asc versions check-readiness --version-id v1",    // pre-flight submission check
-    "submitForReview":   "asc versions submit --version-id v1"              // only present when isEditable == true
-  }
-}
-```
-
-**State-aware**: affordances reflect current state. `submitForReview` only appears when `isEditable == true` — the response itself tells the agent what's valid right now.
 
 ## Features
 
-- **Agent-first JSON output** — complete models with parent IDs, semantic booleans, and state-aware affordances
-- **CAEOAS** — responses tell agents exactly what to run next
-- **Project init** — `asc init` pins the current project's app ID to `.asc/project.json`; auto-detects from `.xcodeproj` bundle ID, or use `--name` / `--app-id` directly
-- **Persistent auth** — `asc auth login` saves credentials to `~/.asc/credentials.json`; no env vars needed after setup
-- **Full resource hierarchy** — Apps → Versions → Localizations → Screenshot Sets → Screenshots
-- **Version localizations** — update What's New, description, keywords, and URLs per locale
-- **App info localizations** — read and write per-locale name, subtitle, and privacy policy
-- **Screenshots** — create screenshot sets and upload images (3-step ASC upload flow)
-- **App Previews** — create preview sets and upload video previews (`.mp4`, `.mov`, `.m4v`) with optional thumbnail timecode
-- **Create & submit** — create versions, link builds, check readiness, submit for App Store review
-- **Builds upload** — upload IPA/PKG with 5-step flow; list/get/delete upload records
-- **TestFlight** — list groups; add/remove/import/export testers; distribute builds to groups; update What's New notes
-- **Code signing** — manage bundle IDs, certificates, devices, and provisioning profiles
-- **In-App Purchases** — create and list IAPs; set per-territory pricing; submit for review; manage per-locale name and description
-- **Subscriptions** — create subscription groups and tiers (weekly–yearly); submit for review; introductory offers (free trial, pay-as-you-go, pay-up-front); manage per-locale name and description
-- **App Shots** — AI-powered screenshot generation and localization; `generate` produces polished marketing PNGs via Gemini; `translate` recreates them in any locale (`--to zh --to ja --to ko`) in one command
-- **Age rating** — get and update age rating declarations; configure content intensity (violence, gambling, sexual content, etc.), boolean flags, kids age band, and regional overrides
-- **Version readiness check** — pre-flight check aggregating all Apple submission requirements
-- **Plugins** — install executable plugins in `~/.asc/plugins/` to extend the CLI with custom event handlers; plugins receive JSON event payloads via stdin (e.g., Slack/Telegram notifications on build upload or version submission)
-- **TUI mode** — interactive terminal UI for human browsing
-- **Swift 6.2** — strict concurrency, async/await throughout
-- **Clean architecture** — Domain / Infrastructure / Command layers with Chicago School TDD
+| Category | What you can do |
+| --- | --- |
+| **Apps & Versions** | List apps, create versions, link builds, submit for App Store review |
+| **Builds** | Upload IPA/PKG, wait for processing, distribute to TestFlight, update beta notes |
+| **Metadata** | Update What's New, description, and keywords per locale |
+| **App Info** | Set per-locale name, subtitle, privacy policy; manage categories and age rating |
+| **Screenshots** | Create screenshot sets and upload images |
+| **App Previews** | Upload video previews (`.mp4`, `.mov`, `.m4v`) per locale and device size |
+| **App Shots** | AI-powered screenshot generation via Gemini; translate to any locale in one command |
+| **TestFlight** | Manage beta groups; add/remove/import/export testers |
+| **Monetization** | IAPs (consumable, non-consumable, non-renewing); subscriptions, offers, pricing |
+| **Code Signing** | Bundle IDs, certificates, devices, provisioning profiles |
+| **Project Init** | `asc init` pins app context to `.asc/project.json`; auto-detects from `.xcodeproj` |
+| **Plugins** | Install executable plugins in `~/.asc/plugins/` for custom event handlers |
+| **AI Agents** | JSON output with CAEOAS affordances — agents navigate without knowing the command tree |
 
 ## Requirements
 
 - macOS 13+
-- Swift 6.2+
 - App Store Connect API key ([create one here](https://appstoreconnect.apple.com/access/integrations/api))
+- Swift 6.2+ _(only needed when building from source)_
 
 ## Installation
 
@@ -121,13 +73,10 @@ asc auth login \
   --private-key-path ~/.asc/AuthKey_XXXXXX.p8
 
 asc auth check   # → shows source: "file"
+asc auth logout  # remove saved credentials
 ```
 
 Credentials are saved to `~/.asc/credentials.json`. All `asc` commands pick them up automatically — no environment variables needed per session.
-
-```bash
-asc auth logout  # remove saved credentials
-```
 
 ### Environment variables (alternative)
 
@@ -140,63 +89,36 @@ export ASC_PRIVATE_KEY_PATH="~/.asc/AuthKey_XXXXXX.p8"
 
 **Resolution order:** `~/.asc/credentials.json` → environment variables.
 
-## Usage
+## Command Reference
 
-### Command Reference
+### Auth & Project
 
-```
-# Auth
+```bash
 asc auth login --key-id <id> --issuer-id <id> --private-key-path <path>
-asc auth logout
 asc auth check
+asc auth logout
 
-# Project Context
-asc init                    # auto-detect app from *.xcodeproj bundle ID
-asc init --name "My App"    # search by name
-asc init --app-id <id>      # direct — no API list call needed
-# → saves .asc/project.json for subsequent sessions
+asc init                     # auto-detect app from *.xcodeproj bundle ID
+asc init --name "My App"     # search by name
+asc init --app-id <id>       # pin directly — no API call needed
+```
 
-# Apps & Versions
-asc apps list                                                         # list all apps
-asc versions list --app-id <id>                                       # list versions
-asc versions create --app-id <id> --version <v> --platform ios        # create version
-asc versions check-readiness --version-id <id>                        # pre-flight check
-asc versions set-build --version-id <id> --build-id <id>             # link build
-asc versions submit --version-id <id>                                 # submit for review
-asc version-review-detail get --version-id <id>                       # get review contact info
-asc version-review-detail update --version-id <id> --contact-first-name Jane --contact-email dev@example.com  # set review info
+### Apps & Versions
 
-# Version Localizations
-asc version-localizations list --version-id <id>
-asc version-localizations create --version-id <id> --locale zh-Hans
-asc version-localizations update --localization-id <id> --whats-new "Bug fixes"
+```bash
+asc apps list
+asc versions list --app-id <id>
+asc versions create --app-id <id> --version <v> --platform ios
+asc versions set-build --version-id <id> --build-id <id>
+asc versions check-readiness --version-id <id>
+asc versions submit --version-id <id>
+asc version-review-detail get --version-id <id>
+asc version-review-detail update --version-id <id> --contact-first-name Jane --contact-email dev@example.com
+```
 
-# Screenshots
-asc screenshot-sets list --localization-id <id>
-asc screenshot-sets create --localization-id <id> --display-type APP_IPHONE_67
-asc screenshots list --set-id <id>
-asc screenshots upload --set-id <id> --file ./screen.png
+### Builds & TestFlight
 
-# App Previews
-asc app-preview-sets list --localization-id <id>
-asc app-preview-sets create --localization-id <id> --preview-type IPHONE_67
-asc app-previews list --set-id <id>
-asc app-previews upload --set-id <id> --file ./preview.mp4 [--preview-frame-time-code 00:00:05]
-
-# App Info
-asc app-infos list --app-id <id>
-asc app-infos update --app-info-id <id> --primary-category GAMES --primary-subcategory-one GAMES_ACTION
-asc app-categories list [--platform IOS]
-asc app-info-localizations list --app-info-id <id>
-asc app-info-localizations create --app-info-id <id> --locale zh-Hans --name "我的应用"
-asc app-info-localizations update --localization-id <id> --name "My App" --subtitle "Do things faster"
-asc app-info-localizations delete --localization-id <id>
-
-# Age Rating
-asc age-rating get --app-info-id <id>
-asc age-rating update --declaration-id <id> --violence-realistic NONE --gambling false --kids-age-band NINE_TO_ELEVEN
-
-# Builds
+```bash
 asc builds list [--app-id <id>]
 asc builds upload --app-id <id> --file MyApp.ipa --version 1.0.0 --build-number 42
 asc builds uploads list --app-id <id>
@@ -206,14 +128,70 @@ asc builds add-beta-group --build-id <id> --beta-group-id <id>
 asc builds remove-beta-group --build-id <id> --beta-group-id <id>
 asc builds update-beta-notes --build-id <id> --locale en-US --notes "What's new"
 
-# TestFlight
 asc testflight groups list [--app-id <id>]
 asc testflight testers list --beta-group-id <id>
 asc testflight testers add --beta-group-id <id> --email user@example.com
 asc testflight testers remove --beta-group-id <id> --tester-id <id>
 asc testflight testers import --beta-group-id <id> --file testers.csv
 asc testflight testers export --beta-group-id <id>
+```
 
+### Metadata
+
+```bash
+# Version localizations (What's New, description, keywords)
+asc version-localizations list --version-id <id>
+asc version-localizations create --version-id <id> --locale zh-Hans
+asc version-localizations update --localization-id <id> --whats-new "Bug fixes"
+
+# App info localizations (name, subtitle, privacy policy)
+asc app-infos list --app-id <id>
+asc app-infos update --app-info-id <id> --primary-category GAMES --primary-subcategory-one GAMES_ACTION
+asc app-categories list [--platform IOS]
+asc app-info-localizations list --app-info-id <id>
+asc app-info-localizations create --app-info-id <id> --locale zh-Hans --name "我的应用"
+asc app-info-localizations update --localization-id <id> --name "My App" --subtitle "Do things faster"
+asc app-info-localizations delete --localization-id <id>
+
+# Age rating
+asc age-rating get --app-info-id <id>
+asc age-rating update --declaration-id <id> --violence-realistic NONE --gambling false --kids-age-band NINE_TO_ELEVEN
+```
+
+### Screenshots & Previews
+
+```bash
+# Screenshots
+asc screenshot-sets list --localization-id <id>
+asc screenshot-sets create --localization-id <id> --display-type APP_IPHONE_67
+asc screenshots list --set-id <id>
+asc screenshots upload --set-id <id> --file ./screen.png
+
+# Video previews
+asc app-preview-sets list --localization-id <id>
+asc app-preview-sets create --localization-id <id> --preview-type IPHONE_67
+asc app-previews list --set-id <id>
+asc app-previews upload --set-id <id> --file ./preview.mp4 [--preview-frame-time-code 00:00:05]
+```
+
+### App Shots (AI screenshot generation)
+
+```bash
+asc app-shots config --gemini-api-key KEY               # save key once
+
+asc app-shots generate                                   # iPhone 6.9" at 1320×2868 (default)
+asc app-shots generate --device-type APP_IPHONE_67      # iPhone 6.7"
+asc app-shots generate --device-type APP_IPAD_PRO_129   # iPad 13"
+asc app-shots generate --style-reference ~/ref.png      # match visual style of reference image
+
+asc app-shots translate --to zh --to ja                 # localize all screens in parallel
+asc app-shots translate --to ko --device-type APP_IPHONE_67
+asc app-shots translate --to zh --style-reference ~/ref.png
+```
+
+### Monetization
+
+```bash
 # In-App Purchases
 asc iap list --app-id <id>
 asc iap create --app-id <id> --reference-name <n> --product-id <id> --type consumable
@@ -228,148 +206,150 @@ asc subscription-groups list --app-id <id>
 asc subscription-groups create --app-id <id> --reference-name <n>
 asc subscriptions list --group-id <id>
 asc subscriptions create --group-id <id> --name <n> --product-id <id> --period ONE_MONTH
+asc subscriptions submit --subscription-id <id>
 asc subscription-localizations list --subscription-id <id>
 asc subscription-localizations create --subscription-id <id> --locale en-US --name <n>
-asc subscriptions submit --subscription-id <id>
 asc subscription-offers list --subscription-id <id>
 asc subscription-offers create --subscription-id <id> --duration ONE_MONTH --mode FREE_TRIAL --periods 1
 asc subscription-offers create --subscription-id <id> --duration THREE_MONTHS --mode PAY_AS_YOU_GO --periods 3 --price-point-id <id>
+```
 
-# Code Signing
+### Code Signing
+
+```bash
 asc bundle-ids list [--platform ios|macos|universal] [--identifier com.example.app]
 asc bundle-ids create --name "My App" --identifier com.example.app --platform ios
 asc bundle-ids delete --bundle-id-id <id>
+
 asc certificates list [--type IOS_DISTRIBUTION]
 asc certificates create --type IOS_DISTRIBUTION --csr-content "$(cat MyApp.certSigningRequest)"
 asc certificates revoke --certificate-id <id>
+
 asc devices list [--platform ios|macos]
 asc devices register --name "My iPhone" --udid <udid> --platform ios
+
 asc profiles list [--bundle-id-id <id>] [--type IOS_APP_STORE]
 asc profiles create --name "My Profile" --type IOS_APP_STORE --bundle-id-id <id> --certificate-ids <id>
 asc profiles delete --profile-id <id>
-
-# App Shots (AI Screenshot Generation & Translation)
-asc app-shots config --gemini-api-key KEY                               # save key once
-asc app-shots generate                                                    # generate English PNGs at 1320×2868 (iPhone 6.9")
-asc app-shots generate --device-type APP_IPHONE_67                       # iPhone 6.7" (1290×2796)
-asc app-shots generate --device-type APP_IPAD_PRO_129                    # iPad 13" (2048×2732)
-asc app-shots generate --style-reference ~/Downloads/inspiration.png     # match visual style of reference image
-asc app-shots translate --to zh --to ja                                  # localize all screens in parallel
-asc app-shots translate --to ko --device-type APP_IPHONE_67              # translate at iPhone 6.7" size
-asc app-shots translate --to zh --style-reference ~/Downloads/ref.png    # translate while preserving reference style
-
-# Plugins
-asc plugins list                                                      # list installed plugins
-asc plugins install ./my-plugin                                       # install from local directory
-asc plugins uninstall --name slack-notify                             # remove
-asc plugins enable --name slack-notify                                # enable
-asc plugins disable --name slack-notify                               # disable
-asc plugins run --name slack-notify --event build.uploaded            # test a plugin manually
-
-# Interactive
-asc tui                                                               # interactive browser
 ```
 
-### Agent Workflow Example
+### Plugins
 
 ```bash
-# 0. One-time setup — no env vars needed after this
-asc auth login --key-id KEY --issuer-id ISSUER --private-key-path ~/.asc/AuthKey_KEY.p8
+asc plugins list
+asc plugins install ./my-plugin
+asc plugins uninstall --name slack-notify
+asc plugins enable --name slack-notify
+asc plugins disable --name slack-notify
+asc plugins run --name slack-notify --event build.uploaded
+```
 
-# 1. Find your app — response includes affordances.listVersions and affordances.listAppInfos
-asc apps list
+### Output & TUI
 
-# 2. Upload a build and wait for processing
+```bash
+asc apps list                        # JSON (default)
+asc apps list --output table         # aligned table
+asc apps list --output markdown      # markdown table
+asc apps list --output json --pretty # pretty-printed JSON
+
+asc tui   # interactive browser — arrow keys, Enter to drill in, Escape to go back
+```
+
+## Release Workflow
+
+A full App Store release from build upload to review submission:
+
+```bash
+# 1. Upload build and wait for processing
 asc builds upload --app-id APP_ID --file ./MyApp.ipa --version 1.2.0 --build-number 55 --wait
 
-# 3. Distribute to TestFlight beta group
+# 2. Distribute to TestFlight
 GROUP_ID=$(asc testflight groups list --app-id APP_ID | jq -r '.data[0].id')
 BUILD_ID=$(asc builds list --app-id APP_ID | jq -r '.data[0].id')
 asc builds add-beta-group --build-id "$BUILD_ID" --beta-group-id "$GROUP_ID"
 asc builds update-beta-notes --build-id "$BUILD_ID" --locale en-US --notes "What's new in 1.2.0"
 
-# 4. Prepare the App Store version
+# 3. Prepare the App Store version
 VERSION_ID=$(asc versions list --app-id APP_ID | jq -r '.data[0].id')
 asc versions set-build --version-id "$VERSION_ID" --build-id "$BUILD_ID"
 
-# 5. Update per-locale content
+# 4. Update What's New
 LOC_ID=$(asc version-localizations list --version-id "$VERSION_ID" | jq -r '.data[0].id')
 asc version-localizations update --localization-id "$LOC_ID" --whats-new "Bug fixes and performance improvements"
-asc screenshots upload --set-id SET_ID --file ./hero.png
 
-# 6. Pre-flight check — affordances.submit appears only when isReadyToSubmit == true
+# 5. Pre-flight check, then submit
 asc versions check-readiness --version-id "$VERSION_ID" --pretty
-
-# 7. Submit for review
 asc versions submit --version-id "$VERSION_ID"
 ```
 
-### Output Formats
-
-```bash
-asc apps list                        # JSON (default)
-asc apps list --output table         # Aligned table
-asc apps list --output markdown      # Markdown table
-asc apps list --output json --pretty # Pretty-printed JSON
-```
-
-### TUI Mode
-
-```bash
-asc tui
-```
-
-Navigate interactively: **arrow keys** to move, **Enter** to drill in, **Escape** to go back.
-
 ## Feature Guides
 
-Detailed documentation for each feature area:
+Detailed documentation for each feature:
 
-- [Auth Login](docs/features/auth-login.md) — persistent credential storage, login/logout/check
-- [Version Localizations](docs/features/version-localizations.md) — What's New, description, keywords, and URLs
+- [Auth](docs/features/auth-login.md) — persistent credential storage, login/logout/check
+- [Version Localizations](docs/features/version-localizations.md) — What's New, description, keywords
 - [Screenshots](docs/features/screenshots.md) — screenshot sets and image uploads
-- [App Previews](docs/features/app-previews.md) — preview sets and video uploads (`.mp4`, `.mov`, `.m4v`)
-- [App Infos](docs/features/app-infos.md) — per-locale name, subtitle, privacy policy, category management, and age rating navigation
+- [App Previews](docs/features/app-previews.md) — preview sets and video uploads
+- [App Info](docs/features/app-infos.md) — name, subtitle, privacy policy, categories, age rating
 - [TestFlight](docs/features/testflight.md) — beta groups, tester management, CSV import/export
 - [Builds Upload](docs/features/builds-upload.md) — upload IPA/PKG, TestFlight distribution, beta notes
 - [Code Signing](docs/features/code-signing.md) — bundle IDs, certificates, devices, profiles
 - [Version Check-Readiness](docs/features/version-check-readiness.md) — pre-flight submission checks
-- [In-App Purchases & Subscriptions](docs/features/iap-subscriptions.md) — IAPs (consumable, non-consumable, non-renewing); subscription groups, tiers, submit, introductory offers; per-locale metadata and pricing
-- [App Shots](docs/features/app-shots.md) — AI-powered screenshot plan enhancement with Gemini AI
-- [Plugins](docs/features/plugins.md) — install executable plugins in `~/.asc/plugins/` for custom event handlers (Slack, Telegram, webhooks, etc.)
-- [App Wall](docs/features/app-wall.md) — community showcase on the homepage; `apps.json` format, iTunes pre-fetch architecture, display logic
+- [In-App Purchases & Subscriptions](docs/features/iap-subscriptions.md) — IAPs, subscriptions, offers, pricing
+- [App Shots](docs/features/app-shots.md) — AI-powered screenshot generation and localization
+- [Plugins](docs/features/plugins.md) — custom event handlers (Slack, Telegram, webhooks)
+- [App Wall](docs/features/app-wall.md) — community showcase; `apps.json` format and architecture
+
+## Design: CAEOAS
+
+REST has **HATEOAS** — responses embed URLs so clients navigate without knowing the API. This CLI has **CAEOAS** (Commands As the Engine Of Application State): responses embed ready-to-run CLI commands so agents navigate without memorising the command tree.
+
+```bash
+$ asc versions list --app-id app-abc
+```
+
+```jsonc
+{
+  "id": "v1",
+  "versionString": "2.1.0",
+  "state": "PREPARE_FOR_SUBMISSION",
+  "isEditable": true,
+  "affordances": {
+    "listLocalizations": "asc version-localizations list --version-id v1",
+    "checkReadiness":    "asc versions check-readiness --version-id v1",
+    "submitForReview":   "asc versions submit --version-id v1"  // only when isEditable == true
+  }
+}
+```
+
+Affordances are state-aware — `submitForReview` only appears when `isEditable == true`. See [docs/design.md](docs/desgin.md) for the full pattern.
 
 ## Development
 
 ```bash
-swift build          # Build
-swift test           # Run tests (701 tests, Chicago School TDD)
-swift format --in-place --recursive Sources Tests  # Format
+swift build          # build
+swift test           # run tests (Chicago School TDD)
+swift format --in-place --recursive Sources Tests
 ```
 
-## Architecture
+**Architecture:**
 
 ```
 Sources/
-├── Domain/          # Pure value types, @Mockable repository protocols — zero I/O
+├── Domain/          # Pure value types, @Mockable protocols — zero I/O
 ├── Infrastructure/  # SDK adapters (appstoreconnect-swift-sdk), parent ID injection
 └── ASCCommand/      # CLI commands, output formatting, TUI
 ```
 
 Unidirectional dependency: `ASCCommand → Infrastructure → Domain`
 
-See [docs/desgin.md](docs/desgin.md) for the full architecture and CAEOAS pattern documentation.
+**Dependencies:**
+- [appstoreconnect-swift-sdk](https://github.com/AvdLee/appstoreconnect-swift-sdk)
+- [swift-argument-parser](https://github.com/apple/swift-argument-parser)
+- [TauTUI](https://github.com/steipete/TauTUI)
+- [Mockable](https://github.com/Kolos65/Mockable)
 
-## Dependencies
-
-- [appstoreconnect-swift-sdk](https://github.com/AvdLee/appstoreconnect-swift-sdk) — App Store Connect API
-- [swift-argument-parser](https://github.com/apple/swift-argument-parser) — CLI parsing
-- [TauTUI](https://github.com/steipete/TauTUI) — Terminal UI framework
-- [Mockable](https://github.com/Kolos65/Mockable) — Protocol mocking for tests
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md).
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## Sponsors
 
@@ -383,51 +363,9 @@ Apps that use and support asc-cli development:
 
 ## App Wall
 
-Apps published on the App Store using asc CLI. Your app could be here!
+Apps built and published using asc-cli. To add yours, edit [`homepage/apps.json`](homepage/apps.json) and open a pull request — see [docs/features/app-wall.md](docs/features/app-wall.md) for the format.
 
-To add your app, edit [`homepage/apps.json`](homepage/apps.json) and open a pull request. Two formats are supported:
-
-**Option A — Developer ID (recommended):** Provide your Apple developer ID and all your apps load automatically.
-
-```json
-{
-  "developer": "your-github-handle",
-  "developerId": "1234567890",
-  "github": "your-github-handle",
-  "x": "your-x-handle"
-}
-```
-
-Find your developer ID on your App Store developer page:
-`https://apps.apple.com/us/developer/your-name/id<NUMBER>`
-
-**Option B — Specific app URLs:** List individual App Store URLs.
-
-```json
-{
-  "developer": "your-github-handle",
-  "github": "your-github-handle",
-  "apps": [
-    "https://apps.apple.com/us/app/your-app/idXXXXXXXXX"
-  ]
-}
-```
-
-Fields:
-- `developer` — display handle (required)
-- `developerId` — Apple developer ID, auto-loads all your apps (optional)
-- `github` — GitHub username, links the card to your GitHub profile (optional)
-- `x` — X/Twitter handle, links the card to your X profile (optional)
-- `apps` — explicit App Store URLs (optional, used if no `developerId` or to supplement it)
-
-After your PR is merged, run the fetch script to regenerate the static metadata cache, then commit both files:
-
-```bash
-node homepage/fetch-apps-data.js   # fetches iTunes metadata → writes apps-data.json
-node homepage/build-i18n.js        # rebuilds all localized HTML pages
-```
-
-App Wall entries are displayed live at [asccli.app/#app-wall](https://asccli.app/#app-wall).
+View the live wall at [asccli.app/#app-wall](https://asccli.app/#app-wall).
 
 ## License
 
