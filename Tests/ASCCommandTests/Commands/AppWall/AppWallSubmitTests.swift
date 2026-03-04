@@ -50,6 +50,19 @@ struct AppWallSubmitTests {
         #expect(output.contains("\"prNumber\":7") || output.contains("\"prNumber\" : 7"))
     }
 
+    @Test func `submit without developerId or apps throws validation error`() async throws {
+        let mockRepo = MockAppWallRepository()
+
+        var cmd = try AppWallSubmit.parse([
+            "--developer", "tddworks",
+            "--github", "tddworks",
+        ])
+
+        await #expect(throws: (any Error).self) {
+            try await cmd.execute(repo: mockRepo)
+        }
+    }
+
     @Test func `submit with specific app URLs passes apps array`() async throws {
         let mockRepo = MockAppWallRepository()
         given(mockRepo).submit(app: .any).willReturn(

@@ -43,6 +43,11 @@ struct AppWallSubmit: AsyncParsableCommand {
             x: x,
             apps: app.isEmpty ? nil : app
         )
+        guard wallApp.hasAppSource else {
+            throw ValidationError(
+                "Provide --developer-id or at least one --app URL so your apps appear on the wall."
+            )
+        }
         let submission = try await repo.submit(app: wallApp)
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
         return try formatter.formatAgentItems(

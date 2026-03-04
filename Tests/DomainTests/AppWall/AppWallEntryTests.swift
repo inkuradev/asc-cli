@@ -53,6 +53,21 @@ struct AppWallAppTests {
         #expect(decoded == app)
     }
 
+    @Test func `hasAppSource is false when neither developerId nor apps provided`() {
+        let app = AppWallApp(developer: "tddworks", github: "tddworks")
+        #expect(app.hasAppSource == false)
+    }
+
+    @Test func `hasAppSource is true when developerId is set`() {
+        let app = AppWallApp(developer: "itshan", developerId: "1725133580")
+        #expect(app.hasAppSource == true)
+    }
+
+    @Test func `hasAppSource is true when apps array is provided`() {
+        let app = AppWallApp(developer: "jane", apps: ["https://apps.apple.com/us/app/x/id123"])
+        #expect(app.hasAppSource == true)
+    }
+
     @Test func `submission carries PR details and openPR affordance`() {
         let submission = AppWallSubmission(
             prNumber: 42,

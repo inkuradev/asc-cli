@@ -27,6 +27,12 @@ public struct AppWallApp: Sendable, Equatable, Codable, Identifiable {
         self.apps = apps
     }
 
+    /// True when the entry has at least one source of apps to display on the wall.
+    /// An entry without `developerId` or `apps` would appear as an empty card.
+    public var hasAppSource: Bool {
+        developerId != nil || (apps?.isEmpty == false)
+    }
+
     // Custom Codable: omit nil/empty fields from JSON output
     enum CodingKeys: String, CodingKey {
         case developer, developerId, github, x, apps
