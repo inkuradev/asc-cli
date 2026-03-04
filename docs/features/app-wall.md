@@ -2,7 +2,238 @@
 
 Community showcase of apps published on the App Store using asc CLI. Displayed at [asccli.app/#app-wall](https://asccli.app/#app-wall) as an auto-scrolling marquee of app cards.
 
+## CLI Usage
+
+### submit — add your app to the app wall
+
+```bash
+asc app-wall submit --developer <handle> [options]
+```
+
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--developer` | ✓ | Display handle shown on the card (`@developer`) |
+| `--developer-id` | — | Apple developer/seller ID — auto-fetches **all** your App Store apps |
+| `--github` | — | GitHub username; card links to `github.com/<handle>` |
+| `--x` | — | X/Twitter handle; card links to `x.com/<handle>` |
+| `--app` | — | Specific App Store URL (repeat flag for multiple apps) |
+| `--github-token` | — | GitHub personal access token (or `GITHUB_TOKEN` env var) |
+| `--output` | — | Output format: `json` (default), `table`, `markdown` |
+| `--pretty` | — | Pretty-print JSON output |
+
+**Examples:**
+
+```bash
+# Mode A — all apps by developer ID
+asc app-wall submit \
+  --developer "itshan" \
+  --developer-id "1725133580" \
+  --github "hanrw" \
+  --x "itshanrw" \
+  --pretty
+
+# Mode B — specific App Store URLs
+asc app-wall submit \
+  --developer "itshan" \
+  --app "https://apps.apple.com/us/app/my-app/id123456789"
+
+# Both modes combined
+asc app-wall submit \
+  --developer "itshan" \
+  --developer-id "1725133580" \
+  --app "https://apps.apple.com/us/app/extra-app/id987654321"
+```
+
+**JSON output:**
+
+```json
+{
+  "data": [
+    {
+      "affordances": {
+        "openPR": "open https://github.com/tddworks/asc-cli/pull/42"
+      },
+      "developer": "itshan",
+      "id": "42",
+      "prNumber": 42,
+      "prUrl": "https://github.com/tddworks/asc-cli/pull/42",
+      "title": "feat(app-wall): add itshan"
+    }
+  ]
+}
+```
+
+**Table output:**
+
+```
+PR #  Title                      URL
+42    feat(app-wall): add itshan  https://github.com/tddworks/asc-cli/pull/42
+```
+
+## Typical Workflow
+
+```bash
+# 1. Set up GitHub token (once)
+export GITHUB_TOKEN="ghp_..."          # or: gh auth login
+
+# 2. Submit your app — opens a PR automatically
+asc app-wall submit \
+  --developer "yourhandle" \
+  --developer-id "1234567890" \
+  --github "yourgithub" \
+  --x "yourx" \
+  --pretty
+
+# 3. The CLI will:
+#    a) Fork tddworks/asc-cli on your behalf
+#    b) Add your entry to homepage/apps.json
+#    c) Open a PR — URL is in the output
+
+# 4. Open the PR in your browser
+open "https://github.com/tddworks/asc-cli/pull/<number>"
+```
+
 ## Architecture
+
+```
+ASCCommand (AppWallSubmit)
+    │  --developer, --developer-id, --github, --x, --app
+    │  resolves GitHub token (flag → $GITHUB_TOKEN → gh auth token)
+    ▼
+Domain (AppWallRepository)
+    │  submit(app: AppWallApp) -> AppWallSubmission
+    ▼
+Infrastructure (GitHubAppWallRepository)
+    │  GitHub REST API
+    ├─ GET  /user                                  → authenticated username
+    ├─ POST /repos/tddworks/asc-cli/forks          → fork (idempotent)
+    ├─ POST /repos/{user}/asc-cli/merge-upstream   → sync to main
+    ├─ GET  /repos/{user}/asc-cli/contents/…       → fetch apps.json + SHA
+    ├─ POST /repos/{user}/asc-cli/git/refs         → create feature branch
+    ├─ PUT  /repos/{user}/asc-cli/contents/…       → commit updated apps.json
+    └─ POST /repos/tddworks/asc-cli/pulls          → open PR
+```
+
+No ASC authentication required — only a GitHub token.
+
+## Domain Models
+
+### `AppWallApp`
+
+Represents an app entry on the app wall. Maps directly to one object in `homepage/apps.json`.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `developer` | `String` | Required. Display handle. Also the `id`. |
+| `developerId` | `String?` | Optional. Auto-fetches all App Store apps. |
+| `github` | `String?` | Optional. GitHub profile link. |
+| `x` | `String?` | Optional. X/Twitter profile link. |
+| `apps` | `[String]?` | Optional. Specific App Store URLs. |
+
+Custom `Codable`: nil fields are omitted from JSON output (`encodeIfPresent`).
+
+### `AppWallSubmission`
+
+The result of a successful submit — the opened GitHub pull request.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `prNumber` | `Int` | PR number. Also the `id`. |
+| `prUrl` | `String` | Full GitHub PR URL. |
+| `title` | `String` | PR title (`feat(app-wall): add <developer>`). |
+| `developer` | `String` | Developer handle from the submitted app. |
+
+**Affordances:** `openPR` → `open <prUrl>`
+
+### `AppWallError`
+
+| Case | Description |
+|------|-------------|
+| `alreadySubmitted(developer:)` | Entry with same `developer` already in `apps.json` |
+| `forkTimeout` | Fork not ready after 8 retries (24 seconds) |
+| `githubAPIError(statusCode:message:)` | GitHub API returned non-2xx |
+
+### `AppWallRepository` (protocol)
+
+```swift
+@Mockable
+public protocol AppWallRepository: Sendable {
+    func submit(app: AppWallApp) async throws -> AppWallSubmission
+}
+```
+
+## File Map
+
+```
+Sources/
+├── Domain/AppWall/
+│   ├── AppWallApp.swift           ← AppWallApp model (Codable, omits nil fields)
+│   ├── AppWallSubmission.swift    ← PR result model + affordances
+│   ├── AppWallRepository.swift    ← @Mockable protocol
+│   └── AppWallError.swift         ← alreadySubmitted / forkTimeout / githubAPIError
+├── Infrastructure/AppWall/
+│   └── GitHubAppWallRepository.swift  ← GitHub REST API implementation
+└── ASCCommand/Commands/AppWall/
+    ├── AppWallCommand.swift        ← parent command (commandName: "app-wall")
+    └── AppWallSubmit.swift         ← submit subcommand + token resolution
+
+Tests/
+├── DomainTests/AppWall/
+│   └── AppWallEntryTests.swift    ← AppWallApp encoding, optionals, affordances
+└── ASCCommandTests/Commands/AppWall/
+    └── AppWallSubmitTests.swift   ← execute() with MockAppWallRepository
+```
+
+**Wiring:**
+- `ASC.swift` — registers `AppWallCommand`
+- `ClientProvider.makeAppWallRepository(token:)` — returns `GitHubAppWallRepository`
+
+## API Reference
+
+| Step | GitHub API endpoint | Notes |
+|------|-------------------|-------|
+| Identify user | `GET /user` | Resolves fork owner username |
+| Fork repo | `POST /repos/tddworks/asc-cli/forks` | 202 = queued, 200/201 = already exists |
+| Sync fork | `POST /repos/{user}/asc-cli/merge-upstream` | Best-effort, errors ignored |
+| Fetch file | `GET /repos/{user}/asc-cli/contents/homepage/apps.json` | Base64 content + SHA |
+| Create branch | `POST /repos/{user}/asc-cli/git/refs` | `refs/heads/app-wall/{developer}` |
+| Commit | `PUT /repos/{user}/asc-cli/contents/homepage/apps.json` | Includes branch + SHA |
+| Open PR | `POST /repos/tddworks/asc-cli/pulls` | head: `{user}:app-wall/{developer}` |
+
+**Token resolution order:** `--github-token` flag → `$GITHUB_TOKEN` → `gh auth token`
+
+## Testing
+
+```swift
+@Test func `submit returns PR details as formatted JSON`() async throws {
+    let mockRepo = MockAppWallRepository()
+    given(mockRepo).submit(app: .any).willReturn(
+        AppWallSubmission(
+            prNumber: 42,
+            prUrl: "https://github.com/tddworks/asc-cli/pull/42",
+            title: "feat(app-wall): add itshan",
+            developer: "itshan"
+        )
+    )
+
+    var cmd = try AppWallSubmit.parse([
+        "--developer", "itshan",
+        "--developer-id", "1725133580",
+        "--github", "hanrw",
+        "--pretty",
+    ])
+    let output = try await cmd.execute(repo: mockRepo)
+
+    #expect(output.contains("\"prNumber\" : 42"))
+    #expect(output.contains("\"developer\" : \"itshan\""))
+}
+```
+
+```bash
+swift test --filter 'AppWallAppTests|AppWallSubmitTests'
+```
+
+## Architecture (homepage pipeline)
 
 ```
 apps.json                  ← community registry — developers submit PRs here
@@ -19,26 +250,11 @@ homepage/{lang}/index.html   (same for all 12 localized pages)
 
 ### Why static pre-fetch?
 
-Fetching the iTunes API directly from the browser triggers CORS errors (`Access-Control-Allow-Origin` mismatch). Pre-fetching at build time avoids this entirely — the browser only loads a static JSON file from the same origin.
-
-## File Map
-
-```
-homepage/
-├── apps.json              ← community registry (source of truth)
-├── apps-data.json         ← generated iTunes metadata cache
-├── fetch-apps-data.js     ← Node script: reads apps.json → writes apps-data.json
-├── build-i18n.js          ← injects APPS_DATA_PATH per language, rebuilds HTML
-├── template.html          ← app wall section + JS renderer
-├── styles/layout.css      ← .app-wall-* CSS (scroll, static, cards)
-└── i18n/
-    ├── en.json            ← appWall.{eyebrow,title,subtitle,submitCta,ctaHint,empty}
-    └── {zh,ja,ko,...}.json  (same keys, native translations)
-```
+Fetching the iTunes API directly from the browser triggers CORS errors. Pre-fetching at build time avoids this — the browser only loads a static JSON file from the same origin.
 
 ## apps.json Format
 
-Developers submit PRs to add their entry. Two modes are supported and can be combined:
+Two modes (combinable):
 
 ```json
 [
@@ -54,12 +270,12 @@ Developers submit PRs to add their entry. Two modes are supported and can be com
 | Field | Required | Description |
 |-------|----------|-------------|
 | `developer` | ✓ | Display handle shown on the card (`@developer`) |
-| `developerId` | — | Apple developer ID — auto-fetches **all** your apps from the App Store. Find it at `https://apps.apple.com/us/developer/name/id<NUMBER>` |
+| `developerId` | — | Apple developer ID — auto-fetches **all** your App Store apps |
 | `github` | — | GitHub username; card links to `github.com/<handle>` with a GitHub icon |
 | `x` | — | X/Twitter handle; card links to `x.com/<handle>` with an X icon |
 | `apps` | — | Array of explicit App Store URLs for specific apps only |
 
-If both `github` and `x` are set, both icons appear on the card. If neither is set, the card falls back to `github.com/developer`.
+Both `developerId` and `apps` can be combined. Duplicate apps (by `trackId`) are deduplicated automatically.
 
 **Option B — specific URLs only:**
 
@@ -72,8 +288,6 @@ If both `github` and `x` are set, both icons appear on the card. If neither is s
   ]
 }
 ```
-
-Both `developerId` and `apps` can be combined in one entry. Duplicate apps (by `trackId`) are deduplicated automatically.
 
 ## apps-data.json Format
 
@@ -97,63 +311,26 @@ Auto-generated by `fetch-apps-data.js`. **Do not edit manually.**
 }
 ```
 
-## Workflow: Adding a New App
-
-1. Edit `homepage/apps.json` — add or update your developer entry
-2. Run the fetch script to pull iTunes metadata:
-   ```bash
-   node homepage/fetch-apps-data.js
-   ```
-3. Rebuild the localized HTML:
-   ```bash
-   node homepage/build-i18n.js
-   ```
-4. Commit all three changed files and open a PR:
-   ```bash
-   git add homepage/apps.json homepage/apps-data.json homepage/index.html
-   git commit -m "feat(app-wall): add <developer> apps"
-   ```
-
-## Display Logic
-
-The homepage JS in `template.html` decides how to render based on the number of apps relative to the viewport width:
+## File Map (homepage)
 
 ```
-apps < rowThreshold          → static centered grid (no animation)
-apps ≥ rowThreshold          → single scrolling row (forward)
-apps ≥ rowThreshold × 2      → two scrolling rows (interleaved, forward + reverse)
+homepage/
+├── apps.json              ← community registry (source of truth)
+├── apps-data.json         ← generated iTunes metadata cache
+├── fetch-apps-data.js     ← Node script: reads apps.json → writes apps-data.json
+├── build-i18n.js          ← injects APPS_DATA_PATH per language, rebuilds HTML
+├── template.html          ← app wall section + JS renderer
+├── styles/layout.css      ← .app-wall-* CSS (scroll, static, cards)
+└── i18n/
+    ├── en.json            ← appWall.{eyebrow,title,subtitle,submitCta,ctaHint,empty}
+    └── {zh,ja,ko,...}.json  (same keys, native translations)
 ```
-
-Where `rowThreshold = Math.ceil(window.innerWidth / 176) + 1` (approx. 9 apps on a 1280px screen).
-
-**Two-row interleaving:** apps at even indices go to row 1, odd indices to row 2. This ensures each app appears exactly once across both rows — no duplication.
-
-**Scroll speed:** ~50px/second. Animation pauses when hovering anywhere in the scroller. Edge fading via CSS `mask-image`.
-
-## CSS Classes
-
-| Class | Purpose |
-|-------|---------|
-| `.app-wall-section` | Section wrapper |
-| `.app-wall-scroller` | Overflow container with edge fade mask |
-| `.app-wall-scroller.is-static` | Static grid mode (overflow visible, flex-wrap) |
-| `.app-wall-track` | Flex row, forward scroll animation |
-| `.app-wall-track--rev` | Reverse scroll animation |
-| `.app-card` | Individual app card link |
-| `.app-card-icon` | 64×64 app icon image |
-| `.app-card-name` | App name text |
-| `.app-card-dev` | Developer row (`@handle` + profile icons) |
-| `.app-card-dev-profiles` | Container for GitHub/X icon links |
-| `.app-card-profile-link` | Individual profile icon link |
-| `.app-card-category` | Category badge (accent colour pill) |
-| `.app-wall-loading` | Three-dot pulse loading indicator |
-| `.app-wall-empty` | Empty state message |
 
 ## Extending
 
-### Automate with GitHub Actions
+### Automate apps-data.json regeneration
 
-Add a workflow to regenerate `apps-data.json` automatically whenever `apps.json` changes:
+Add a GitHub Actions workflow to refresh `apps-data.json` whenever `apps.json` changes:
 
 ```yaml
 # .github/workflows/update-app-wall.yml
@@ -176,9 +353,3 @@ jobs:
           commit_message: 'chore(app-wall): refresh apps-data.json'
           file_pattern: 'homepage/apps-data.json homepage/index.html homepage/*/index.html'
 ```
-
-### Add a New i18n Field
-
-1. Add the key to all 12 files in `homepage/i18n/*.json`
-2. Add the `{{appWall.newKey}}` placeholder to `homepage/template.html`
-3. Run `node homepage/build-i18n.js`
