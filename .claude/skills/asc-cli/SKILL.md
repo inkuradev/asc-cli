@@ -22,16 +22,23 @@ description: |
 **Option A — Persistent login (recommended):**
 
 ```bash
+# Single account
 asc auth login \
   --key-id YOUR_KEY_ID \
   --issuer-id YOUR_ISSUER_ID \
   --private-key-path ~/.asc/AuthKey_XXXXXX.p8
 
-asc auth logout   # remove saved credentials
-asc auth check    # verify and show source (file or environment)
+# Multiple accounts
+asc auth login --key-id K1 --issuer-id I1 --private-key-path work.p8 --name work
+asc auth login --key-id K2 --issuer-id I2 --private-key-path personal.p8 --name personal
+asc auth use work         # switch active account
+asc auth list             # see all accounts
+asc auth logout           # remove active account
+asc auth logout --name personal  # remove specific account
+asc auth check            # verify active credentials
 ```
 
-Credentials are saved to `~/.asc/credentials.json`. All `asc` commands pick them up automatically.
+Credentials are saved to `~/.asc/credentials.json`. All `asc` commands use the active account automatically. See the `asc-auth` skill for full multi-account details.
 
 **Option B — Environment variables:**
 
@@ -41,7 +48,7 @@ export ASC_ISSUER_ID="YOUR_ISSUER_ID"
 export ASC_PRIVATE_KEY_PATH="~/.asc/AuthKey_XXXXXX.p8"
 ```
 
-**Resolution order:** `~/.asc/credentials.json` → environment variables.
+**Resolution order:** active account in `~/.asc/credentials.json` → environment variables.
 
 ---
 
@@ -73,9 +80,11 @@ See [api_reference.md](references/api_reference.md) for the underlying App Store
 | Goal | Command |
 |------|---------|
 | **Auth** | |
-| Save credentials to disk | `asc auth login --key-id <id> --issuer-id <id> --private-key-path <path>` |
-| Remove saved credentials | `asc auth logout` |
-| Check credentials + source | `asc auth check` |
+| Save credentials to disk | `asc auth login --key-id <id> --issuer-id <id> --private-key-path <path> [--name alias]` |
+| List all saved accounts | `asc auth list` |
+| Switch active account | `asc auth use <name>` |
+| Remove an account | `asc auth logout [--name alias]` |
+| Check active credentials | `asc auth check` |
 | **Project Context** | |
 | Pin app to current directory | `asc init --app-id <id>` |
 | Find app by name | `asc init --name "My App"` |
