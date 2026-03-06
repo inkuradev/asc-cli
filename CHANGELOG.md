@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.36] - 2026-03-05
+
 ### Added
 - `asc users list/update/remove` — manage App Store Connect team members; list users filtered by role, update a member's roles (replaces all current roles), or revoke access immediately; `TeamMember` carries `username`, `firstName`, `lastName`, `roles`, `isAllAppsVisible`, `isProvisioningAllowed`; affordances: `remove`, `updateRoles` (pre-filled with current roles)
 - `asc user-invitations list/invite/cancel` — manage pending team invitations; invite a new member with one or more roles (`--role DEVELOPER --role APP_MANAGER`); `UserInvitationRecord` carries `email`, `roles`, `expirationDate`; affordance: `cancel`; supports 13 roles; `--all-apps-visible` flag on invite grants access to all apps
@@ -306,7 +310,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.35...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.36...HEAD
+[0.1.36]: https://github.com/tddworks/asc-cli/compare/v0.1.35...v0.1.36
 [0.1.35]: https://github.com/tddworks/asc-cli/compare/v0.1.34...v0.1.35
 [0.1.34]: https://github.com/tddworks/asc-cli/compare/v0.1.33...v0.1.34
 [0.1.33]: https://github.com/tddworks/asc-cli/compare/v0.1.32...v0.1.33
