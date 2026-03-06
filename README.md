@@ -1,5 +1,7 @@
 # <img src="homepage/static/icon-192.png" width="36" height="36" valign="middle" alt=""> asc-cli
 
+**App Store Command Center** — inspired by the Terran Command Center from StarCraft.
+
 [![CI](https://github.com/tddworks/asc-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/tddworks/asc-cli/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/tddworks/asc-cli/graph/badge.svg?token=v0k1Vzubrx)](https://codecov.io/gh/tddworks/asc-cli)
 [![Swift](https://img.shields.io/badge/Swift-6.2-orange)](https://swift.org)
