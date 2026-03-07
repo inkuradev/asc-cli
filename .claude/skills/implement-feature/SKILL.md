@@ -211,6 +211,7 @@ Use `docs/features/screenshots.md` as the canonical reference example.
 - [Domain model patterns](references/domain-models.md) — model requirements, parent IDs, mappers, MockRepositoryFactory
 - [Command Affordances](references/command-affordances.md) — AffordanceProviding, formatAgentItems, JSON shape
 - [TDD patterns](references/tdd-patterns.md) — MockRepositoryFactory, affordance tests, async patterns
+  -  implement following strict TDD — tests first, then implementation
 - [Swift concurrency](references/swift-observable.md) — Sendable, @unchecked Sendable, method naming
 
 ---
