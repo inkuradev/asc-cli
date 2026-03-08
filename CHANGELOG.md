@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.39] - 2026-03-08
+
 ### Added
 - `asc game-center detail get --app-id <id>` — get Game Center configuration for an app; `GameCenterDetail` carries `appId` (injected), `isArcadeEnabled`; affordances: `getDetail`, `listAchievements`, `listLeaderboards`
 - `asc game-center achievements list --detail-id <id>` — list Game Center achievements; `GameCenterAchievement` carries `gameCenterDetailId` (injected), `referenceName`, `vendorIdentifier`, `points`, `isShowBeforeEarned`, `isRepeatable`, `isArchived`; affordances: `listAchievements`, `delete`
@@ -339,7 +343,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.38...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.39...HEAD
+[0.1.39]: https://github.com/tddworks/asc-cli/compare/v0.1.38...v0.1.39
 [0.1.38]: https://github.com/tddworks/asc-cli/compare/v0.1.37...v0.1.38
 [0.1.37]: https://github.com/tddworks/asc-cli/compare/v0.1.36...v0.1.37
 [0.1.36]: https://github.com/tddworks/asc-cli/compare/v0.1.35...v0.1.36
