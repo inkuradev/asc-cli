@@ -187,7 +187,7 @@ After every code change — new feature, improvement, or bug fix — update all 
 
 **`README.md`** — update the feature/command table and any usage examples that changed.
 
-**`.claude/skills/`** — keep skills in sync whenever commands are added or flags change:
+**`.claude/skills/<feature>`** — keep skills in sync whenever commands are added or flags change:
 - If the skill **exists**: update the relevant `SKILL.md` or reference file, then re-package with `package_skill.py`.
 - If the skill **does not exist**: use the `skill-creator` skill to create it from scratch (init → edit → package).
 

@@ -529,3 +529,80 @@ asc user-invitations cancel --invitation-id <id>
 ```
 
 `UserInvitationRecord` affordance: `cancel`.
+
+---
+
+## game-center
+
+Manage Game Center achievements and leaderboards.
+
+### detail get
+```bash
+asc game-center detail get --app-id <id> [--pretty] [--output table]
+```
+Returns `GameCenterDetail` with `id`, `appId`, `isArcadeEnabled`. Affordances: `getDetail`, `listAchievements`, `listLeaderboards`.
+
+### achievements list
+```bash
+asc game-center achievements list --detail-id <id> [--pretty] [--output table]
+```
+Lists all achievements for a Game Center detail. `GameCenterAchievement` carries `gameCenterDetailId` (injected), `referenceName`, `vendorIdentifier`, `points`, `isShowBeforeEarned`, `isRepeatable`, `isArchived`. Affordances: `listAchievements`, `delete`.
+
+### achievements create
+```bash
+asc game-center achievements create \
+  --detail-id <id> \
+  --reference-name <name> \
+  --vendor-identifier <identifier> \
+  --points <n> \
+  [--show-before-earned] \
+  [--repeatable]
+```
+Creates a new achievement linked to the given Game Center detail.
+
+### achievements delete
+```bash
+asc game-center achievements delete --achievement-id <id>
+```
+
+### leaderboards list
+```bash
+asc game-center leaderboards list --detail-id <id> [--pretty] [--output table]
+```
+Lists all leaderboards for a Game Center detail. `GameCenterLeaderboard` carries `gameCenterDetailId` (injected), `referenceName`, `vendorIdentifier`, `scoreSortType` (`ASC`/`DESC`), `submissionType` (`BEST_SCORE`/`MOST_RECENT_SCORE`), `isArchived`. Affordances: `listLeaderboards`, `delete`.
+
+### leaderboards create
+```bash
+asc game-center leaderboards create \
+  --detail-id <id> \
+  --reference-name <name> \
+  --vendor-identifier <identifier> \
+  --score-sort-type ASC|DESC \
+  [--submission-type BEST_SCORE|MOST_RECENT_SCORE]
+```
+Default `--submission-type` is `BEST_SCORE`.
+
+### leaderboards delete
+```bash
+asc game-center leaderboards delete --leaderboard-id <id>
+```
+
+**Typical workflow:**
+```bash
+# 1. Get Game Center detail ID for your app
+asc game-center detail get --app-id 6450000000 --pretty
+
+# 2. Create an achievement
+asc game-center achievements create \
+  --detail-id gc-abc123 \
+  --reference-name "First Launch" \
+  --vendor-identifier first_launch \
+  --points 10
+
+# 3. Create a leaderboard
+asc game-center leaderboards create \
+  --detail-id gc-abc123 \
+  --reference-name "All Time High" \
+  --vendor-identifier all_time_high \
+  --score-sort-type DESC
+```
