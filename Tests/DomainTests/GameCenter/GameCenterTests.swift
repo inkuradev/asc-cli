@@ -2,12 +2,26 @@ import Foundation
 import Testing
 @testable import Domain
 
+// MARK: - GameCenterDetail
+
 @Suite
 struct GameCenterDetailTests {
+
+    @Test func `detail carries all fields`() {
+        let detail = GameCenterDetail(id: "gc-1", appId: "app-42", isArcadeEnabled: true)
+        #expect(detail.id == "gc-1")
+        #expect(detail.appId == "app-42")
+        #expect(detail.isArcadeEnabled == true)
+    }
 
     @Test func `detail carries appId`() {
         let detail = MockRepositoryFactory.makeGameCenterDetail(id: "gc-1", appId: "app-1")
         #expect(detail.appId == "app-1")
+    }
+
+    @Test func `detail is arcade disabled by default`() {
+        let detail = MockRepositoryFactory.makeGameCenterDetail()
+        #expect(detail.isArcadeEnabled == false)
     }
 
     @Test func `detail affordances include get, list achievements, list leaderboards`() {
@@ -16,10 +30,52 @@ struct GameCenterDetailTests {
         #expect(detail.affordances["listAchievements"] == "asc game-center achievements list --detail-id gc-1")
         #expect(detail.affordances["listLeaderboards"] == "asc game-center leaderboards list --detail-id gc-1")
     }
+
+    @Test func `detail equatable two equal instances`() {
+        let a = GameCenterDetail(id: "gc-1", appId: "app-1", isArcadeEnabled: false)
+        let b = GameCenterDetail(id: "gc-1", appId: "app-1", isArcadeEnabled: false)
+        #expect(a == b)
+    }
+
+    @Test func `detail equatable different ids are not equal`() {
+        let a = GameCenterDetail(id: "gc-1", appId: "app-1", isArcadeEnabled: false)
+        let b = GameCenterDetail(id: "gc-2", appId: "app-1", isArcadeEnabled: false)
+        #expect(a != b)
+    }
+
+    @Test func `detail codable round trip preserves all fields`() throws {
+        let detail = GameCenterDetail(id: "gc-1", appId: "app-42", isArcadeEnabled: true)
+        let data = try JSONEncoder().encode(detail)
+        let decoded = try JSONDecoder().decode(GameCenterDetail.self, from: data)
+        #expect(decoded == detail)
+    }
 }
+
+// MARK: - GameCenterAchievement
 
 @Suite
 struct GameCenterAchievementTests {
+
+    @Test func `achievement carries all fields`() {
+        let a = GameCenterAchievement(
+            id: "ach-1",
+            gameCenterDetailId: "gc-1",
+            referenceName: "First Steps",
+            vendorIdentifier: "first_steps",
+            points: 10,
+            isShowBeforeEarned: true,
+            isRepeatable: false,
+            isArchived: false
+        )
+        #expect(a.id == "ach-1")
+        #expect(a.gameCenterDetailId == "gc-1")
+        #expect(a.referenceName == "First Steps")
+        #expect(a.vendorIdentifier == "first_steps")
+        #expect(a.points == 10)
+        #expect(a.isShowBeforeEarned == true)
+        #expect(a.isRepeatable == false)
+        #expect(a.isArchived == false)
+    }
 
     @Test func `achievement carries gameCenterDetailId`() {
         let a = MockRepositoryFactory.makeGameCenterAchievement(id: "ach-1", gameCenterDetailId: "gc-1")
@@ -31,10 +87,59 @@ struct GameCenterAchievementTests {
         #expect(a.affordances["listAchievements"] == "asc game-center achievements list --detail-id gc-1")
         #expect(a.affordances["delete"] == "asc game-center achievements delete --achievement-id ach-1")
     }
+
+    @Test func `achievement affordances have exactly two keys`() {
+        let a = MockRepositoryFactory.makeGameCenterAchievement(id: "ach-1", gameCenterDetailId: "gc-1")
+        #expect(a.affordances.count == 2)
+    }
+
+    @Test func `achievement equatable two equal instances`() {
+        let a = MockRepositoryFactory.makeGameCenterAchievement(id: "ach-1", gameCenterDetailId: "gc-1", points: 10)
+        let b = MockRepositoryFactory.makeGameCenterAchievement(id: "ach-1", gameCenterDetailId: "gc-1", points: 10)
+        #expect(a == b)
+    }
+
+    @Test func `achievement equatable different points are not equal`() {
+        let a = MockRepositoryFactory.makeGameCenterAchievement(id: "ach-1", gameCenterDetailId: "gc-1", points: 10)
+        let b = MockRepositoryFactory.makeGameCenterAchievement(id: "ach-1", gameCenterDetailId: "gc-1", points: 50)
+        #expect(a != b)
+    }
+
+    @Test func `achievement codable round trip preserves all fields`() throws {
+        let achievement = GameCenterAchievement(
+            id: "ach-1", gameCenterDetailId: "gc-1",
+            referenceName: "First Steps", vendorIdentifier: "first_steps",
+            points: 10, isShowBeforeEarned: true, isRepeatable: false, isArchived: false
+        )
+        let data = try JSONEncoder().encode(achievement)
+        let decoded = try JSONDecoder().decode(GameCenterAchievement.self, from: data)
+        #expect(decoded == achievement)
+    }
 }
+
+// MARK: - GameCenterLeaderboard
 
 @Suite
 struct GameCenterLeaderboardTests {
+
+    @Test func `leaderboard carries all fields`() {
+        let lb = GameCenterLeaderboard(
+            id: "lb-1",
+            gameCenterDetailId: "gc-1",
+            referenceName: "All Time High",
+            vendorIdentifier: "all_time_high",
+            scoreSortType: .desc,
+            submissionType: .bestScore,
+            isArchived: false
+        )
+        #expect(lb.id == "lb-1")
+        #expect(lb.gameCenterDetailId == "gc-1")
+        #expect(lb.referenceName == "All Time High")
+        #expect(lb.vendorIdentifier == "all_time_high")
+        #expect(lb.scoreSortType == .desc)
+        #expect(lb.submissionType == .bestScore)
+        #expect(lb.isArchived == false)
+    }
 
     @Test func `leaderboard carries gameCenterDetailId`() {
         let lb = MockRepositoryFactory.makeGameCenterLeaderboard(id: "lb-1", gameCenterDetailId: "gc-1")
@@ -47,6 +152,28 @@ struct GameCenterLeaderboardTests {
         #expect(lb.affordances["delete"] == "asc game-center leaderboards delete --leaderboard-id lb-1")
     }
 
+    @Test func `leaderboard affordances have exactly two keys`() {
+        let lb = MockRepositoryFactory.makeGameCenterLeaderboard(id: "lb-1", gameCenterDetailId: "gc-1")
+        #expect(lb.affordances.count == 2)
+    }
+
+    @Test func `leaderboard equatable two equal instances`() {
+        let a = MockRepositoryFactory.makeGameCenterLeaderboard(id: "lb-1", gameCenterDetailId: "gc-1")
+        let b = MockRepositoryFactory.makeGameCenterLeaderboard(id: "lb-1", gameCenterDetailId: "gc-1")
+        #expect(a == b)
+    }
+
+    @Test func `leaderboard codable round trip preserves all fields`() throws {
+        let lb = GameCenterLeaderboard(
+            id: "lb-1", gameCenterDetailId: "gc-1",
+            referenceName: "All Time High", vendorIdentifier: "all_time",
+            scoreSortType: .desc, submissionType: .bestScore, isArchived: false
+        )
+        let data = try JSONEncoder().encode(lb)
+        let decoded = try JSONDecoder().decode(GameCenterLeaderboard.self, from: data)
+        #expect(decoded == lb)
+    }
+
     @Test func `score sort type asc has expected raw value`() {
         #expect(ScoreSortType.asc.rawValue == "ASC")
     }
@@ -55,11 +182,23 @@ struct GameCenterLeaderboardTests {
         #expect(ScoreSortType.desc.rawValue == "DESC")
     }
 
+    @Test func `score sort type init from raw value`() {
+        #expect(ScoreSortType(rawValue: "ASC") == .asc)
+        #expect(ScoreSortType(rawValue: "DESC") == .desc)
+        #expect(ScoreSortType(rawValue: "INVALID") == nil)
+    }
+
     @Test func `submission type best score has expected raw value`() {
         #expect(LeaderboardSubmissionType.bestScore.rawValue == "BEST_SCORE")
     }
 
     @Test func `submission type most recent score has expected raw value`() {
         #expect(LeaderboardSubmissionType.mostRecentScore.rawValue == "MOST_RECENT_SCORE")
+    }
+
+    @Test func `submission type init from raw value`() {
+        #expect(LeaderboardSubmissionType(rawValue: "BEST_SCORE") == .bestScore)
+        #expect(LeaderboardSubmissionType(rawValue: "MOST_RECENT_SCORE") == .mostRecentScore)
+        #expect(LeaderboardSubmissionType(rawValue: "INVALID") == nil)
     }
 }
