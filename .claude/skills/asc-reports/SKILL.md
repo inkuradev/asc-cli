@@ -1,12 +1,13 @@
 ---
 name: asc-reports
 description: |
-  Download sales, trends, and financial reports from App Store Connect using the `asc` CLI tool.
+  Download sales, trends, financial, and analytics reports from App Store Connect using the `asc` CLI tool.
   Use this skill when:
   (1) Downloading sales reports: "asc sales-reports download --vendor-number ... --report-type SALES ..."
   (2) Downloading finance reports: "asc finance-reports download --vendor-number ... --report-type FINANCIAL ..."
-  (3) Checking app sales, revenue, downloads, subscriptions, or proceeds
-  (4) User says "download my sales report", "show sales data", "get financial report", "check my app revenue", "how many downloads", "subscription metrics"
+  (3) Analytics reports: "asc analytics-reports request/list/reports/instances/segments"
+  (4) Checking app sales, revenue, downloads, subscriptions, proceeds, or analytics
+  (5) User says "download my sales report", "show sales data", "get financial report", "check my app revenue", "how many downloads", "subscription metrics", "app analytics", "app usage data", "engagement metrics"
 ---
 
 # asc Sales & Finance Reports
@@ -120,6 +121,50 @@ asc finance-reports download \
 - Not all report type + sub-type + frequency combinations are valid; Apple returns an error for unsupported combinations
 - Finance reports require `--region-code` (e.g. `US`, `EU`, `JP`, `AU`) and `--report-date`
 - Daily reports are typically available after a 1-day delay; monthly reports after the month ends
+
+## Analytics Reports
+
+Multi-step workflow for app engagement, commerce, usage, framework, and performance analytics.
+
+### Commands
+
+```bash
+# Create a report request
+asc analytics-reports request --app-id <id> --access-type ONE_TIME_SNAPSHOT|ONGOING
+
+# List existing requests
+asc analytics-reports list --app-id <id> [--access-type ONGOING]
+
+# Delete a request
+asc analytics-reports delete --request-id <id>
+
+# List reports by category
+asc analytics-reports reports --request-id <id> [--category APP_USAGE|APP_STORE_ENGAGEMENT|COMMERCE|FRAMEWORK_USAGE|PERFORMANCE]
+
+# List instances by granularity
+asc analytics-reports instances --report-id <id> [--granularity DAILY|WEEKLY|MONTHLY]
+
+# Get download URLs
+asc analytics-reports segments --instance-id <id>
+```
+
+### Analytics Workflow
+
+```bash
+# 1. Request analytics
+asc analytics-reports request --app-id 6450000000 --access-type ONE_TIME_SNAPSHOT --pretty
+
+# 2. List commerce reports
+asc analytics-reports reports --request-id req-abc --category COMMERCE --pretty
+
+# 3. Get daily instances
+asc analytics-reports instances --report-id rpt-xyz --granularity DAILY --pretty
+
+# 4. Get download URLs
+asc analytics-reports segments --instance-id inst-123 --pretty
+```
+
+Analytics responses include CAEOAS affordances guiding the agent through each step of the hierarchy.
 
 ## Reference
 

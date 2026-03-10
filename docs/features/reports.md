@@ -229,21 +229,39 @@ Reports return `[[String: String]]` — arrays of dictionaries where keys are TS
 ```
 Sources/
 ├── Domain/Reports/
-│   ├── SalesReportFilter.swift      # SalesReportType, SalesReportSubType, ReportFrequency
-│   ├── FinanceReportFilter.swift    # FinanceReportType
-│   └── ReportRepository.swift       # @Mockable protocol
+│   ├── SalesReportFilter.swift        # SalesReportType, SalesReportSubType, ReportFrequency
+│   ├── FinanceReportFilter.swift      # FinanceReportType
+│   ├── ReportRepository.swift         # @Mockable protocol (sales + finance)
+│   └── Analytics/
+│       ├── AnalyticsFilter.swift              # AnalyticsAccessType, AnalyticsCategory, AnalyticsGranularity
+│       ├── AnalyticsReportRequest.swift       # Request model + AffordanceProviding
+│       ├── AnalyticsReport.swift              # Report model + AffordanceProviding
+│       ├── AnalyticsReportInstance.swift       # Instance model + AffordanceProviding
+│       ├── AnalyticsReportSegment.swift        # Segment model + AffordanceProviding
+│       └── AnalyticsReportRepository.swift     # @Mockable protocol (6 methods)
 ├── Infrastructure/
 │   ├── Reports/
-│   │   ├── SDKReportRepository.swift  # Gzip download + TSV parse
-│   │   └── TSVParser.swift            # Tab-separated values parser
+│   │   ├── SDKReportRepository.swift           # Gzip download + TSV parse
+│   │   ├── TSVParser.swift                     # Tab-separated values parser
+│   │   └── Analytics/
+│   │       └── SDKAnalyticsReportRepository.swift  # Analytics SDK adapter
 │   └── Client/
-│       └── DataExtensions.swift       # Data.gunzipped() via zlib
-└── ASCCommand/Commands/Reports/
-    ├── SalesReportsCommand.swift       # Parent: asc sales-reports
-    ├── SalesReportsDownload.swift      # asc sales-reports download
-    ├── FinanceReportsCommand.swift     # Parent: asc finance-reports
-    ├── FinanceReportsDownload.swift    # asc finance-reports download
-    └── ReportOutputHelper.swift        # JSON/table formatting
+│       └── DataExtensions.swift                # Data.gunzipped() via zlib
+└── ASCCommand/Commands/
+    ├── Reports/
+    │   ├── SalesReportsCommand.swift       # Parent: asc sales-reports
+    │   ├── SalesReportsDownload.swift      # asc sales-reports download
+    │   ├── FinanceReportsCommand.swift     # Parent: asc finance-reports
+    │   ├── FinanceReportsDownload.swift    # asc finance-reports download
+    │   └── ReportOutputHelper.swift        # JSON/table formatting
+    └── AnalyticsReports/
+        ├── AnalyticsReportsCommand.swift       # Parent: asc analytics-reports
+        ├── AnalyticsReportsRequest.swift       # asc analytics-reports request
+        ├── AnalyticsReportsList.swift          # asc analytics-reports list
+        ├── AnalyticsReportsDelete.swift        # asc analytics-reports delete
+        ├── AnalyticsReportsReportsList.swift   # asc analytics-reports reports
+        ├── AnalyticsReportsInstancesList.swift # asc analytics-reports instances
+        └── AnalyticsReportsSegmentsList.swift  # asc analytics-reports segments
 ```
 
 ### Tests
@@ -251,21 +269,27 @@ Sources/
 ```
 Tests/
 ├── DomainTests/Reports/
-│   └── ReportFilterTests.swift           # Enum raw values + CLI init
+│   ├── ReportFilterTests.swift                     # Enum raw values + CLI init (26 tests)
+│   └── AnalyticsReportTests.swift                  # Analytics models + affordances (34 tests)
 ├── InfrastructureTests/Reports/
-│   └── SDKReportRepositoryTests.swift    # Gzip, TSV parsing, full flow
-└── ASCCommandTests/Commands/Reports/
-    ├── SalesReportsDownloadTests.swift   # JSON + table output
-    └── FinanceReportsDownloadTests.swift # JSON + table output
+│   ├── SDKReportRepositoryTests.swift              # Gzip, TSV parsing (11 tests)
+│   └── SDKAnalyticsReportRepositoryTests.swift     # Analytics parent ID injection (7 tests)
+└── ASCCommandTests/Commands/
+    ├── Reports/
+    │   ├── SalesReportsDownloadTests.swift          # JSON + table output (4 tests)
+    │   └── FinanceReportsDownloadTests.swift        # JSON + table output (2 tests)
+    └── AnalyticsReports/
+        └── AnalyticsReportsTests.swift              # All 6 commands (6 tests)
 ```
 
 ### Wiring Files
 
 | File | Change |
 |------|--------|
-| `ASC.swift` | Registers `SalesReportsCommand`, `FinanceReportsCommand` |
-| `ClientProvider.swift` | `makeReportRepository()` factory |
-| `ClientFactory.swift` | `makeReportRepository(authProvider:)` factory |
+| `ASC.swift` | Registers `SalesReportsCommand`, `FinanceReportsCommand`, `AnalyticsReportsCommand` |
+| `ClientProvider.swift` | `makeReportRepository()`, `makeAnalyticsReportRepository()` |
+| `ClientFactory.swift` | `makeReportRepository(...)`, `makeAnalyticsReportRepository(...)` |
+| `MockRepositoryFactory.swift` | 4 analytics factory methods |
 
 ## API Reference
 
@@ -274,7 +298,7 @@ Tests/
 | `GET /v1/salesReports` | `APIEndpoint.v1.salesReports.get(parameters:)` | `downloadSalesReport(...)` |
 | `GET /v1/financeReports` | `APIEndpoint.v1.financeReports.get(parameters:)` | `downloadFinanceReport(...)` |
 
-Both endpoints return gzip-compressed TSV data (`Request<Data>`). The SDK's `APIProvider.request()` returns raw `Data` when `T` is `Data` (line 343 of APIProvider.swift: `if let data = data as? T`).
+Sales and finance endpoints return gzip-compressed TSV data (`Request<Data>`). The SDK's `APIProvider.request()` returns raw `Data` when `T` is `Data` (line 343 of APIProvider.swift: `if let data = data as? T`). Analytics endpoints return standard JSON responses.
 
 ## Testing
 
@@ -312,17 +336,84 @@ Both endpoints return gzip-compressed TSV data (`Request<Data>`). The SDK's `API
 swift test --filter 'ReportFilterTests|SDKReportRepository|SalesReportsDownloadTests|FinanceReportsDownloadTests'
 ```
 
+## Analytics Reports
+
+Analytics reports use a multi-step workflow with structured JSON responses (unlike sales/finance which return TSV).
+
+### Resource Hierarchy
+
+```
+App → AnalyticsReportRequest → AnalyticsReport → AnalyticsReportInstance → AnalyticsReportSegment
+         (create/list/delete)    (by category)      (by granularity)          (download URL)
+```
+
+### Commands
+
+```bash
+# 1. Create an analytics report request
+asc analytics-reports request --app-id <id> --access-type ONE_TIME_SNAPSHOT|ONGOING
+
+# 2. List existing requests
+asc analytics-reports list --app-id <id> [--access-type ONGOING]
+
+# 3. Delete a request
+asc analytics-reports delete --request-id <id>
+
+# 4. List reports for a request (filtered by category)
+asc analytics-reports reports --request-id <id> [--category APP_USAGE|APP_STORE_ENGAGEMENT|COMMERCE|FRAMEWORK_USAGE|PERFORMANCE]
+
+# 5. List report instances (filtered by granularity)
+asc analytics-reports instances --report-id <id> [--granularity DAILY|WEEKLY|MONTHLY]
+
+# 6. Get download URLs for segments
+asc analytics-reports segments --instance-id <id>
+```
+
+### Analytics Domain Models
+
+**`AnalyticsReportRequest`** — id, appId, accessType, isStoppedDueToInactivity?
+- Affordances: `listReports`, `delete`, `listRequests`
+
+**`AnalyticsReport`** — id, requestId, name?, category?
+- Categories: `APP_USAGE`, `APP_STORE_ENGAGEMENT`, `COMMERCE`, `FRAMEWORK_USAGE`, `PERFORMANCE`
+- Affordances: `listInstances`, `listReports`
+
+**`AnalyticsReportInstance`** — id, reportId, granularity?, processingDate?
+- Granularity: `DAILY`, `WEEKLY`, `MONTHLY`
+- Affordances: `listSegments`, `listInstances`
+
+**`AnalyticsReportSegment`** — id, instanceId, checksum?, sizeInBytes?, url?
+- Affordances: `listSegments`
+
+### Typical Analytics Workflow
+
+```bash
+# 1. Request analytics for an app
+asc analytics-reports request --app-id 6450000000 --access-type ONE_TIME_SNAPSHOT --pretty
+
+# 2. List available reports (filter to commerce)
+asc analytics-reports reports --request-id req-abc --category COMMERCE --pretty
+
+# 3. Get daily instances
+asc analytics-reports instances --report-id rpt-xyz --granularity DAILY --pretty
+
+# 4. Get download segments
+asc analytics-reports segments --instance-id inst-123 --pretty
+# → returns URLs to download the raw analytics data
+```
+
+### Analytics API Reference
+
+| Endpoint | SDK Call | Repository Method |
+|----------|---------|-------------------|
+| `POST /v1/analyticsReportRequests` | `APIEndpoint.v1.analyticsReportRequests.post(body)` | `createRequest(...)` |
+| `GET /v1/apps/{id}/analyticsReportRequests` | `APIEndpoint.v1.apps.id(appId).analyticsReportRequests.get(...)` | `listRequests(...)` |
+| `DELETE /v1/analyticsReportRequests/{id}` | `APIEndpoint.v1.analyticsReportRequests.id(id).delete` | `deleteRequest(...)` |
+| `GET /v1/analyticsReportRequests/{id}/reports` | `APIEndpoint.v1.analyticsReportRequests.id(id).reports.get(...)` | `listReports(...)` |
+| `GET /v1/analyticsReports/{id}/instances` | `APIEndpoint.v1.analyticsReports.id(id).instances.get(...)` | `listInstances(...)` |
+| `GET /v1/analyticsReportInstances/{id}/segments` | `APIEndpoint.v1.analyticsReportInstances.id(id).segments.get()` | `listSegments(...)` |
+
 ## Extending
-
-### Analytics Reports (multi-step async workflow)
-
-The App Store Connect API also supports Analytics Reports with a more complex workflow:
-1. Create an analytics report request
-2. Poll for report availability
-3. Fetch report instances
-4. Download report segments
-
-This could be added as `asc analytics-reports request/status/download`.
 
 ### Save to File
 

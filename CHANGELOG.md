@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sales reports: `asc sales-reports download` with support for 10 report types, 5 sub-types, and 4 frequencies
 - Finance reports: `asc finance-reports download` with financial and finance detail report types
 - Gzip decompression and TSV parsing infrastructure for App Store Connect report downloads
+- Analytics reports: `asc analytics-reports request/list/delete/reports/instances/segments` — multi-step analytics workflow with 5 report categories and 3 granularity levels
 
 ---
 
