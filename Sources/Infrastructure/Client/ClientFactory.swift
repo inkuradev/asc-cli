@@ -176,6 +176,11 @@ public struct ClientFactory: Sendable {
         return SDKAppClipRepository(client: provider)
     }
 
+    public func makeReportRepository(authProvider: any AuthProvider) throws -> any ReportRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKReportRepository(client: provider)
+    }
+
     // MARK: - Plugins (no ASC auth needed — local filesystem + subprocess)
 
     public func makePluginRepository() -> any PluginRepository {
