@@ -35,7 +35,8 @@ let package = Package(
                 "Infrastructure",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "TauTUI", package: "TauTUI"),
-            ]
+            ],
+            resources: [.copy("Resources/mockups")]
         ),
         .testTarget(
             name: "DomainTests",

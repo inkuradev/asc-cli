@@ -72,7 +72,7 @@ struct AppShotsHTMLTests {
             .appendingPathComponent("app-shots-html-out-\(UUID().uuidString)").path
     }
 
-    // MARK: - Tests
+    // MARK: - Basic HTML generation
 
     @Test func `html generates an HTML file from the plan`() async throws {
         let plan = makePlan(screens: [makeScreen(index: 0)])
@@ -83,7 +83,7 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
         let output = try await cmd.execute()
 
         let htmlPath = "\(outputDir)/app-shots.html"
@@ -102,7 +102,7 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
         _ = try await cmd.execute()
 
         let html = try String(contentsOfFile: "\(outputDir)/app-shots.html", encoding: .utf8)
@@ -119,14 +119,14 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
         _ = try await cmd.execute()
 
         let html = try String(contentsOfFile: "\(outputDir)/app-shots.html", encoding: .utf8)
-        #expect(html.contains("#0A1628"))  // primary
-        #expect(html.contains("#4A7CFF"))  // accent
-        #expect(html.contains("#FFFFFF"))  // text
-        #expect(html.contains("#A8B8D0"))  // subtext
+        #expect(html.contains("#0A1628"))
+        #expect(html.contains("#4A7CFF"))
+        #expect(html.contains("#FFFFFF"))
+        #expect(html.contains("#A8B8D0"))
     }
 
     @Test func `html embeds screenshots as base64 data URIs`() async throws {
@@ -138,7 +138,7 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
         _ = try await cmd.execute()
 
         let html = try String(contentsOfFile: "\(outputDir)/app-shots.html", encoding: .utf8)
@@ -158,7 +158,7 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
         _ = try await cmd.execute()
 
         let html = try String(contentsOfFile: "\(outputDir)/app-shots.html", encoding: .utf8)
@@ -180,7 +180,7 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
         _ = try await cmd.execute()
 
         let html = try String(contentsOfFile: "\(outputDir)/app-shots.html", encoding: .utf8)
@@ -198,7 +198,7 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
         _ = try await cmd.execute()
 
         #expect(FileManager.default.fileExists(atPath: outputDir))
@@ -213,8 +213,7 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        // No screenshot arguments — should auto-discover
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir])
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"])
         _ = try await cmd.execute()
 
         let htmlPath = "\(outputDir)/app-shots.html"
@@ -230,7 +229,7 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
         _ = try await cmd.execute()
 
         let html = try String(contentsOfFile: "\(outputDir)/app-shots.html", encoding: .utf8)
@@ -249,7 +248,7 @@ struct AppShotsHTMLTests {
 
         let cmd = try AppShotsHTML.parse([
             "--plan", planPath, "--output-dir", outputDir,
-            "--device-type", "APP_IPHONE_67"
+            "--device-type", "APP_IPHONE_67", "--mockup", "none"
         ] + screenshots)
         _ = try await cmd.execute()
 
@@ -259,7 +258,7 @@ struct AppShotsHTMLTests {
     }
 
     @Test func `html throws when plan file not found`() async throws {
-        let cmd = try AppShotsHTML.parse(["--plan", "/nonexistent/plan.json"])
+        let cmd = try AppShotsHTML.parse(["--plan", "/nonexistent/plan.json", "--mockup", "none"])
         do {
             _ = try await cmd.execute()
             Issue.record("Expected error to be thrown")
@@ -268,12 +267,29 @@ struct AppShotsHTMLTests {
         }
     }
 
-    @Test func `html with mockup embeds frame as base64 and uses screen-content class`() async throws {
+    @Test func `html app name appears in the page title`() async throws {
+        let plan = makePlan(appName: "SuperApp", screens: [makeScreen()])
+        let (planPath, screenshots) = try writePlanAndScreenshots(plan: plan, screenshotCount: 1)
+        let outputDir = makeTempOutputDir()
+        defer {
+            try? FileManager.default.removeItem(at: URL(fileURLWithPath: planPath).deletingLastPathComponent())
+            try? FileManager.default.removeItem(atPath: outputDir)
+        }
+
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
+        _ = try await cmd.execute()
+
+        let html = try String(contentsOfFile: "\(outputDir)/app-shots.html", encoding: .utf8)
+        #expect(html.contains("<title>SuperApp"))
+    }
+
+    // MARK: - Mockup tests
+
+    @Test func `html with custom mockup path embeds frame and uses screen-content class`() async throws {
         let plan = makePlan(screens: [makeScreen(index: 0)])
         let (planPath, screenshots) = try writePlanAndScreenshots(plan: plan, screenshotCount: 1)
         let outputDir = makeTempOutputDir()
 
-        // Write a fake mockup PNG
         let mockupPath = FileManager.default.temporaryDirectory
             .appendingPathComponent("mockup-\(UUID().uuidString).png")
         try Self.fakePNG.write(to: mockupPath)
@@ -297,24 +313,7 @@ struct AppShotsHTMLTests {
         #expect(html.contains("Device frame"))
     }
 
-    @Test func `html with mockup throws when mockup file not found`() async throws {
-        let plan = makePlan(screens: [makeScreen()])
-        let (planPath, screenshots) = try writePlanAndScreenshots(plan: plan, screenshotCount: 1)
-        defer { try? FileManager.default.removeItem(at: URL(fileURLWithPath: planPath).deletingLastPathComponent()) }
-
-        let cmd = try AppShotsHTML.parse([
-            "--plan", planPath,
-            "--mockup", "/nonexistent/mockup.png"
-        ] + screenshots)
-        do {
-            _ = try await cmd.execute()
-            Issue.record("Expected error to be thrown")
-        } catch {
-            #expect(String(describing: error).contains("Mockup file not found"))
-        }
-    }
-
-    @Test func `html without mockup uses simple device div with box-shadow`() async throws {
+    @Test func `html with --mockup none disables mockup frame`() async throws {
         let plan = makePlan(screens: [makeScreen(index: 0)])
         let (planPath, screenshots) = try writePlanAndScreenshots(plan: plan, screenshotCount: 1)
         let outputDir = makeTempOutputDir()
@@ -323,7 +322,7 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
-        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
+        let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir, "--mockup", "none"] + screenshots)
         _ = try await cmd.execute()
 
         let html = try String(contentsOfFile: "\(outputDir)/app-shots.html", encoding: .utf8)
@@ -331,8 +330,8 @@ struct AppShotsHTMLTests {
         #expect(!html.contains("mockup-frame"))
     }
 
-    @Test func `html app name appears in the page title`() async throws {
-        let plan = makePlan(appName: "SuperApp", screens: [makeScreen()])
+    @Test func `html default uses bundled mockup with mockup-frame class`() async throws {
+        let plan = makePlan(screens: [makeScreen(index: 0)])
         let (planPath, screenshots) = try writePlanAndScreenshots(plan: plan, screenshotCount: 1)
         let outputDir = makeTempOutputDir()
         defer {
@@ -340,10 +339,34 @@ struct AppShotsHTMLTests {
             try? FileManager.default.removeItem(atPath: outputDir)
         }
 
+        // No --mockup flag — should use bundled default
         let cmd = try AppShotsHTML.parse(["--plan", planPath, "--output-dir", outputDir] + screenshots)
         _ = try await cmd.execute()
 
         let html = try String(contentsOfFile: "\(outputDir)/app-shots.html", encoding: .utf8)
-        #expect(html.contains("<title>SuperApp"))
+        #expect(html.contains("mockup-frame"))
+        #expect(html.contains("screen-content"))
+    }
+
+    @Test func `mockup resolver finds device by name`() throws {
+        // This tests that the bundled mockups.json has the expected default entry
+        let resolved = try MockupResolver.resolve(argument: nil, insetXOverride: nil, insetYOverride: nil)
+        #expect(resolved != nil)
+        #expect(resolved?.screenInsetX == 75)
+        #expect(resolved?.screenInsetY == 66)
+        #expect(resolved?.frameWidth == 1470)
+        #expect(resolved?.frameHeight == 3000)
+    }
+
+    @Test func `mockup resolver returns nil for --mockup none`() throws {
+        let resolved = try MockupResolver.resolve(argument: "none", insetXOverride: nil, insetYOverride: nil)
+        #expect(resolved == nil)
+    }
+
+    @Test func `mockup resolver applies inset overrides`() throws {
+        let resolved = try MockupResolver.resolve(argument: nil, insetXOverride: 100, insetYOverride: 200)
+        #expect(resolved != nil)
+        #expect(resolved?.screenInsetX == 100)
+        #expect(resolved?.screenInsetY == 200)
     }
 }

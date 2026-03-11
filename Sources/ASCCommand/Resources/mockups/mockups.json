@@ -1,0 +1,13 @@
+{
+  "iPhone 17 Pro Max - Deep Blue": {
+    "category": "iPhone",
+    "model": "iPhone 17 Pro Max",
+    "displayType": "APP_IPHONE_67",
+    "outputWidth": 1470,
+    "outputHeight": 3000,
+    "screenInsetX": 75,
+    "screenInsetY": 66,
+    "file": "iPhone 17 Pro Max - Deep Blue - Portrait.png",
+    "default": true
+  }
+}

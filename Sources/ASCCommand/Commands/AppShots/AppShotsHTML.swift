@@ -27,13 +27,13 @@ struct AppShotsHTML: AsyncParsableCommand {
     @Option(name: .long, help: "Named device type — overrides --output-width/height")
     var deviceType: AppShotsDisplayType?
 
-    @Option(name: .long, help: "Path to a device mockup frame PNG (transparent background). Screenshot is positioned inside.")
+    @Option(name: .long, help: "Device mockup: a file path, a device name from mockups.json, or \"none\" to disable. Default: bundled iPhone 17 Pro Max frame.")
     var mockup: String?
 
-    @Option(name: .long, help: "Screen area X inset in pixels from mockup edge (default: auto-detect from devices.json or 5.2%)")
+    @Option(name: .long, help: "Screen area X inset in pixels from mockup edge (overrides mockups.json value)")
     var screenInsetX: Int?
 
-    @Option(name: .long, help: "Screen area Y inset in pixels from mockup edge (default: auto-detect from devices.json or 2.2%)")
+    @Option(name: .long, help: "Screen area Y inset in pixels from mockup edge (overrides mockups.json value)")
     var screenInsetY: Int?
 
     @Argument(help: "Screenshot files — omit to auto-discover *.png/*.jpg from the plan's directory")
@@ -78,8 +78,8 @@ struct AppShotsHTML: AsyncParsableCommand {
             screenshotDataURIs[url.lastPathComponent] = "data:\(mime);base64,\(data.base64EncodedString())"
         }
 
-        // Load mockup frame if provided
-        let mockupInfo = try resolveMockup()
+        // Resolve mockup frame (default: bundled iPhone 17 Pro Max)
+        let mockupInfo = try resolveMockupInfo()
 
         // Generate HTML
         let html = generateHTML(
@@ -99,7 +99,7 @@ struct AppShotsHTML: AsyncParsableCommand {
         return formatOutput(path: htmlPath.path)
     }
 
-    /// Mockup frame data: base64 URI + screen position offsets.
+    /// Mockup frame data for HTML embedding.
     struct MockupInfo {
         let dataURI: String
         let frameWidth: Int
@@ -108,71 +108,24 @@ struct AppShotsHTML: AsyncParsableCommand {
         let insetY: Int
     }
 
-    private func resolveMockup() throws -> MockupInfo? {
-        guard let mockupPath = mockup else { return nil }
-        let url = URL(fileURLWithPath: mockupPath)
-        guard FileManager.default.fileExists(atPath: url.path) else {
-            throw ValidationError("Mockup file not found: \(mockupPath)")
-        }
-        let data = try Data(contentsOf: url)
+    private func resolveMockupInfo() throws -> MockupInfo? {
+        let resolved = try MockupResolver.resolve(
+            argument: mockup,
+            insetXOverride: screenInsetX,
+            insetYOverride: screenInsetY
+        )
+        guard let r = resolved else { return nil }
+
+        let data = try Data(contentsOf: r.fileURL)
         let dataURI = "data:image/png;base64,\(data.base64EncodedString())"
 
-        // Get image dimensions via CoreGraphics
-        let (frameW, frameH) = imageSize(data: data)
-
-        // Resolve screen insets: CLI flags > devices.json > percentage fallback
-        let insetX: Int
-        let insetY: Int
-        if let x = screenInsetX, let y = screenInsetY {
-            insetX = x
-            insetY = y
-        } else if let devicesInset = lookupDevicesJSON(mockupPath: mockupPath) {
-            insetX = screenInsetX ?? devicesInset.x
-            insetY = screenInsetY ?? devicesInset.y
-        } else {
-            // Default: ~5.2% X, ~2.2% Y (calibrated for modern iPhones)
-            insetX = screenInsetX ?? Int(Double(frameW) * 0.052)
-            insetY = screenInsetY ?? Int(Double(frameH) * 0.022)
-        }
-
-        return MockupInfo(dataURI: dataURI, frameWidth: frameW, frameHeight: frameH, insetX: insetX, insetY: insetY)
-    }
-
-    /// Reads image pixel dimensions from PNG/JPEG data.
-    private func imageSize(data: Data) -> (width: Int, height: Int) {
-        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
-              let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
-              let w = props[kCGImagePropertyPixelWidth] as? Int,
-              let h = props[kCGImagePropertyPixelHeight] as? Int else {
-            return (0, 0)
-        }
-        return (w, h)
-    }
-
-    /// Looks up screen insets from a `devices.json` next to the mockup file or in known locations.
-    private func lookupDevicesJSON(mockupPath: String) -> (x: Int, y: Int)? {
-        let mockupURL = URL(fileURLWithPath: mockupPath)
-        let mockupFilename = mockupURL.lastPathComponent
-
-        // Search for devices.json in the mockup's parent directories (up to 4 levels)
-        var searchDir = mockupURL.deletingLastPathComponent()
-        for _ in 0..<4 {
-            let candidate = searchDir.appendingPathComponent("devices.json")
-            if let data = try? Data(contentsOf: candidate),
-               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                // Search by filename match in path values
-                for (_, deviceInfo) in json {
-                    guard let info = deviceInfo as? [String: Any],
-                          let path = info["path"] as? String,
-                          path.contains(mockupFilename.replacingOccurrences(of: ".png", with: "")),
-                          let x = info["screenInsetX"] as? Int,
-                          let y = info["screenInsetY"] as? Int else { continue }
-                    return (x, y)
-                }
-            }
-            searchDir = searchDir.deletingLastPathComponent()
-        }
-        return nil
+        return MockupInfo(
+            dataURI: dataURI,
+            frameWidth: r.frameWidth,
+            frameHeight: r.frameHeight,
+            insetX: r.screenInsetX,
+            insetY: r.screenInsetY
+        )
     }
 
     private func formatOutput(path: String) -> String {
@@ -211,7 +164,7 @@ struct AppShotsHTML: AsyncParsableCommand {
             let insetYPct = Double(m.insetY) / Double(m.frameHeight) * 100
             let screenWPct = Double(screenW) / Double(m.frameWidth) * 100
             let screenHPct = Double(screenH) / Double(m.frameHeight) * 100
-            let borderRadiusPct = 13.8  // Modern iPhone corner radius as % of frame width
+            let borderRadiusPct = 13.8
             deviceCSS = """
             .slide .phone .device {
                 position: relative;
@@ -631,7 +584,6 @@ struct AppShotsHTML: AsyncParsableCommand {
         """
     }
 
-    /// Matches a screenshot file to a screen config by filename, falling back to index order.
     private func matchScreenshot(screen: ScreenConfig, dataURIs: [String: String]) -> String? {
         if let uri = dataURIs[screen.screenshotFile] {
             return uri
