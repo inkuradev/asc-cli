@@ -133,10 +133,13 @@ Examples:
 
 **ALWAYS write tests first, then implement. Never write implementation code without a failing test. This is non-negotiable.**
 
+Think from the user's mental model — test cases describe what the user expects, not internal implementation details.
+
 ```swift
 @Suite
 struct {Component}Tests {
-    @Test func `{describes improved behavior}`() {
+    // Name reflects user's expectation, not code internals
+    @Test func `{what the user expects to see or happen}`() {
         // Given - standard setup
         let component = Component(...)
 

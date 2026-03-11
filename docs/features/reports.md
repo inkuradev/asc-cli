@@ -278,8 +278,8 @@ Tests/
 │   └── SDKAnalyticsReportRepositoryTests.swift     # Analytics parent ID injection (7 tests)
 └── ASCCommandTests/Commands/
     ├── Reports/
-    │   ├── SalesReportsDownloadTests.swift          # JSON + table output (4 tests)
-    │   └── FinanceReportsDownloadTests.swift        # JSON + table output (2 tests)
+    │   ├── SalesReportsDownloadTests.swift          # JSON + table + vendor resolution (7 tests)
+    │   └── FinanceReportsDownloadTests.swift        # JSON + table + vendor resolution (4 tests)
     └── AnalyticsReports/
         └── AnalyticsReportsTests.swift              # All 6 commands (6 tests)
 ```

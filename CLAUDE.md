@@ -134,11 +134,12 @@ We follow the Chicago School of TDD — state-based, not interaction-based. Test
 
 - If code is difficult to test, treat that as a design problem, not an exception to testing.
 - The proper TDD workflow:
-    1. **Think**: What should `execute()` return in JSON mode? For example: raw field values like `"IOS"`, `"READY_FOR_SALE"`, `"expired": true`.
-    2. **Write the test**: Assert those exact output values.
+    1. **Think from user's mental model**: How would the user describe this behavior? What would they expect to see? For example: "a version is live when its state is readyForSale", "submit is only available when the version is editable".
+    2. **Write the test**: Name it after the user's expectation. Assert the exact output values (e.g. `"IOS"`, `"READY_FOR_SALE"`, `"expired": true`).
     3. **Run the test**: It **must fail** (red). If it passes, the test is not testing new behaviour.
     4. **Implement**: Write just enough code to make the test pass (green).
     5. **Refactor**: Clean up while keeping tests green.
+- Test cases should reflect the user's mental model — describe what the user sees and expects, not internal implementation details.
 - Never modify a test to make it pass — if a test fails unexpectedly, the specification (step 1) was wrong. Fix the thinking, not the test.
 - If you find yourself writing implementation before tests, stop and reverse course.
 - Framework: Apple's `@Testing` macro (not XCTest)

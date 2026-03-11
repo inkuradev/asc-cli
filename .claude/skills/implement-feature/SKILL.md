@@ -23,6 +23,7 @@ Implement features using architecture-first design, TDD, rich domain models, and
 
 2. TDD IMPLEMENTATION (Always write tests FIRST)
    • NEVER write implementation code without a failing test
+   • Think from user's mental model — test cases describe what the user expects, not internals
    • Write domain tests first → then infrastructure tests → then command tests
    • Each test must FAIL (red) before writing implementation
    • Domain tests → Domain value types + AffordanceProviding + @Mockable protocol
@@ -156,7 +157,7 @@ See [tdd-patterns.md](references/tdd-patterns.md) for complete patterns includin
 5. Run `swift test` — all must pass
 
 **Three mandatory rules for every command test:**
-1. **Behavior-focused name** — describe what the user sees, not how the code works
+1. **Behavior-focused name from user's mental model** — describe what the user sees and expects (e.g. `` `listed versions show submit affordance when editable` ``), not how the code works
 2. **Always `#expect()`** — every test must have an assertion; `_ = try await cmd.execute(...)` with no `#expect` is not a test
 3. **Exact JSON assertion** — assert the complete output string, never `output.contains(...)`
 
