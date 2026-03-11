@@ -69,6 +69,44 @@
           "scale": 0.82
         }
       ]
+    },
+    {
+      "background": { "type": "gradient", "from": "#0f1d35", "to": "#162a4a", "angle": 135 },
+      "texts": [
+        {
+          "content": "One App.\nTwo Views.",
+          "x": 0.5,
+          "y": 0.04,
+          "fontSize": 0.085,
+          "fontWeight": 800,
+          "color": "#FFFFFF",
+          "textAlign": "center"
+        },
+        {
+          "content": "Browse your apps and dive into\ndetailed controls — seamlessly",
+          "x": 0.5,
+          "y": 0.12,
+          "fontSize": 0.03,
+          "color": "#A8B8D0",
+          "textAlign": "center"
+        }
+      ],
+      "devices": [
+        {
+          "screenshotFile": "screenshot-1.png",
+          "mockup": "iPhone 17 Pro Max",
+          "x": 0.30,
+          "y": 0.55,
+          "scale": 0.48
+        },
+        {
+          "screenshotFile": "screenshot-2.png",
+          "mockup": "iPhone 17 Pro Max",
+          "x": 0.62,
+          "y": 0.60,
+          "scale": 0.58
+        }
+      ]
     }
   ]
 }

@@ -749,7 +749,16 @@ struct AppShotsHTML: AsyncParsableCommand {
                 let px = Int(t.fontSize * Double(W))
                 let left = Int(t.x * Double(W))
                 let top = Int(t.y * Double(H))
-                return "<div style=\"position:absolute;left:\(left)px;top:\(top)px;font-family:'\(escapeHTML(font))',sans-serif;font-size:\(px)px;font-weight:\(t.fontWeight);color:\(t.color);line-height:1.1;letter-spacing:-0.02em;white-space:pre-line;z-index:3;\">\(escapeHTML(t.content))</div>"
+                let alignCSS: String
+                switch t.textAlign {
+                case .center:
+                    alignCSS = "text-align:center;transform:translateX(-50%);"
+                case .right:
+                    alignCSS = "text-align:right;transform:translateX(-100%);"
+                case .left:
+                    alignCSS = ""
+                }
+                return "<div style=\"position:absolute;left:\(left)px;top:\(top)px;font-family:'\(escapeHTML(font))',sans-serif;font-size:\(px)px;font-weight:\(t.fontWeight);color:\(t.color);line-height:1.1;letter-spacing:-0.02em;white-space:pre-line;z-index:3;\(alignCSS)\">\(escapeHTML(t.content))</div>"
             }.joined(separator: "\n")
 
             // Device slots
@@ -817,7 +826,16 @@ struct AppShotsHTML: AsyncParsableCommand {
                 let px = Int(t.fontSize * Double(W))
                 let left = Int(t.x * Double(W))
                 let top = Int(t.y * Double(H))
-                return "<div style=\"position:absolute;left:\(left)px;top:\(top)px;font-family:'\(escapeHTML(font))',sans-serif;font-size:\(px)px;font-weight:\(t.fontWeight);color:\(t.color);line-height:1.1;letter-spacing:-0.02em;white-space:pre-line;z-index:3;\">\(escapeHTML(t.content))</div>"
+                let alignCSS: String
+                switch t.textAlign {
+                case .center:
+                    alignCSS = "text-align:center;transform:translateX(-50%);"
+                case .right:
+                    alignCSS = "text-align:right;transform:translateX(-100%);"
+                case .left:
+                    alignCSS = ""
+                }
+                return "<div style=\"position:absolute;left:\(left)px;top:\(top)px;font-family:'\(escapeHTML(font))',sans-serif;font-size:\(px)px;font-weight:\(t.fontWeight);color:\(t.color);line-height:1.1;letter-spacing:-0.02em;white-space:pre-line;z-index:3;\(alignCSS)\">\(escapeHTML(t.content))</div>"
             }.joined(separator: "\n")
 
             let devices = screen.devices.map { slot in

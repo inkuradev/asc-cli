@@ -166,6 +166,8 @@ public struct TextOverlay: Sendable, Equatable {
     public let color: String
     /// Font family override. `nil` uses `defaults.font`.
     public let font: String?
+    /// Text alignment. Default: `left`.
+    public let textAlign: TextAlignment
 
     public init(
         content: String,
@@ -173,7 +175,8 @@ public struct TextOverlay: Sendable, Equatable {
         fontSize: Double,
         fontWeight: Int = 700,
         color: String,
-        font: String? = nil
+        font: String? = nil,
+        textAlign: TextAlignment = .left
     ) {
         self.content = content
         self.x = x
@@ -182,12 +185,19 @@ public struct TextOverlay: Sendable, Equatable {
         self.fontWeight = fontWeight
         self.color = color
         self.font = font
+        self.textAlign = textAlign
+    }
+
+    public enum TextAlignment: String, Sendable, Equatable, Codable {
+        case left
+        case center
+        case right
     }
 }
 
 extension TextOverlay: Codable {
     private enum CodingKeys: String, CodingKey {
-        case content, x, y, fontSize, fontWeight, color, font
+        case content, x, y, fontSize, fontWeight, color, font, textAlign
     }
 
     public init(from decoder: any Decoder) throws {
@@ -199,6 +209,7 @@ extension TextOverlay: Codable {
         fontWeight = try c.decodeIfPresent(Int.self, forKey: .fontWeight) ?? 700
         color = try c.decode(String.self, forKey: .color)
         font = try c.decodeIfPresent(String.self, forKey: .font)
+        textAlign = try c.decodeIfPresent(TextAlignment.self, forKey: .textAlign) ?? .left
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -210,6 +221,7 @@ extension TextOverlay: Codable {
         try c.encode(fontWeight, forKey: .fontWeight)
         try c.encode(color, forKey: .color)
         try c.encodeIfPresent(font, forKey: .font)
+        if textAlign != .left { try c.encode(textAlign, forKey: .textAlign) }
     }
 }
 
