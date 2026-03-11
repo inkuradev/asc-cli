@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.43] - 2026-03-11
+
 ### Added
 - HTML screenshot generation: `asc app-shots html --plan composition-plan.json` — deterministic App Store screenshot generation with real device mockup frames, no AI or API keys needed
 - CompositionPlan format: normalized 0-1 coordinates, multiple devices per slide, text overlays with alignment, gradient backgrounds, per-screen color themes
@@ -389,7 +393,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.42...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.43...HEAD
+[0.1.43]: https://github.com/tddworks/asc-cli/compare/v0.1.42...v0.1.43
 [0.1.42]: https://github.com/tddworks/asc-cli/compare/v0.1.41...v0.1.42
 [0.1.41]: https://github.com/tddworks/asc-cli/compare/v0.1.40...v0.1.41
 [0.1.40]: https://github.com/tddworks/asc-cli/compare/v0.1.39...v0.1.40
