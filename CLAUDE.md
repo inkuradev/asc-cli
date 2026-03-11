@@ -130,14 +130,17 @@ asc init --app-id <id>
 
 We follow the Chicago School of TDD — state-based, not interaction-based. Tests should verify what domain objects return and compute, rather than how they call their collaborators.
 
+**ALWAYS write tests first, then implement.** Never write implementation code without a failing test. This is non-negotiable.
+
 - If code is difficult to test, treat that as a design problem, not an exception to testing.
-- Implement strictly in TDD order: tests first, then implementation
 - The proper TDD workflow:
     1. **Think**: What should `execute()` return in JSON mode? For example: raw field values like `"IOS"`, `"READY_FOR_SALE"`, `"expired": true`.
     2. **Write the test**: Assert those exact output values.
-    3. **Run the test**: It should fail (red) if the functionality is not yet implemented.
+    3. **Run the test**: It **must fail** (red). If it passes, the test is not testing new behaviour.
     4. **Implement**: Write just enough code to make the test pass (green).
-- Changing a test after it fails means the specification was wrong, which means step 1 (thinking) was skipped.
+    5. **Refactor**: Clean up while keeping tests green.
+- Never modify a test to make it pass — if a test fails unexpectedly, the specification (step 1) was wrong. Fix the thinking, not the test.
+- If you find yourself writing implementation before tests, stop and reverse course.
 - Framework: Apple's `@Testing` macro (not XCTest)
 - Mocking: `@Mockable` annotation on protocols + `given().willReturn()` in tests
 - Test naming: backtick style — `` func `version is live when state is readyForSale`() ``
@@ -187,9 +190,9 @@ After every code change — new feature, improvement, or bug fix — update all 
 
 **`README.md`** — update the feature/command table and any usage examples that changed.
 
-**`.claude/skills/<feature>`** — keep skills in sync whenever commands are added or flags change:
-- If the skill **exists**: update the relevant `SKILL.md` or reference file, then re-package with `package_skill.py`.
-- If the skill **does not exist**: use the `skill-creator` skill to create it from scratch (init → edit → package).
+**`.claude/skills/<feature>`** — always use the `/skill-creator` skill to create or update feature skills:
+- If the skill **does not exist**: use `/skill-creator` to create it from scratch.
+- If the skill **exists**: use `/skill-creator` to update it (handles editing + re-packaging).
 
 Key skills to keep in sync:
 - `implement-feature/SKILL.md` — workflow + checklist
