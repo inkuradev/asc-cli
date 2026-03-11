@@ -716,3 +716,62 @@ asc finance-reports download \
   --region-code US \
   --report-date 2024-01 --pretty
 ```
+
+---
+
+## reviews
+
+### list
+```bash
+asc reviews list --app-id <id>
+```
+List customer reviews for an app, sorted by most recent first. Fields: `id`, `appId`, `rating` (1-5), `title?`, `body?`, `reviewerNickname?`, `createdDate?`, `territory?` (ISO 3166-1 alpha-3).
+
+### get
+```bash
+asc reviews get --review-id <id>
+```
+Get a single customer review. Note: `appId` will be empty because the single-GET endpoint doesn't return the parent app ID.
+
+---
+
+## review-responses
+
+### get
+```bash
+asc review-responses get --review-id <id>
+```
+Get the developer response to a review. Uses the review ID (not the response ID).
+
+### create
+```bash
+asc review-responses create --review-id <id> --response-body "Thank you for your feedback!"
+```
+New responses start in `PENDING_PUBLISH` state — go live within ~24 hours.
+
+### delete
+```bash
+asc review-responses delete --response-id <id>
+```
+To revise a response, delete and recreate.
+
+### Customer Reviews Typical Workflow
+
+```bash
+# 1. List reviews
+asc reviews list --app-id 6450000000 --output table
+
+# 2. Read a specific review
+asc reviews get --review-id rev-001 --pretty
+
+# 3. Respond to the review
+asc review-responses create \
+  --review-id rev-001 \
+  --response-body "Thank you! We fixed the crash in v2.1."
+
+# 4. To revise, delete and recreate
+asc review-responses delete --response-id resp-001
+asc review-responses create \
+  --review-id rev-001 \
+  --response-body "Updated response with more detail."
+```
