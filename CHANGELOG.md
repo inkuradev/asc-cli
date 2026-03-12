@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.45] - 2026-03-12
+
 ### Changed
 - Subscription offer codes: `asc subscription-offer-codes list/create/update`, `asc subscription-offer-code-custom-codes list/create/update`, `asc subscription-offer-code-one-time-codes list/create/update` — manage offer codes, custom redeemable codes, and one-time use code batches for auto-renewable subscriptions
 - IAP offer codes: `asc iap-offer-codes list/create/update`, `asc iap-offer-code-custom-codes list/create/update`, `asc iap-offer-code-one-time-codes list/create/update` — manage offer codes, custom redeemable codes, and one-time use code batches for in-app purchases
@@ -407,7 +411,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.43...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.45...HEAD
+[0.1.45]: https://github.com/tddworks/asc-cli/compare/v0.1.43...v0.1.45
 [0.1.43]: https://github.com/tddworks/asc-cli/compare/v0.1.42...v0.1.43
 [0.1.42]: https://github.com/tddworks/asc-cli/compare/v0.1.41...v0.1.42
 [0.1.41]: https://github.com/tddworks/asc-cli/compare/v0.1.40...v0.1.41
