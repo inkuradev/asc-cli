@@ -3,16 +3,14 @@ name: asc-subscriptions
 description: |
   Manage auto-renewable subscriptions using the `asc` CLI tool.
   Use this skill when:
-  (1) Listing or creating subscription groups: "asc subscription-groups list|create"
-  (2) Listing or creating subscriptions: "asc subscriptions list|create --group-id ID"
-  (3) Listing or creating subscription localizations: "asc subscription-localizations list|create"
-  (4) Submitting a subscription for review: "asc subscriptions submit --subscription-id ID"
-  (5) Listing introductory offers: "asc subscription-offers list --subscription-id ID"
-  (6) Creating introductory offers (FREE_TRIAL, PAY_AS_YOU_GO, PAY_UP_FRONT): "asc subscription-offers create"
-  (7) Managing subscription offer codes: "asc subscription-offer-codes list/create/update"
-  (8) Managing subscription offer code custom codes: "asc subscription-offer-code-custom-codes list/create/update"
-  (9) Managing subscription offer code one-time use codes: "asc subscription-offer-code-one-time-codes list/create/update"
-  (10) User says "add subscription tier", "create subscription group", "manage subscriptions", "localize subscription", "subscription plans", "introductory offer", "free trial offer", "submit subscription", "subscription offer code", "custom code for subscription", "one-time codes for subscription", "promo code subscription"
+  (1) Subscription groups: "asc subscription-groups list|create"
+  (2) Subscriptions: "asc subscriptions list|create|submit"
+  (3) Subscription localizations: "asc subscription-localizations list|create"
+  (4) Introductory offers: "asc subscription-offers list|create" (FREE_TRIAL, PAY_AS_YOU_GO, PAY_UP_FRONT)
+  (5) Offer codes: "asc subscription-offer-codes list/create/update"
+  (6) Custom codes: "asc subscription-offer-code-custom-codes list/create/update"
+  (7) One-time codes: "asc subscription-offer-code-one-time-codes list/create/update"
+  (8) User says "subscription group", "subscription tier", "subscription offer code", "custom code", "one-time codes", "free trial", "promo code"
 ---
 
 # asc Subscriptions

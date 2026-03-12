@@ -3,16 +3,15 @@ name: asc-iap
 description: |
   Manage In-App Purchases (IAPs) using the `asc` CLI tool.
   Use this skill when:
-  (1) Listing IAPs for an app: "asc iap list --app-id ID"
-  (2) Creating an IAP: "asc iap create --app-id ID --type consumable|non-consumable|non-renewing-subscription"
-  (3) Adding IAP localizations: "asc iap-localizations create --iap-id ID --locale en-US --name 'Gold Coins'"
-  (4) Submitting an IAP for review: "asc iap submit --iap-id ID"
-  (5) Listing IAP price points: "asc iap price-points list --iap-id ID [--territory USA]"
-  (6) Setting IAP pricing: "asc iap prices set --iap-id ID --base-territory USA --price-point-id ID"
-  (7) Managing IAP offer codes: "asc iap-offer-codes list/create/update"
-  (8) Managing IAP offer code custom codes: "asc iap-offer-code-custom-codes list/create/update"
-  (9) Managing IAP offer code one-time use codes: "asc iap-offer-code-one-time-codes list/create/update"
-  (10) User says "create in-app purchase", "list IAPs", "localize IAP", "submit IAP", "set IAP price", "offer codes for IAP", "IAP offer code", "create IAP custom code", "one-time codes for IAP"
+  (1) Listing IAPs: "asc iap list --app-id ID"
+  (2) Creating IAPs: "asc iap create --type consumable|non-consumable|non-renewing-subscription"
+  (3) IAP localizations: "asc iap-localizations create/list"
+  (4) Submitting IAP: "asc iap submit --iap-id ID"
+  (5) IAP pricing: "asc iap price-points list", "asc iap prices set"
+  (6) IAP offer codes: "asc iap-offer-codes list/create/update"
+  (7) IAP custom codes: "asc iap-offer-code-custom-codes list/create/update"
+  (8) IAP one-time codes: "asc iap-offer-code-one-time-codes list/create/update"
+  (9) User says "create in-app purchase", "list IAPs", "submit IAP", "IAP offer code", "custom code", "one-time codes"
 ---
 
 # asc In-App Purchases
