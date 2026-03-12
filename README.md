@@ -204,6 +204,22 @@ asc game-center leaderboards create --detail-id <id> --reference-name <n> --vend
 asc game-center leaderboards delete --leaderboard-id <id>
 ```
 
+### Power & Performance
+
+```bash
+# App-level performance metrics (launch time, hang rate, memory, etc.)
+asc perf-metrics list --app-id <id>
+asc perf-metrics list --app-id <id> --metric-type LAUNCH
+asc perf-metrics list --build-id <id> --metric-type HANG
+
+# Diagnostic signatures (hang/disk-write/launch hotspots)
+asc diagnostics list --build-id <id>
+asc diagnostics list --build-id <id> --diagnostic-type HANGS
+
+# Diagnostic logs (call stacks for a signature)
+asc diagnostic-logs list --signature-id <id>
+```
+
 ### Metadata
 
 ```bash
@@ -420,6 +436,7 @@ Detailed documentation for each feature:
 - [Users & Roles](docs/features/users.md) — team member management, role assignment, invitation lifecycle; directory integration for automated access control
 - [Customer Reviews](docs/features/customer-reviews.md) — list reviews, respond to feedback, manage review responses
 - [Game Center](docs/features/game-center.md) — achievements (list, create, delete) and leaderboards (list, create, delete)
+- [Power & Performance](docs/features/performance.md) — performance metrics (app/build), diagnostic signatures, diagnostic logs
 - [Reports](docs/features/reports.md) — sales, finance, and analytics reports; TSV parsing, multi-step analytics workflow
 
 ## Design: CAEOAS

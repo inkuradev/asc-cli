@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Power & performance metrics: `asc perf-metrics list --app-id <id>` and `asc perf-metrics list --build-id <id>` — download launch time, hang rate, memory, disk, battery, termination, and animation metrics with `--metric-type` filter
+- Diagnostic signatures: `asc diagnostics list --build-id <id>` — list hang, disk write, and launch diagnostic hotspots with `--diagnostic-type` filter
+- Diagnostic logs: `asc diagnostic-logs list --signature-id <id>` — view call stack metadata for a specific diagnostic signature
+
 ---
 
 ## [0.1.43] - 2026-03-11

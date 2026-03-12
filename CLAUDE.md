@@ -81,6 +81,9 @@ App → CiProduct (XcodeCloud) → CiWorkflow → CiBuildRun
 AppStoreVersion → VersionReadiness
 AppStoreVersion → AppStoreReviewDetail
 CodeSigning: BundleID → Profile
+App → PerformanceMetric (via perfPowerMetrics)
+Build → PerformanceMetric (via perfPowerMetrics)
+Build → DiagnosticSignatureInfo → DiagnosticLogEntry
 ```
 
 Domain folders are nested to mirror the resource hierarchy:
@@ -101,7 +104,9 @@ Domain/
 │   ├── Builds/                    → Build, BuildUpload, BetaBuildLocalization,
 │   │                                BuildRepository, BuildUploadRepository, BetaBuildLocalizationRepository
 │   ├── Pricing/                   → PricingRepository
-│   └── TestFlight/                → BetaGroup, BetaTester, TestFlightRepository
+│   ├── TestFlight/                → BetaGroup, BetaTester, TestFlightRepository
+│   └── Performance/              → PerformanceMetric, PerformanceMetricCategory, DiagnosticSignatureInfo,
+│                                    DiagnosticType, DiagnosticLogEntry, PerfMetricsRepository, DiagnosticsRepository
 ├── CodeSigning/                   → BundleID, Certificate, Device, Profile + their repositories
 │   ├── BundleIDs/                 → BundleID, BundleIDRepository
 │   ├── Certificates/              → Certificate, CertificateRepository
