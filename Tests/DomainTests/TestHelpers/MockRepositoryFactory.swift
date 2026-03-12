@@ -901,6 +901,130 @@ struct MockRepositoryFactory {
         )
     }
 
+    // MARK: - Subscription Offer Codes
+
+    static func makeSubscriptionOfferCode(
+        id: String = "oc-1",
+        subscriptionId: String = "sub-1",
+        name: String = "SUMMER2026",
+        customerEligibilities: [SubscriptionCustomerEligibility] = [.new],
+        offerEligibility: SubscriptionOfferEligibility = .stackable,
+        duration: SubscriptionOfferDuration = .oneMonth,
+        offerMode: SubscriptionOfferMode = .freeTrial,
+        numberOfPeriods: Int = 1,
+        totalNumberOfCodes: Int? = nil,
+        isActive: Bool = true
+    ) -> SubscriptionOfferCode {
+        SubscriptionOfferCode(
+            id: id,
+            subscriptionId: subscriptionId,
+            name: name,
+            customerEligibilities: customerEligibilities,
+            offerEligibility: offerEligibility,
+            duration: duration,
+            offerMode: offerMode,
+            numberOfPeriods: numberOfPeriods,
+            totalNumberOfCodes: totalNumberOfCodes,
+            isActive: isActive
+        )
+    }
+
+    static func makeSubscriptionOfferCodeCustomCode(
+        id: String = "cc-1",
+        offerCodeId: String = "oc-1",
+        customCode: String = "SUMMER2026",
+        numberOfCodes: Int = 1000,
+        createdDate: String? = nil,
+        expirationDate: String? = nil,
+        isActive: Bool = true
+    ) -> SubscriptionOfferCodeCustomCode {
+        SubscriptionOfferCodeCustomCode(
+            id: id,
+            offerCodeId: offerCodeId,
+            customCode: customCode,
+            numberOfCodes: numberOfCodes,
+            createdDate: createdDate,
+            expirationDate: expirationDate,
+            isActive: isActive
+        )
+    }
+
+    static func makeSubscriptionOfferCodeOneTimeUseCode(
+        id: String = "otc-1",
+        offerCodeId: String = "oc-1",
+        numberOfCodes: Int = 5000,
+        createdDate: String? = nil,
+        expirationDate: String? = "2026-12-31",
+        isActive: Bool = true
+    ) -> SubscriptionOfferCodeOneTimeUseCode {
+        SubscriptionOfferCodeOneTimeUseCode(
+            id: id,
+            offerCodeId: offerCodeId,
+            numberOfCodes: numberOfCodes,
+            createdDate: createdDate,
+            expirationDate: expirationDate,
+            isActive: isActive
+        )
+    }
+
+    // MARK: - IAP Offer Codes
+
+    static func makeIAPOfferCode(
+        id: String = "oc-1",
+        iapId: String = "iap-1",
+        name: String = "FREEGEMS",
+        customerEligibilities: [IAPCustomerEligibility] = [.nonSpender],
+        isActive: Bool = true,
+        totalNumberOfCodes: Int? = nil
+    ) -> InAppPurchaseOfferCode {
+        InAppPurchaseOfferCode(
+            id: id,
+            iapId: iapId,
+            name: name,
+            customerEligibilities: customerEligibilities,
+            isActive: isActive,
+            totalNumberOfCodes: totalNumberOfCodes
+        )
+    }
+
+    static func makeIAPOfferCodeCustomCode(
+        id: String = "cc-1",
+        offerCodeId: String = "oc-1",
+        customCode: String = "FREEGEMS100",
+        numberOfCodes: Int = 500,
+        createdDate: String? = nil,
+        expirationDate: String? = nil,
+        isActive: Bool = true
+    ) -> InAppPurchaseOfferCodeCustomCode {
+        InAppPurchaseOfferCodeCustomCode(
+            id: id,
+            offerCodeId: offerCodeId,
+            customCode: customCode,
+            numberOfCodes: numberOfCodes,
+            createdDate: createdDate,
+            expirationDate: expirationDate,
+            isActive: isActive
+        )
+    }
+
+    static func makeIAPOfferCodeOneTimeUseCode(
+        id: String = "otc-1",
+        offerCodeId: String = "oc-1",
+        numberOfCodes: Int = 3000,
+        createdDate: String? = nil,
+        expirationDate: String? = "2026-06-30",
+        isActive: Bool = true
+    ) -> InAppPurchaseOfferCodeOneTimeUseCode {
+        InAppPurchaseOfferCodeOneTimeUseCode(
+            id: id,
+            offerCodeId: offerCodeId,
+            numberOfCodes: numberOfCodes,
+            createdDate: createdDate,
+            expirationDate: expirationDate,
+            isActive: isActive
+        )
+    }
+
     static func makeAnalyticsReportSegment(
         id: String = "seg-1",
         instanceId: String = "inst-1",
