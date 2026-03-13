@@ -56,14 +56,18 @@ public struct ProcessXcodeBuildRunner: XcodeBuildRunner {
     }
 
     public func exportArchive(request: ExportRequest) async throws -> ExportResult {
-        let plistPath = try writeExportOptionsPlist(method: request.method)
+        let plistPath = try writeExportOptionsPlist(request: request)
 
-        let args = [
+        var args = [
             "-exportArchive",
             "-archivePath", request.archivePath,
             "-exportPath", request.exportPath,
             "-exportOptionsPlist", plistPath,
         ]
+
+        if request.signingStyle == .automatic {
+            args += ["-allowProvisioningUpdates"]
+        }
 
         let (exitCode, _, stderr) = try runProcess(arguments: args)
 
@@ -114,14 +118,26 @@ public struct ProcessXcodeBuildRunner: XcodeBuildRunner {
         }
     }
 
-    private func writeExportOptionsPlist(method: ExportMethod) throws -> String {
+    private func writeExportOptionsPlist(request: ExportRequest) throws -> String {
+        var entries = """
+            <key>method</key>
+            <string>\(request.method.rawValue)</string>
+            <key>signingStyle</key>
+            <string>\(request.signingStyle.rawValue)</string>
+        """
+        if let teamId = request.teamId {
+            entries += """
+
+                <key>teamID</key>
+                <string>\(teamId)</string>
+            """
+        }
         let plist = """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0">
         <dict>
-            <key>method</key>
-            <string>\(method.rawValue)</string>
+        \(entries)
         </dict>
         </plist>
         """

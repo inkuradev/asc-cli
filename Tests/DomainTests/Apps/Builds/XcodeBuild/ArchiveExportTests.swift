@@ -56,6 +56,32 @@ struct ArchiveExportTests {
         #expect(result.affordances["exportArchive"]!.contains("MyApp.xcarchive"))
     }
 
+    // MARK: - ExportRequest signing
+
+    @Test func `export request defaults to automatic signing`() {
+        let request = ExportRequest(archivePath: "/tmp/a.xcarchive", exportPath: "/tmp/export")
+        #expect(request.signingStyle == .automatic)
+        #expect(request.teamId == nil)
+    }
+
+    @Test func `export request carries manual signing with team id`() {
+        let request = ExportRequest(
+            archivePath: "/tmp/a.xcarchive",
+            exportPath: "/tmp/export",
+            signingStyle: .manual,
+            teamId: "ABCD1234"
+        )
+        #expect(request.signingStyle == .manual)
+        #expect(request.teamId == "ABCD1234")
+    }
+
+    // MARK: - SigningStyle
+
+    @Test func `signing style raw values match xcodebuild`() {
+        #expect(SigningStyle.automatic.rawValue == "automatic")
+        #expect(SigningStyle.manual.rawValue == "manual")
+    }
+
     // MARK: - ExportResult
 
     @Test func `export result carries ipa path`() {

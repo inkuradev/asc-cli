@@ -29,6 +29,12 @@ struct BuildsArchive: AsyncParsableCommand {
     @Option(name: .long, help: "Export method: app-store-connect, ad-hoc, development, enterprise (default: app-store-connect)")
     var exportMethod: String?
 
+    @Option(name: .long, help: "Signing style: automatic, manual (default: automatic)")
+    var signingStyle: String?
+
+    @Option(name: .long, help: "Team ID for signing")
+    var teamId: String?
+
     @Option(name: .long, help: "Output directory for archive and export (default: .build)")
     var outputDir: String = ".build"
 
@@ -78,6 +84,17 @@ struct BuildsArchive: AsyncParsableCommand {
             resolvedMethod = .appStoreConnect
         }
 
+        // Resolve signing style
+        let resolvedSigningStyle: SigningStyle
+        if let styleArg = signingStyle {
+            guard let s = SigningStyle(rawValue: styleArg) else {
+                throw ValidationError("Unknown signing style: \(styleArg). Use: automatic, manual")
+            }
+            resolvedSigningStyle = s
+        } else {
+            resolvedSigningStyle = .automatic
+        }
+
         // Resolve workspace/project from cwd if not provided
         let resolvedWorkspace = workspace ?? detectWorkspace()
         let resolvedProject = (resolvedWorkspace == nil) ? (project ?? detectProject()) : project
@@ -100,7 +117,9 @@ struct BuildsArchive: AsyncParsableCommand {
         let exportRequest = ExportRequest(
             archivePath: archivePath,
             exportPath: exportPath,
-            method: resolvedMethod
+            method: resolvedMethod,
+            signingStyle: resolvedSigningStyle,
+            teamId: teamId
         )
         let exportResult = try await runner.exportArchive(request: exportRequest)
 

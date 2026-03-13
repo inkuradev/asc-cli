@@ -48,15 +48,30 @@ extension ArchiveResult: AffordanceProviding {
     }
 }
 
+public enum SigningStyle: String, Sendable, Equatable, Codable {
+    case automatic = "automatic"
+    case manual = "manual"
+}
+
 public struct ExportRequest: Sendable, Equatable {
     public let archivePath: String
     public let exportPath: String
     public let method: ExportMethod
+    public let signingStyle: SigningStyle
+    public let teamId: String?
 
-    public init(archivePath: String, exportPath: String, method: ExportMethod = .appStoreConnect) {
+    public init(
+        archivePath: String,
+        exportPath: String,
+        method: ExportMethod = .appStoreConnect,
+        signingStyle: SigningStyle = .automatic,
+        teamId: String? = nil
+    ) {
         self.archivePath = archivePath
         self.exportPath = exportPath
         self.method = method
+        self.signingStyle = signingStyle
+        self.teamId = teamId
     }
 }
 
