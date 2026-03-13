@@ -38,7 +38,7 @@ async function main() {
 
   for (const entry of entries) {
     const devInfo = {
-      developer: entry.developer,
+      developer: entry.developer || null,
       github:    entry.github || null,
       x:         entry.x     || null,
     };
@@ -46,7 +46,7 @@ async function main() {
     // ── Phase 1: all apps from a developer ID ───────────────────────────
     if (entry.developerId) {
       const url = `https://itunes.apple.com/lookup?id=${entry.developerId}&entity=software&limit=200`;
-      console.log(`  [developer ${entry.developerId}] ${entry.developer}`);
+      console.log(`  [developer ${entry.developerId}] ${entry.developer || '(no name)'}`);
       try {
         const data = await fetchJson(url);
         for (const app of (data.results || [])) {
@@ -56,6 +56,7 @@ async function main() {
           seen.add(key);
           items.push({
             ...devInfo,
+            developer: devInfo.developer || app.artistName || null,
             trackId:          app.trackId,
             trackName:        app.trackName,
             artworkUrl100:    app.artworkUrl100,
@@ -90,6 +91,7 @@ async function main() {
             seen.add(appId);
             items.push({
               ...devInfo,
+              developer: devInfo.developer || app.artistName || null,
               trackId:          app.trackId,
               trackName:        app.trackName,
               artworkUrl100:    app.artworkUrl100,

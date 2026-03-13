@@ -936,7 +936,7 @@
           card.rel = 'noopener';
           card.className = 'app-card';
           const name = (info.trackName || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-          const devDisplay = '@' + developer.replace(/</g,'&lt;');
+          const devDisplay = developer ? '@' + developer.replace(/</g,'&lt;') : '';
 
           // Build profile icon links for each platform provided
           let profileLinks = '';
@@ -947,7 +947,7 @@
             profileLinks += '<a class="app-card-profile-link" href="https://x.com/' + x.replace(/</g,'&lt;') + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="X">'+  ICON_X + '</a>';
           }
           // Fallback: link developer handle to GitHub if neither provided
-          if (!profileLinks) {
+          if (!profileLinks && developer) {
             profileLinks = '<a class="app-card-profile-link" href="https://github.com/' + developer.replace(/</g,'&lt;') + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="GitHub">' + ICON_GITHUB + '</a>';
           }
 
