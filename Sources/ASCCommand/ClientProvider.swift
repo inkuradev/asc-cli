@@ -182,6 +182,12 @@ struct ClientProvider {
         return try factory.makeAgeRatingDeclarationRepository(authProvider: authProvider)
     }
 
+    static func makeBetaAppReviewRepository() throws -> any BetaAppReviewRepository {
+        let authProvider = CompositeAuthProvider()
+        let factory = ClientFactory()
+        return try factory.makeBetaAppReviewRepository(authProvider: authProvider)
+    }
+
     // MARK: - Plugins
 
     static func makePluginRepository() -> any PluginRepository {

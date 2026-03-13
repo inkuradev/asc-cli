@@ -211,6 +211,11 @@ public struct ClientFactory: Sendable {
         return SDKDiagnosticsRepository(client: provider)
     }
 
+    public func makeBetaAppReviewRepository(authProvider: any AuthProvider) throws -> any BetaAppReviewRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKBetaAppReviewRepository(client: provider)
+    }
+
     // MARK: - Plugins (no ASC auth needed — local filesystem + subprocess)
 
     public func makePluginRepository() -> any PluginRepository {
