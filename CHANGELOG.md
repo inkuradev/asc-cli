@@ -7,12 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `--app-id` flag on `asc app-wall submit` — accepts App Store Connect app IDs directly, auto-constructs App Store URLs (repeatable, combinable with `--app` and `--developer-id`)
+
 ---
 
 ## [0.1.48] - 2026-03-13
-
-### Added
-- `--app-id` flag on `asc app-wall submit` — accepts App Store Connect app IDs directly, auto-constructs App Store URLs (repeatable, combinable with `--app` and `--developer-id`)
 
 ### Changed
 - `--developer` on `asc app-wall submit` is now optional — when omitted, the homepage card uses the iTunes artist name instead
