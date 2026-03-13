@@ -29,7 +29,7 @@ asc init --app-id <id> # pin it — skip --app-id on every future command
 | Category | What you can do |
 | --- | --- |
 | **Apps & Versions** | List apps, create versions, link builds, submit for App Store review |
-| **Builds** | Upload IPA/PKG, wait for processing, distribute to TestFlight, update beta notes |
+| **Builds** | Archive Xcode projects, export IPA/PKG, upload to App Store Connect, distribute to TestFlight, update beta notes |
 | **Metadata** | Update What's New, description, and keywords per locale |
 | **App Info** | Set per-locale name, subtitle, privacy policy; manage categories and age rating |
 | **Screenshots** | Create screenshot sets and upload images |
@@ -413,6 +413,9 @@ A full App Store release from build upload to review submission:
 
 ```bash
 # 1. Upload build and wait for processing
+# Option A: Archive from Xcode project and upload in one step
+asc builds archive --scheme MyApp --upload --app-id APP_ID --version 1.2.0 --build-number 55
+# Option B: Upload a pre-built IPA/PKG
 asc builds upload --app-id APP_ID --file ./MyApp.ipa --version 1.2.0 --build-number 55 --wait
 
 # 2. Distribute to TestFlight
@@ -445,6 +448,7 @@ Detailed documentation for each feature:
 - [App Info](docs/features/app-infos.md) — name, subtitle, privacy policy, categories, age rating
 - [TestFlight](docs/features/testflight.md) — beta groups, tester management, CSV import/export
 - [Xcode Cloud](docs/features/xcode-cloud.md) — products, workflows, build runs, start builds
+- [Builds Archive](docs/features/builds-archive.md) — archive Xcode projects, export IPA/PKG, optional upload chaining
 - [Builds Upload](docs/features/builds-upload.md) — upload IPA/PKG, TestFlight distribution, beta notes
 - [Code Signing](docs/features/code-signing.md) — bundle IDs, certificates, devices, profiles
 - [Version Check-Readiness](docs/features/version-check-readiness.md) — pre-flight submission checks
