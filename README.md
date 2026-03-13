@@ -140,6 +140,7 @@ asc version-review-detail update --version-id <id> --contact-first-name Jane --c
 
 ```bash
 asc builds list [--app-id <id>]
+asc builds archive --scheme MyApp [--platform ios] [--export-method app-store] [--upload --app-id <id> --version 1.0.0 --build-number 42]
 asc builds upload --app-id <id> --file MyApp.ipa --version 1.0.0 --build-number 42
 asc builds uploads list --app-id <id>
 asc builds uploads get --upload-id <id>

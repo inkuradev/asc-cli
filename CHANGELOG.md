@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `asc builds archive --scheme <name>` — archive and export Xcode projects locally via `xcodebuild`, auto-detecting workspace/project from the current directory; supports `--platform`, `--configuration`, `--export-method` (app-store/ad-hoc/development/enterprise), and `--output-dir`
+- `--upload` flag on `asc builds archive` chains the exported IPA/PKG directly into App Store Connect upload, combining archive + export + upload in a single command
+
 ---
 
 ## [0.1.45] - 2026-03-12
