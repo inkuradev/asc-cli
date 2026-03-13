@@ -691,8 +691,10 @@
       </div>
     </div>
     <div class="app-wall-cta" data-animate="fade-up">
-      <div class="btn btn-secondary" style="cursor:default;user-select:all;font-family:'JetBrains Mono',monospace;font-size:0.85rem;letter-spacing:-0.02em">
-        asc app-wall submit --app-id &lt;your-app-id&gt;
+      <div class="install-box install-box--secondary" onclick="copyAppWall(this)">
+        <span class="prompt">$</span>
+        <span class="cmd">asc app-wall submit --app-id &lt;your-app-id&gt;</span>
+        <button class="copy-btn">copy</button>
       </div>
       <p class="app-wall-cta-hint">{{appWall.ctaHint}}</p>
     </div>
@@ -762,6 +764,8 @@
   <script>
     var _nuclearAudio = new Audio('static/nuclear-launch-detected.mp3');
     function _playNuclear() { _nuclearAudio.currentTime = 0; _nuclearAudio.play(); }
+    var _dropshipAudio = new Audio('static/SC_Dropship_In_The_Pipe_Five_By_Five_Sound_Effect.mp3');
+    function _playDropship() { _dropshipAudio.currentTime = 0; _dropshipAudio.play(); }
     document.querySelectorAll('.nav-logo-icon').forEach(function(el) {
       el.style.cursor = 'pointer';
       el.addEventListener('click', function(e) { e.preventDefault(); _playNuclear(); });
@@ -863,6 +867,16 @@
       });
     }
     function copyInstallCTA(box) { copyInstall(box); }
+    function copyAppWall(box) {
+      const cmd = box.querySelector('.cmd').textContent;
+      const btn = box.querySelector('.copy-btn');
+      navigator.clipboard.writeText(cmd).then(() => {
+        btn.textContent = 'copied!';
+        btn.classList.add('copied');
+        _playDropship();
+        setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
 
     // App Wall — fetch apps.json, lookup iTunes metadata, render cards
     // Supports two modes per entry:

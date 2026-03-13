@@ -185,6 +185,14 @@
 }
 .install-box .copy-btn:hover { background: rgba(var(--color-accent-rgb), 0.25); }
 .install-box .copy-btn.copied { color: var(--color-accent); }
+.install-box.install-box--secondary {
+  background: transparent;
+  border-color: var(--color-border);
+}
+.install-box.install-box--secondary:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-hover);
+}
 
 /* ---- Sections ---- */
 .section {
