@@ -7,6 +7,7 @@ struct BuildsCommand: AsyncParsableCommand {
         subcommands: [
             BuildsList.self,
             BuildsUpload.self,
+            BuildsArchive.self,
             BuildsUploadsCommand.self,
             BuildsAddBetaGroup.self,
             BuildsRemoveBetaGroup.self,

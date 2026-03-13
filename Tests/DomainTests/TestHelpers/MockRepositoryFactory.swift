@@ -1025,6 +1025,41 @@ struct MockRepositoryFactory {
         )
     }
 
+    // MARK: - XcodeBuild Archive/Export
+
+    static func makeArchiveRequest(
+        scheme: String = "MyApp",
+        workspace: String? = nil,
+        project: String? = nil,
+        platform: BuildUploadPlatform = .iOS,
+        configuration: String = "Release",
+        archivePath: String = "/tmp/MyApp.xcarchive"
+    ) -> ArchiveRequest {
+        ArchiveRequest(
+            scheme: scheme,
+            workspace: workspace,
+            project: project,
+            platform: platform,
+            configuration: configuration,
+            archivePath: archivePath
+        )
+    }
+
+    static func makeArchiveResult(
+        archivePath: String = "/tmp/MyApp.xcarchive",
+        scheme: String = "MyApp",
+        platform: BuildUploadPlatform = .iOS
+    ) -> ArchiveResult {
+        ArchiveResult(archivePath: archivePath, scheme: scheme, platform: platform)
+    }
+
+    static func makeExportResult(
+        ipaPath: String = "/tmp/export/MyApp.ipa",
+        exportPath: String = "/tmp/export"
+    ) -> ExportResult {
+        ExportResult(ipaPath: ipaPath, exportPath: exportPath)
+    }
+
     static func makeAnalyticsReportSegment(
         id: String = "seg-1",
         instanceId: String = "inst-1",
