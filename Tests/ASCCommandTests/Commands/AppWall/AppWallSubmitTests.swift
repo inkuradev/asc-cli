@@ -6,7 +6,7 @@ import Testing
 @Suite("AppWallSubmit")
 struct AppWallSubmitTests {
 
-    @Test func `submit returns PR details as formatted JSON`() async throws {
+    @Test func `submit with all flags returns PR details`() async throws {
         let mockRepo = MockAppWallRepository()
         given(mockRepo).submit(app: .any).willReturn(
             AppWallSubmission(
@@ -31,27 +31,46 @@ struct AppWallSubmitTests {
         #expect(output.contains("\"openPR\""))
     }
 
-    @Test func `submit with developer and developerId works`() async throws {
+    @Test func `submit with just app-id works`() async throws {
         let mockRepo = MockAppWallRepository()
         given(mockRepo).submit(app: .any).willReturn(
             AppWallSubmission(
-                prNumber: 7,
-                prUrl: "https://github.com/tddworks/asc-cli/pull/7",
-                title: "feat(app-wall): add jane",
-                developer: "jane"
+                prNumber: 20,
+                prUrl: "https://github.com/tddworks/asc-cli/pull/20",
+                title: "feat(app-wall): add 6446381990",
+                developer: "6446381990"
             )
         )
 
         var cmd = try AppWallSubmit.parse([
-            "--developer", "jane",
-            "--developer-id", "9876543210",
+            "--app-id", "6446381990",
         ])
         let output = try await cmd.execute(repo: mockRepo)
 
-        #expect(output.contains("\"prNumber\":7") || output.contains("\"prNumber\" : 7"))
+        #expect(output.contains("\"prNumber\":20") || output.contains("\"prNumber\" : 20"))
     }
 
-    @Test func `submit without developerId or apps throws validation error`() async throws {
+    @Test func `submit with app-id and developer works`() async throws {
+        let mockRepo = MockAppWallRepository()
+        given(mockRepo).submit(app: .any).willReturn(
+            AppWallSubmission(
+                prNumber: 15,
+                prUrl: "https://github.com/tddworks/asc-cli/pull/15",
+                title: "feat(app-wall): add itshan",
+                developer: "itshan"
+            )
+        )
+
+        var cmd = try AppWallSubmit.parse([
+            "--app-id", "6446381990",
+            "--developer", "itshan",
+        ])
+        let output = try await cmd.execute(repo: mockRepo)
+
+        #expect(output.contains("\"prNumber\":15") || output.contains("\"prNumber\" : 15"))
+    }
+
+    @Test func `submit without any app source throws validation error`() async throws {
         let mockRepo = MockAppWallRepository()
 
         var cmd = try AppWallSubmit.parse([
@@ -83,5 +102,24 @@ struct AppWallSubmitTests {
         let output = try await cmd.execute(repo: mockRepo)
 
         #expect(output.contains("\"prNumber\":10") || output.contains("\"prNumber\" : 10"))
+    }
+
+    @Test func `submit with developer-id alone works`() async throws {
+        let mockRepo = MockAppWallRepository()
+        given(mockRepo).submit(app: .any).willReturn(
+            AppWallSubmission(
+                prNumber: 7,
+                prUrl: "https://github.com/tddworks/asc-cli/pull/7",
+                title: "feat(app-wall): add 9876543210",
+                developer: "9876543210"
+            )
+        )
+
+        var cmd = try AppWallSubmit.parse([
+            "--developer-id", "9876543210",
+        ])
+        let output = try await cmd.execute(repo: mockRepo)
+
+        #expect(output.contains("\"prNumber\":7") || output.contains("\"prNumber\" : 7"))
     }
 }

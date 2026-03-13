@@ -18,19 +18,20 @@ No ASC authentication required. Only a GitHub token is needed.
 ## Command
 
 ```bash
-asc app-wall submit --developer <handle> [options]
+asc app-wall submit [options]
 ```
 
 | Flag | Required | Description |
 |------|----------|-------------|
-| `--developer` | ✓ | Display handle shown on the card (`@developer`) |
+| `--developer` | — | Display handle on the card; when omitted, uses iTunes artist name |
 | `--developer-id` | ✓* | Apple developer/seller ID — auto-fetches **all** your App Store apps |
+| `--app-id` | ✓* | App Store Connect app ID (repeatable) |
 | `--github` | — | GitHub username |
 | `--x` | — | X/Twitter handle |
 | `--app` | ✓* | Specific App Store URL (repeat for multiple) |
 | `--github-token` | — | GitHub token (or set `GITHUB_TOKEN` / `gh auth login`) |
 
-_✓* At least one of `--developer-id` or `--app` is required — without it there are no apps to display on the wall._
+_✓* At least one of `--developer-id`, `--app-id`, or `--app` is required — without it there are no apps to display on the wall._
 
 ## Typical Workflow
 

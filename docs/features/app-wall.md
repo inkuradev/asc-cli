@@ -7,13 +7,14 @@ Community showcase of apps published on the App Store using asc CLI. Displayed a
 ### submit — add your app to the app wall
 
 ```bash
-asc app-wall submit --developer <handle> [options]
+asc app-wall submit [options]
 ```
 
 | Flag | Required | Description |
 |------|----------|-------------|
-| `--developer` | ✓ | Display handle shown on the card (`@developer`) |
+| `--developer` | — | Display handle shown on the card (`@developer`); when omitted, the homepage uses the iTunes artist name |
 | `--developer-id` | ✓* | Apple developer/seller ID — auto-fetches **all** your App Store apps |
+| `--app-id` | ✓* | App Store Connect app ID — auto-constructs App Store URL (repeatable) |
 | `--github` | — | GitHub username; card links to `github.com/<handle>` |
 | `--x` | — | X/Twitter handle; card links to `x.com/<handle>` |
 | `--app` | ✓* | Specific App Store URL (repeat flag for multiple apps) |
@@ -21,12 +22,18 @@ asc app-wall submit --developer <handle> [options]
 | `--output` | — | Output format: `json` (default), `table`, `markdown` |
 | `--pretty` | — | Pretty-print JSON output |
 
-_✓* At least one of `--developer-id` or `--app` is required — an entry with neither has no apps to display on the wall._
+_✓* At least one of `--developer-id`, `--app-id`, or `--app` is required — an entry with none has no apps to display on the wall._
 
 **Examples:**
 
 ```bash
-# Mode A — all apps by developer ID
+# Simplest — just an app ID
+asc app-wall submit --app-id 6446381990
+
+# With a display name
+asc app-wall submit --app-id 6446381990 --developer "itshan"
+
+# All apps by developer ID
 asc app-wall submit \
   --developer "itshan" \
   --developer-id "1725133580" \
@@ -34,15 +41,16 @@ asc app-wall submit \
   --x "itshanrw" \
   --pretty
 
-# Mode B — specific App Store URLs
+# Specific App Store URLs
 asc app-wall submit \
   --developer "itshan" \
   --app "https://apps.apple.com/us/app/my-app/id123456789"
 
-# Both modes combined
+# All modes combined
 asc app-wall submit \
   --developer "itshan" \
   --developer-id "1725133580" \
+  --app-id 6446381990 \
   --app "https://apps.apple.com/us/app/extra-app/id987654321"
 ```
 

@@ -11,8 +11,8 @@ struct AppWallSubmit: AsyncParsableCommand {
 
     @OptionGroup var globals: GlobalOptions
 
-    @Option(name: .long, help: "Your developer display name (required)")
-    var developer: String
+    @Option(name: .long, help: "Your developer display name")
+    var developer: String?
 
     @Option(name: .long, help: "Your Apple developer/seller ID — auto-fetches all your App Store apps")
     var developerId: String?
@@ -22,6 +22,9 @@ struct AppWallSubmit: AsyncParsableCommand {
 
     @Option(name: .long, help: "Your X (Twitter) handle")
     var x: String?
+
+    @Option(name: .long, help: "App Store Connect app ID (repeat for multiple apps)")
+    var appId: [String] = []
 
     @Option(name: .long, help: "Specific App Store URL (repeat for multiple apps)")
     var app: [String] = []
@@ -36,16 +39,18 @@ struct AppWallSubmit: AsyncParsableCommand {
     }
 
     func execute(repo: any AppWallRepository) async throws -> String {
+        let appIdURLs = appId.map { "https://apps.apple.com/app/id\($0)" }
+        let allApps = appIdURLs + app
         let wallApp = AppWallApp(
             developer: developer,
             developerId: developerId,
             github: github,
             x: x,
-            apps: app.isEmpty ? nil : app
+            apps: allApps.isEmpty ? nil : allApps
         )
         guard wallApp.hasAppSource else {
             throw ValidationError(
-                "Provide --developer-id or at least one --app URL so your apps appear on the wall."
+                "Provide --developer-id, --app-id, or --app URL so your apps appear on the wall."
             )
         }
         let submission = try await repo.submit(app: wallApp)

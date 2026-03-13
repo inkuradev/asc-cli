@@ -40,17 +40,18 @@ public struct GitHubAppWallRepository: AppWallRepository {
         // 4. Fetch current file — retry briefly while fork initialises
         let (currentApps, baseSHA) = try await getFileWithRetry(owner: username)
 
-        // 5. Guard against duplicate entries
-        let isDuplicate = currentApps.contains { $0.developer == app.developer }
+        // 5. Guard against duplicate entries (match on branchLabel — derived from best available field)
+        let label = app.branchLabel
+        let isDuplicate = currentApps.contains { $0.branchLabel == label }
         guard !isDuplicate else {
-            throw AppWallError.alreadySubmitted(developer: app.developer)
+            throw AppWallError.alreadySubmitted(developer: label)
         }
 
         // 6. Encode updated array
         let newContent = try encodeApps(currentApps + [app])
 
         // 7. Create feature branch
-        let branchName = "app-wall/\(app.developer)"
+        let branchName = "app-wall/\(label)"
         try await createBranch(owner: username, branchName: branchName)
 
         // 8. Commit file update to feature branch
@@ -156,7 +157,7 @@ public struct GitHubAppWallRepository: AppWallRepository {
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.httpBody = try JSONSerialization.data(withJSONObject: [
-            "message": "feat(app-wall): add \(app.developer)",
+            "message": "feat(app-wall): add \(app.branchLabel)",
             "content": content.base64EncodedString(),
             "sha": sha,
             "branch": branchName
@@ -180,11 +181,11 @@ public struct GitHubAppWallRepository: AppWallRepository {
         request.httpMethod = "POST"
 
         var bodyLines = [
-            "## Add \(app.developer) to the app wall",
+            "## Add \(app.branchLabel) to the app wall",
             "",
-            "- **Developer**: \(app.developer)",
         ]
-        if let devId = app.developerId { bodyLines.append("- **Developer ID**: \(devId)") }
+        if let dev = app.developer       { bodyLines.append("- **Developer**: \(dev)") }
+        if let devId = app.developerId   { bodyLines.append("- **Developer ID**: \(devId)") }
         if let gh = app.github        { bodyLines.append("- **GitHub**: @\(gh)") }
         if let x = app.x              { bodyLines.append("- **X**: @\(x)") }
         if let appUrls = app.apps     { bodyLines.append("- **Apps**: \(appUrls.joined(separator: ", "))") }
@@ -192,7 +193,7 @@ public struct GitHubAppWallRepository: AppWallRepository {
         bodyLines.append("_Submitted via `asc app-wall submit`_")
 
         request.httpBody = try JSONSerialization.data(withJSONObject: [
-            "title": "feat(app-wall): add \(app.developer)",
+            "title": "feat(app-wall): add \(app.branchLabel)",
             "head": "\(fromOwner):\(branchName)",
             "base": "main",
             "body": bodyLines.joined(separator: "\n")
@@ -209,7 +210,7 @@ public struct GitHubAppWallRepository: AppWallRepository {
             prNumber: pr.number,
             prUrl: pr.html_url,
             title: pr.title,
-            developer: app.developer
+            developer: app.branchLabel
         )
     }
 

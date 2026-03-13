@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `--app-id` flag on `asc app-wall submit` — accepts App Store Connect app IDs directly, auto-constructs App Store URLs (repeatable, combinable with `--app` and `--developer-id`)
+
+### Changed
+- `--developer` on `asc app-wall submit` is now optional — when omitted, the homepage card uses the iTunes artist name instead
 - `asc beta-review submissions list --build-id <id>` — list beta app review submissions for a build
 - `asc beta-review submissions create --build-id <id>` — submit a build for beta (TestFlight external) review
 - `asc beta-review submissions get --submission-id <id>` — get a specific beta review submission
