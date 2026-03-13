@@ -53,7 +53,7 @@ public struct ExportRequest: Sendable, Equatable {
     public let exportPath: String
     public let method: ExportMethod
 
-    public init(archivePath: String, exportPath: String, method: ExportMethod = .appStore) {
+    public init(archivePath: String, exportPath: String, method: ExportMethod = .appStoreConnect) {
         self.archivePath = archivePath
         self.exportPath = exportPath
         self.method = method
@@ -79,7 +79,7 @@ extension ExportResult: AffordanceProviding {
 }
 
 public enum ExportMethod: String, Sendable, Equatable, Codable {
-    case appStore = "app-store"
+    case appStoreConnect = "app-store-connect"
     case adHoc = "ad-hoc"
     case development = "development"
     case enterprise = "enterprise"

@@ -8,14 +8,14 @@ struct ArchiveExportTests {
     // MARK: - ExportMethod
 
     @Test func `export method raw values match xcodebuild`() {
-        #expect(ExportMethod.appStore.rawValue == "app-store")
+        #expect(ExportMethod.appStoreConnect.rawValue == "app-store-connect")
         #expect(ExportMethod.adHoc.rawValue == "ad-hoc")
         #expect(ExportMethod.development.rawValue == "development")
         #expect(ExportMethod.enterprise.rawValue == "enterprise")
     }
 
     @Test func `export method cli argument init`() {
-        #expect(ExportMethod(cliArgument: "app-store") == .appStore)
+        #expect(ExportMethod(cliArgument: "app-store-connect") == .appStoreConnect)
         #expect(ExportMethod(cliArgument: "ad-hoc") == .adHoc)
         #expect(ExportMethod(cliArgument: "development") == .development)
         #expect(ExportMethod(cliArgument: "enterprise") == .enterprise)

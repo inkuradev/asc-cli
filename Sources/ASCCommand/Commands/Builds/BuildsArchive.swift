@@ -26,7 +26,7 @@ struct BuildsArchive: AsyncParsableCommand {
     @Option(name: .long, help: "Build configuration (default: Release)")
     var configuration: String = "Release"
 
-    @Option(name: .long, help: "Export method: app-store, ad-hoc, development, enterprise (default: app-store)")
+    @Option(name: .long, help: "Export method: app-store-connect, ad-hoc, development, enterprise (default: app-store-connect)")
     var exportMethod: String?
 
     @Option(name: .long, help: "Output directory for archive and export (default: .build)")
@@ -71,11 +71,11 @@ struct BuildsArchive: AsyncParsableCommand {
         let resolvedMethod: ExportMethod
         if let methodArg = exportMethod {
             guard let m = ExportMethod(cliArgument: methodArg) else {
-                throw ValidationError("Unknown export method: \(methodArg). Use: app-store, ad-hoc, development, enterprise")
+                throw ValidationError("Unknown export method: \(methodArg). Use: app-store-connect, ad-hoc, development, enterprise")
             }
             resolvedMethod = m
         } else {
-            resolvedMethod = .appStore
+            resolvedMethod = .appStoreConnect
         }
 
         // Resolve workspace/project from cwd if not provided
