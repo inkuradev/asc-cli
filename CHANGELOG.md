@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `asc skills list` — list available skills from the asc-cli repository via `npx skills add tddworks/asc-cli --list`
+- `asc skills install --name <name>` — install a specific skill; `--all` to install all available skills
+- `asc skills installed` — show skills installed in `~/.claude/skills/` with CAEOAS affordances
+- `asc skills uninstall --name <name>` — remove an installed skill from `~/.claude/skills/`
+- `asc skills check` — check for available skill updates via `npx skills check`
+- `asc skills update` — update installed skills via `npx skills update`
+- Auto-update checker — non-blocking skill update check on every `asc` command (24h cooldown, CI-aware, disable with `ASC_SKIP_SKILL_CHECK=true`)
 - `--app-id` flag on `asc app-wall submit` — accepts App Store Connect app IDs directly, auto-constructs App Store URLs (repeatable, combinable with `--app` and `--developer-id`)
 
 ---

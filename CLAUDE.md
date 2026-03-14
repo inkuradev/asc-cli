@@ -115,6 +115,7 @@ Domain/
 ├── Submissions/                   → ReviewSubmission, ReviewSubmissionState, SubmissionRepository
 ├── Auth/                          → AuthCredentials, AuthProvider, AuthStatus, AuthStorage, CredentialSource, AuthError
 ├── Projects/                      → ProjectConfig, ProjectConfigStorage
+├── Skills/                        → Skill, SkillCheckResult, SkillConfig, SkillRepository, SkillConfigStorage
 └── Shared/                        → AffordanceProviding, APIError, OutputFormat, PaginatedResponse
 ```
 Infrastructure and test folders mirror this exact structure.
@@ -171,7 +172,7 @@ After every code change — new feature, improvement, or bug fix — update all 
 
 | Change type | Files to update |
 |-------------|-----------------|
-| New feature / command | `docs/features/<feature>.md` (create), `CHANGELOG.md` ([Unreleased]), `README.md` (feature list + CLI examples), `.claude/skills/` (relevant skill files) |
+| New feature / command | `docs/features/<feature>.md` (create), `CHANGELOG.md` ([Unreleased]), `README.md` (feature list + CLI examples), `skills/` (relevant skill files) |
 | Improvement / enhancement | `docs/features/<feature>.md` (update affected sections), `CHANGELOG.md` ([Unreleased]) |
 | Bug fix | `CHANGELOG.md` ([Unreleased]) |
 | Architecture / API change | `CLAUDE.md` (update architecture / patterns sections), `docs/features/<feature>.md` |
@@ -196,7 +197,7 @@ After every code change — new feature, improvement, or bug fix — update all 
 
 **`README.md`** — update the feature/command table and any usage examples that changed.
 
-**`.claude/skills/<feature>`** — always use the `/skill-creator` skill to create or update feature skills
+**`skills/<feature>`** — always use the `/skill-creator` skill to create or update feature skills
 
 Key skills to keep in sync:
 - `implement-feature/SKILL.md` — workflow + checklist
