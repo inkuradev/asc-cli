@@ -40,23 +40,30 @@ public struct SystemShellRunner: ShellRunner {
         // Close stdin so the child process cannot block waiting for input.
         process.standardInput = FileHandle.nullDevice
         let stdoutPipe = Pipe()
-        let stderrPipe = Pipe()
         process.standardOutput = stdoutPipe
+        // Stream stderr directly to the terminal so the user sees progress
+        // (spinners, banners) in real time. Capture it only for error reporting.
+        let stderrPipe = Pipe()
         process.standardError = stderrPipe
 
         try process.run()
 
-        // Read stdout and stderr concurrently to avoid pipe buffer deadlock.
-        // If one pipe fills its buffer (~64KB) while we're blocking on the other,
-        // the child process blocks on write and we deadlock.
+        // Forward stderr to the terminal in real time while also collecting it
+        // for error reporting if the process fails.
         var stderrData = Data()
         let stderrQueue = DispatchQueue(label: "shell-runner-stderr")
         stderrQueue.async {
-            stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+            let handle = stderrPipe.fileHandleForReading
+            while true {
+                let chunk = handle.availableData
+                if chunk.isEmpty { break }
+                FileHandle.standardError.write(chunk)
+                stderrData.append(chunk)
+            }
         }
 
         let outputData = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
-        stderrQueue.sync {} // wait for stderr read to finish
+        stderrQueue.sync {} // wait for stderr forwarding to finish
         process.waitUntilExit()
 
         guard process.terminationStatus == 0 else {
