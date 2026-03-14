@@ -15,7 +15,8 @@
     "github": "GitHub",
     "getApp": "インストール",
     "appWall": "ショーケース",
-    "editor": "エディター"
+    "editor": "エディター",
+    "skills": "スキル"
   },
   "hero": {
     "badge": "オープンソース · MIT ライセンス",
@@ -154,6 +155,20 @@
     "step3": {
       "title": "アプリの管理を始める",
       "description": "アプリの一覧表示、バージョン確認、スクリーンショットのアップロード、レビュー提出 — ターミナルから、または AI エージェントを通じて。"
+    }
+  },
+  "skills": {
+    "eyebrow": "エージェントスキル",
+    "title": "AI エージェントをパワーアップ",
+    "subtitle": "26 以上のビルド済みスキルをインストールして、AI コーディングエージェントにすべての asc コマンドの使い方を教えましょう — アップロードから提出まで。",
+    "countLabel": "26 以上のスキルが利用可能 — Claude Code、Cursor、Windsurf などに対応",
+    "cards": {
+      "buildsUpload": "IPA/PKG ビルドのアップロードと TestFlight 配信の管理",
+      "appShots": "AI で App Store スクリーンショットを生成・翻訳",
+      "checkReadiness": "レビュー提出前のプリフライトチェック",
+      "auth": "App Store Connect API 認証情報の設定と管理",
+      "testflight": "TestFlight のベータグループとテスターの管理",
+      "releaseWorkflow": "エンドツーエンドのリリース：バンプ、アーカイブ、アップロード、提出"
     }
   },
   "cta": {

@@ -15,7 +15,8 @@
     "appWall": "Showcase",
     "github": "GitHub",
     "getApp": "Install",
-    "editor": "Editor"
+    "editor": "Editor",
+    "skills": "Skills"
   },
   "hero": {
     "badge": "Open Source · MIT License",
@@ -154,6 +155,20 @@
     "step3": {
       "title": "Start managing your apps",
       "description": "List apps, inspect versions, upload screenshots, and submit for review — all from your terminal or from an AI agent."
+    }
+  },
+  "skills": {
+    "eyebrow": "Agent Skills",
+    "title": "Supercharge your AI agent",
+    "subtitle": "Install 26+ pre-built skills that teach your AI coding agent how to use every asc command — from uploads to submissions.",
+    "countLabel": "26+ skills available — works with Claude Code, Cursor, Windsurf, and more",
+    "cards": {
+      "buildsUpload": "Upload IPA/PKG builds and manage TestFlight distribution",
+      "appShots": "Generate and translate App Store screenshots with AI",
+      "checkReadiness": "Pre-flight checks before submitting for review",
+      "auth": "Set up and manage App Store Connect API credentials",
+      "testflight": "Manage beta groups and testers for TestFlight",
+      "releaseWorkflow": "End-to-end release: bump, archive, upload, submit"
     }
   },
   "cta": {

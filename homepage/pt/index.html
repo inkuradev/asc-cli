@@ -129,6 +129,7 @@
     <ul class="nav-links">
       <li><a href="#features">Recursos</a></li>
       <li><a href="#how-it-works">Início rápido</a></li>
+      <li><a href="#skills">Habilidades</a></li>
       <li><a href="#install">Instalar</a></li>
       <li><a href="#app-wall">Showcase</a></li>
       <li><a href="https://asccli.app/editor/" target="_blank" rel="noopener">Editor</a></li>
@@ -674,6 +675,86 @@
     </div>
   </section>
 
+  <!-- Skills -->
+  <section class="section skills-section" id="skills">
+    <div class="gradient-line" style="position:absolute;top:0;left:8%;right:8%;"></div>
+    <div class="section-header">
+      <p class="section-eyebrow" data-animate="fade-up">Habilidades do Agente</p>
+      <h2 class="section-title" data-animate="fade-up" data-delay="1">Turbine seu agente de IA</h2>
+      <p class="section-subtitle" data-animate="fade-up" data-delay="2">Instale mais de 26 habilidades prontas que ensinam seu agente de codificação IA a usar cada comando asc — de uploads a submissões.</p>
+    </div>
+
+    <!-- Install commands -->
+    <div class="skills-install-row" data-animate="fade-up" data-delay="3">
+      <div class="skills-install-tabs">
+        <button class="skills-tab active" data-tab="asc">asc CLI</button>
+        <button class="skills-tab" data-tab="npx">npx</button>
+      </div>
+      <div class="skills-install-cmd" id="skills-cmd-asc">
+        <div class="install-box" onclick="copySkillsInstall(this)">
+          <span class="prompt">$</span>
+          <span class="cmd">asc skills install --all</span>
+          <button class="copy-btn">copy</button>
+        </div>
+      </div>
+      <div class="skills-install-cmd" id="skills-cmd-npx" style="display:none;">
+        <div class="install-box" onclick="copySkillsInstall(this)">
+          <span class="prompt">$</span>
+          <span class="cmd">npx skills add tddworks/asc-cli-skills --yes</span>
+          <button class="copy-btn">copy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills grid -->
+    <div class="skills-grid" data-animate="fade-up" data-delay="4">
+      <div class="skill-card">
+        <div class="skill-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/></svg>
+        </div>
+        <h4 class="skill-name">asc-builds-upload</h4>
+        <p class="skill-desc">Faça upload de builds IPA/PKG e gerencie a distribuição TestFlight</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <h4 class="skill-name">asc-app-shots</h4>
+        <p class="skill-desc">Gere e traduza capturas de tela do App Store com IA</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4"/><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+        </div>
+        <h4 class="skill-name">asc-check-readiness</h4>
+        <p class="skill-desc">Verificações prévias antes de enviar para revisão</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
+        </div>
+        <h4 class="skill-name">asc-auth</h4>
+        <p class="skill-desc">Configure e gerencie credenciais da API do App Store Connect</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h4 class="skill-name">asc-testflight</h4>
+        <p class="skill-desc">Gerencie grupos beta e testadores do TestFlight</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h4 class="skill-name">asc-release-workflow</h4>
+        <p class="skill-desc">Lançamento ponta a ponta: versionar, arquivar, fazer upload, enviar</p>
+      </div>
+    </div>
+
+    <p class="skills-count" data-animate="fade-up" data-delay="5">Mais de 26 habilidades disponíveis — compatível com Claude Code, Cursor, Windsurf e mais</p>
+  </section>
+
   <!-- CTA / Install -->
   <section class="cta" id="install">
     <div class="cta-card" data-animate="fade-up">
@@ -890,6 +971,19 @@
       });
     }
     function copyInstallCTA(box) { copyInstall(box); }
+    function copySkillsInstall(box) { copyInstall(box); }
+
+    // Skills tab switching
+    document.querySelectorAll('.skills-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.skills-tab').forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        var target = tab.getAttribute('data-tab');
+        document.querySelectorAll('.skills-install-cmd').forEach(function(cmd) { cmd.style.display = 'none'; });
+        document.getElementById('skills-cmd-' + target).style.display = '';
+      });
+    });
+
     function copyAppWall(box) {
       const cmd = box.querySelector('.cmd').textContent;
       const btn = box.querySelector('.copy-btn');

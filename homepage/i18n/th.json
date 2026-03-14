@@ -15,7 +15,8 @@
     "github": "GitHub",
     "getApp": "ติดตั้ง",
     "appWall": "ผลงาน",
-    "editor": "ตัวแก้ไข"
+    "editor": "ตัวแก้ไข",
+    "skills": "ทักษะ"
   },
   "hero": {
     "badge": "โอเพนซอร์ส · สัญญาอนุญาต MIT",
@@ -154,6 +155,20 @@
     "step3": {
       "title": "เริ่มจัดการแอปของคุณ",
       "description": "แสดงรายการแอป ตรวจสอบเวอร์ชัน อัปโหลดภาพหน้าจอ และส่งเพื่อรีวิว — ทั้งหมดจาก terminal หรือผ่าน AI agent"
+    }
+  },
+  "skills": {
+    "eyebrow": "ทักษะเอเจนต์",
+    "title": "เพิ่มพลังให้ AI agent ของคุณ",
+    "subtitle": "ติดตั้ง 26+ ทักษะสำเร็จรูปที่สอน AI coding agent ของคุณให้ใช้คำสั่ง asc ทุกตัว — ตั้งแต่อัปโหลดจนถึงส่งรีวิว",
+    "countLabel": "26+ ทักษะพร้อมใช้ — ใช้ได้กับ Claude Code, Cursor, Windsurf และอื่นๆ",
+    "cards": {
+      "buildsUpload": "อัปโหลดบิลด์ IPA/PKG และจัดการการแจกจ่ายผ่าน TestFlight",
+      "appShots": "สร้างและแปลภาพหน้าจอ App Store ด้วย AI",
+      "checkReadiness": "ตรวจสอบก่อนส่งเพื่อรีวิว",
+      "auth": "ตั้งค่าและจัดการข้อมูลรับรอง API ของ App Store Connect",
+      "testflight": "จัดการกลุ่มเบตาและผู้ทดสอบสำหรับ TestFlight",
+      "releaseWorkflow": "การเผยแพร่ครบวงจร: เพิ่มเวอร์ชัน, archive, อัปโหลด, ส่ง"
     }
   },
   "cta": {

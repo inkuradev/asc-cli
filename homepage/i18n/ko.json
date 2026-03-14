@@ -15,7 +15,8 @@
     "github": "GitHub",
     "getApp": "설치",
     "appWall": "쇼케이스",
-    "editor": "에디터"
+    "editor": "에디터",
+    "skills": "스킬"
   },
   "hero": {
     "badge": "오픈소스 · MIT 라이선스",
@@ -154,6 +155,20 @@
     "step3": {
       "title": "앱 관리 시작",
       "description": "앱 목록 조회, 버전 확인, 스크린샷 업로드, 심사 제출 — 터미널에서 또는 AI 에이전트를 통해."
+    }
+  },
+  "skills": {
+    "eyebrow": "에이전트 스킬",
+    "title": "AI 에이전트를 강화하세요",
+    "subtitle": "26개 이상의 사전 구축 스킬을 설치하여 AI 코딩 에이전트에게 모든 asc 명령어 사용법을 가르치세요 — 업로드부터 제출까지.",
+    "countLabel": "26개 이상의 스킬 사용 가능 — Claude Code, Cursor, Windsurf 등과 호환",
+    "cards": {
+      "buildsUpload": "IPA/PKG 빌드 업로드 및 TestFlight 배포 관리",
+      "appShots": "AI로 App Store 스크린샷 생성 및 번역",
+      "checkReadiness": "심사 제출 전 사전 점검",
+      "auth": "App Store Connect API 인증 정보 설정 및 관리",
+      "testflight": "TestFlight 베타 그룹 및 테스터 관리",
+      "releaseWorkflow": "엔드투엔드 릴리스: 버전 범프, 아카이브, 업로드, 제출"
     }
   },
   "cta": {

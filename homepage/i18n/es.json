@@ -15,7 +15,8 @@
     "github": "GitHub",
     "getApp": "Instalar",
     "appWall": "Showcase",
-    "editor": "Editor"
+    "editor": "Editor",
+    "skills": "Habilidades"
   },
   "hero": {
     "badge": "Código abierto · Licencia MIT",
@@ -154,6 +155,20 @@
     "step3": {
       "title": "Empieza a gestionar tus apps",
       "description": "Lista apps, inspecciona versiones, sube capturas de pantalla y envía a revisión — todo desde tu terminal o mediante un agente de IA."
+    }
+  },
+  "skills": {
+    "eyebrow": "Habilidades del agente",
+    "title": "Potencia tu agente de IA",
+    "subtitle": "Instala más de 26 habilidades prediseñadas que enseñan a tu agente de codificación IA cómo usar cada comando asc — desde subidas hasta envíos.",
+    "countLabel": "Más de 26 habilidades disponibles — compatible con Claude Code, Cursor, Windsurf y más",
+    "cards": {
+      "buildsUpload": "Sube builds IPA/PKG y gestiona la distribución TestFlight",
+      "appShots": "Genera y traduce capturas de pantalla del App Store con IA",
+      "checkReadiness": "Verificaciones previas antes de enviar a revisión",
+      "auth": "Configura y gestiona las credenciales de la API de App Store Connect",
+      "testflight": "Gestiona grupos beta y testers para TestFlight",
+      "releaseWorkflow": "Lanzamiento de extremo a extremo: versionar, archivar, subir, enviar"
     }
   },
   "cta": {

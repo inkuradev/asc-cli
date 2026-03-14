@@ -15,7 +15,8 @@
     "github": "GitHub",
     "getApp": "安装",
     "appWall": "应用展示",
-    "editor": "编辑器"
+    "editor": "编辑器",
+    "skills": "技能"
   },
   "hero": {
     "badge": "开源 · MIT 许可证",
@@ -154,6 +155,20 @@
     "step3": {
       "title": "开始管理您的应用",
       "description": "列出应用、查看版本、上传截图、提交审核——一切尽在终端，也可由 AI 智能体自动完成。"
+    }
+  },
+  "skills": {
+    "eyebrow": "智能体技能",
+    "title": "为你的 AI 智能体加速",
+    "subtitle": "安装 26+ 个预构建技能，教你的 AI 编程智能体如何使用每一个 asc 命令——从上传到提交。",
+    "countLabel": "26+ 个技能可用——兼容 Claude Code、Cursor、Windsurf 等",
+    "cards": {
+      "buildsUpload": "上传 IPA/PKG 构建包并管理 TestFlight 分发",
+      "appShots": "使用 AI 生成和翻译 App Store 截图",
+      "checkReadiness": "提交审核前的预检查",
+      "auth": "设置和管理 App Store Connect API 凭证",
+      "testflight": "管理 TestFlight 的测试组和测试人员",
+      "releaseWorkflow": "端到端发布流程：版本号、归档、上传、提交"
     }
   },
   "cta": {

@@ -15,7 +15,8 @@
     "github": "GitHub",
     "getApp": "Cài đặt",
     "appWall": "Showcase",
-    "editor": "Trình soạn thảo"
+    "editor": "Trình soạn thảo",
+    "skills": "Kỹ năng"
   },
   "hero": {
     "badge": "Mã nguồn mở · Giấy phép MIT",
@@ -154,6 +155,20 @@
     "step3": {
       "title": "Bắt đầu quản lý ứng dụng của bạn",
       "description": "Liệt kê ứng dụng, kiểm tra phiên bản, tải ảnh chụp màn hình và gửi để xem xét — tất cả từ terminal hoặc qua tác nhân AI."
+    }
+  },
+  "skills": {
+    "eyebrow": "Kỹ năng Tác nhân",
+    "title": "Tăng sức mạnh cho tác nhân AI của bạn",
+    "subtitle": "Cài đặt hơn 26 kỹ năng dựng sẵn giúp tác nhân lập trình AI của bạn biết cách sử dụng mọi lệnh asc — từ tải lên đến gửi duyệt.",
+    "countLabel": "Hơn 26 kỹ năng sẵn có — tương thích với Claude Code, Cursor, Windsurf và nhiều hơn nữa",
+    "cards": {
+      "buildsUpload": "Tải lên bản build IPA/PKG và quản lý phân phối TestFlight",
+      "appShots": "Tạo và dịch ảnh chụp màn hình App Store bằng AI",
+      "checkReadiness": "Kiểm tra trước khi gửi để xem xét",
+      "auth": "Thiết lập và quản lý thông tin xác thực API App Store Connect",
+      "testflight": "Quản lý nhóm beta và người kiểm thử cho TestFlight",
+      "releaseWorkflow": "Phát hành từ đầu đến cuối: tăng phiên bản, lưu trữ, tải lên, gửi"
     }
   },
   "cta": {
