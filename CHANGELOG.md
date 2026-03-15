@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `asc iap-availability get --iap-id <id>` — get territory availability for an in-app purchase
+- `asc iap-availability create --iap-id <id> --available-in-new-territories --territory USA --territory CHN` — create territory availability for an IAP
+- `asc subscription-availability get --subscription-id <id>` — get territory availability for a subscription
+- `asc subscription-availability create --subscription-id <id> --available-in-new-territories --territory USA` — create territory availability for a subscription
+- `getAvailability` affordance on `InAppPurchase` and `Subscription` models for CAEOAS navigation
+
 ---
 
 ## [0.1.49] - 2026-03-14
