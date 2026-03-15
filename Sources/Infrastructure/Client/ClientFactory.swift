@@ -216,6 +216,16 @@ public struct ClientFactory: Sendable {
         return SDKBetaAppReviewRepository(client: provider)
     }
 
+    public func makeInAppPurchaseAvailabilityRepository(authProvider: any AuthProvider) throws -> any InAppPurchaseAvailabilityRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKInAppPurchaseAvailabilityRepository(client: provider)
+    }
+
+    public func makeSubscriptionAvailabilityRepository(authProvider: any AuthProvider) throws -> any SubscriptionAvailabilityRepository {
+        let provider = try makeProvider(authProvider: authProvider)
+        return SDKSubscriptionAvailabilityRepository(client: provider)
+    }
+
     // MARK: - Skills (no ASC auth needed — subprocess + local filesystem)
 
     public func makeSkillRepository() -> any SkillRepository {
