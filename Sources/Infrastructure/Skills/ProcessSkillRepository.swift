@@ -36,7 +36,7 @@ public struct ProcessSkillRepository: SkillRepository {
     }
 
     public func update() async throws -> String {
-        try await runSkillsCommand(["update"])
+        try await runSkillsCommand(["add", Self.repoSlug, "--yes"])
     }
 
     // MARK: - Private

@@ -420,6 +420,22 @@ struct MockRepositoryFactory {
         )
     }
 
+    // MARK: - IAP Availability
+
+    static func makeInAppPurchaseAvailability(
+        id: String = "avail-1",
+        iapId: String = "iap-1",
+        isAvailableInNewTerritories: Bool = true,
+        territories: [String] = ["USA"]
+    ) -> InAppPurchaseAvailability {
+        InAppPurchaseAvailability(
+            id: id,
+            iapId: iapId,
+            isAvailableInNewTerritories: isAvailableInNewTerritories,
+            territories: territories
+        )
+    }
+
     // MARK: - Subscriptions
 
     static func makeSubscriptionGroup(
@@ -496,6 +512,22 @@ struct MockRepositoryFactory {
             name: name,
             description: description,
             state: state
+        )
+    }
+
+    // MARK: - Subscription Availability
+
+    static func makeSubscriptionAvailability(
+        id: String = "avail-1",
+        subscriptionId: String = "sub-1",
+        isAvailableInNewTerritories: Bool = true,
+        territories: [String] = ["USA"]
+    ) -> SubscriptionAvailability {
+        SubscriptionAvailability(
+            id: id,
+            subscriptionId: subscriptionId,
+            isAvailableInNewTerritories: isAvailableInNewTerritories,
+            territories: territories
         )
     }
 
