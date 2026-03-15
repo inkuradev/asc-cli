@@ -1,8 +1,33 @@
-# IAP & Subscription Availability
+# App, IAP & Subscription Availability
 
-Manage territory availability for in-app purchases and auto-renewable subscriptions.
+Manage territory availability for apps, in-app purchases, and auto-renewable subscriptions.
 
 ## CLI Usage
+
+### App Availability (Per-Territory Status)
+
+The richest availability view — shows every territory with `isAvailable`, blocking reasons (`contentStatuses`), `releaseDate`, and `isPreOrderEnabled`.
+
+```bash
+asc app-availability get --app-id <id> [--pretty]
+```
+
+Example output:
+```json
+{
+  "data": [{
+    "id": "avail-1",
+    "appId": "app-42",
+    "isAvailableInNewTerritories": true,
+    "territories": [
+      { "id": "ta-1", "territoryId": "USA", "isAvailable": true, "isPreOrderEnabled": false, "contentStatuses": ["AVAILABLE"] },
+      { "id": "ta-2", "territoryId": "CHN", "isAvailable": false, "isPreOrderEnabled": false, "contentStatuses": ["CANNOT_SELL_RESTRICTED_RATING"] }
+    ]
+  }]
+}
+```
+
+**ContentStatus values** include: `AVAILABLE`, `MISSING_RATING`, `CANNOT_SELL_RESTRICTED_RATING`, `CANNOT_SELL_GAMBLING`, `BRAZIL_REQUIRED_TAX_ID`, `ICP_NUMBER_MISSING`, and 30+ more reasons explaining why a territory is blocked.
 
 ### Discover Territories
 

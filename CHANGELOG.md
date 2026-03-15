@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Territory` domain model with id and currency, shared across availability responses
 - `getAvailability` affordance on `InAppPurchase` and `Subscription` models for CAEOAS navigation
 - `listTerritories` affordance on availability models for territory discovery
+- `asc app-availability get --app-id <id>` — get per-territory availability with `isAvailable`, `contentStatuses` (blocking reasons), `releaseDate`, and `isPreOrderEnabled` for every territory
 
 ---
 
