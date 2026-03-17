@@ -8,14 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-        },
-      },
+      theme: { extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+      }},
     }
   </script>
   <style>
@@ -36,14 +31,22 @@
   <!-- Sidebar -->
   <aside class="fixed top-0 left-0 bottom-0 w-56 bg-white border-r border-neutral-200 z-50 flex flex-col">
     <!-- App selector -->
-    <div class="px-4 pt-4 pb-3 border-b border-neutral-100">
-      <div class="flex items-center gap-2 px-2 py-1.5">
-        <div class="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shrink-0">
+    <div class="px-3 pt-4 pb-3 border-b border-neutral-100 relative">
+      <button id="app-selector" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-neutral-50 cursor-pointer transition-colors">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shrink-0">
           <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
         </div>
-        <div class="min-w-0">
-          <p id="app-name" class="text-sm font-semibold text-neutral-900 truncate">Loading...</p>
+        <div class="min-w-0 text-left flex-1">
+          <p id="app-name" class="text-sm font-semibold text-neutral-900 truncate">Select App</p>
           <p id="app-bundle" class="text-[0.6rem] text-neutral-400 font-mono truncate"></p>
+        </div>
+        <svg class="w-3.5 h-3.5 text-neutral-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+
+      <!-- App dropdown -->
+      <div id="app-dropdown" class="hidden absolute left-3 right-3 top-full mt-1 bg-white border border-neutral-200 rounded-xl shadow-lg overflow-hidden z-[60]">
+        <div id="app-list" class="max-h-64 overflow-y-auto py-1">
+          <div class="px-4 py-3 text-xs text-neutral-400">Loading apps...</div>
         </div>
       </div>
     </div>
@@ -98,7 +101,7 @@
       </button>
     </nav>
 
-    <!-- Footer: auth status -->
+    <!-- Footer -->
     <div class="border-t border-neutral-100 px-4 py-3">
       <div class="flex items-center gap-2">
         <div id="auth-dot" class="w-2 h-2 rounded-full bg-neutral-300"></div>
@@ -107,17 +110,16 @@
     </div>
   </aside>
 
-  <!-- Main content -->
+  <!-- Main -->
   <main class="ml-56 flex-1 min-h-screen">
     <div id="page" class="max-w-5xl mx-auto px-6 py-6 fade-in"></div>
   </main>
 
   <script type="module">
     import { asc, toList } from './js/api.js';
-    import { state, navigate, onNavigate } from './js/state.js';
-    import { loading, error, setupActionHandler } from './js/components.js';
+    import { state, navigate, selectApp, onNavigate } from './js/state.js';
+    import { loading, error, setupActionHandler, esc } from './js/components.js';
 
-    // Page modules (lazy loaded)
     const pages = {
       releases:      () => import('./js/pages/releases.js'),
       builds:        () => import('./js/pages/builds.js'),
@@ -132,25 +134,25 @@
 
     const pageEl = document.getElementById('page');
 
-    // Render current page
     async function renderPage() {
       pageEl.classList.remove('fade-in');
       void pageEl.offsetWidth;
       pageEl.classList.add('fade-in');
-
       pageEl.innerHTML = loading();
       try {
         const mod = await pages[state.page]();
         pageEl.innerHTML = await mod.render();
+        // Setup page-specific events if available
+        if (mod.setupEvents) mod.setupEvents(renderPage);
       } catch (e) {
         pageEl.innerHTML = error(e.message);
       }
     }
 
     // Navigation
-    onNavigate((page) => {
+    onNavigate(() => {
       document.querySelectorAll('.nav-item').forEach(el => {
-        el.classList.toggle('active', el.dataset.page === page);
+        el.classList.toggle('active', el.dataset.page === state.page);
       });
       renderPage();
     });
@@ -164,19 +166,70 @@
       el.addEventListener('click', () => {
         state.platform = el.dataset.platform;
         document.querySelectorAll('.platform-tab').forEach(t => {
-          const isActive = t === el;
-          t.className = `platform-tab flex-1 text-[0.65rem] font-medium py-1 rounded text-center cursor-pointer ${isActive ? 'bg-neutral-100 text-neutral-800' : 'text-neutral-400 hover:text-neutral-600'}`;
+          t.className = `platform-tab flex-1 text-[0.65rem] font-medium py-1 rounded text-center cursor-pointer ${t === el ? 'bg-neutral-100 text-neutral-800' : 'text-neutral-400 hover:text-neutral-600'}`;
         });
         renderPage();
       });
     });
 
-    // Action handler: click affordance button -> run command -> toast -> refresh
+    // Action + edit handler
     setupActionHandler(renderPage);
 
-    // Init
+    // ── App selector ────────────────────────────────────
+    const appSelector = document.getElementById('app-selector');
+    const appDropdown = document.getElementById('app-dropdown');
+    const appList = document.getElementById('app-list');
+    let dropdownOpen = false;
+
+    appSelector.addEventListener('click', () => {
+      dropdownOpen = !dropdownOpen;
+      appDropdown.classList.toggle('hidden', !dropdownOpen);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (dropdownOpen && !e.target.closest('#app-selector') && !e.target.closest('#app-dropdown')) {
+        dropdownOpen = false;
+        appDropdown.classList.add('hidden');
+      }
+    });
+
+    function renderAppList() {
+      if (!state.apps.length) {
+        appList.innerHTML = '<div class="px-4 py-3 text-xs text-neutral-400">No apps found</div>';
+        return;
+      }
+      appList.innerHTML = state.apps.map(app => `
+        <button class="app-option w-full flex items-center gap-2.5 px-4 py-2.5 hover:bg-neutral-50 cursor-pointer transition-colors text-left ${app.id === state.appId ? 'bg-blue-50' : ''}" data-app-id="${esc(app.id)}">
+          <div class="w-6 h-6 rounded-md ${app.id === state.appId ? 'bg-blue-600' : 'bg-neutral-200'} flex items-center justify-center shrink-0">
+            <span class="text-[0.55rem] font-bold text-white">${esc((app.name || app.appName || '?')[0])}</span>
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-neutral-800 truncate">${esc(app.name || app.appName)}</p>
+            <p class="text-[0.55rem] text-neutral-400 font-mono truncate">${esc(app.bundleId || '')}</p>
+          </div>
+          ${app.id === state.appId ? '<svg class="w-3.5 h-3.5 text-blue-600 shrink-0 ml-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+        </button>
+      `).join('');
+
+      // Click handler
+      appList.querySelectorAll('.app-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const app = state.apps.find(a => a.id === btn.dataset.appId);
+          if (app) {
+            selectApp(app);
+            document.getElementById('app-name').textContent = state.appName;
+            document.getElementById('app-bundle').textContent = state.bundleId;
+            renderAppList();
+            dropdownOpen = false;
+            appDropdown.classList.add('hidden');
+          }
+        });
+      });
+    }
+
+    // ── Init ──────────────────────────────────────────
     async function init() {
-      // Auth check
+      // Auth
       try {
         const auth = await asc('auth check --output json');
         document.getElementById('auth-dot').className = 'w-2 h-2 rounded-full bg-emerald-400';
@@ -186,19 +239,17 @@
         document.getElementById('auth-label').textContent = 'Not authenticated';
       }
 
-      // Load first app
+      // Load all apps
       try {
-        const apps = toList(await asc('apps list --output json'));
-        if (apps.length > 0) {
-          const app = apps[0];
-          state.appId = app.id;
-          state.appName = app.name || app.appName || 'App';
-          state.bundleId = app.bundleId || '';
+        state.apps = toList(await asc('apps list --output json'));
+        if (state.apps.length > 0) {
+          selectApp(state.apps[0]);
           document.getElementById('app-name').textContent = state.appName;
           document.getElementById('app-bundle').textContent = state.bundleId;
         }
+        renderAppList();
       } catch {
-        document.getElementById('app-name').textContent = 'No app found';
+        document.getElementById('app-name').textContent = 'No apps';
       }
 
       renderPage();
