@@ -53,7 +53,9 @@
     .table-row:hover { background: rgba(148,163,184,0.04); }
     .cmd-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; }
     .group-header { font-size: 0.65rem; letter-spacing: 0.08em; }
-    @media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .animate-spin { animation: spin 0.8s linear infinite; }
+    @media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } .animate-spin { animation: none; } }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans antialiased min-h-screen flex">
@@ -122,18 +124,51 @@
     </div>
   </main>
 
-  <!-- Command Palette Modal -->
+  <!-- Terminal Panel (bottom drawer) -->
+  <div id="terminal-panel" class="fixed bottom-0 left-60 right-0 z-[55] translate-y-full transition-transform duration-300 ease-out" style="height: 45vh;">
+    <div class="h-full bg-slate-925 border-t border-slate-700/60 shadow-2xl flex flex-col">
+      <!-- Terminal header -->
+      <div class="flex items-center justify-between px-4 py-2 border-b border-slate-800/60 shrink-0 cursor-grab select-none" id="terminal-header">
+        <div class="flex items-center gap-2">
+          <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span class="text-xs font-medium text-slate-400">Terminal</span>
+          <span id="terminal-status" class="text-[0.55rem] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ready</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button id="terminal-clear" class="p-1 rounded hover:bg-slate-800 cursor-pointer transition-colors" title="Clear">
+            <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+          <button id="terminal-close" class="p-1 rounded hover:bg-slate-800 cursor-pointer transition-colors" title="Close">
+            <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- Terminal output -->
+      <div id="cmd-output" class="flex-1 overflow-y-auto p-4 font-mono text-xs text-slate-400 space-y-3">
+        <div class="text-slate-600">ASC Web Console terminal. Type a command and press Enter.</div>
+        <div class="text-slate-600 text-[0.6rem]">Server: <span id="server-url">http://127.0.0.1:8420</span></div>
+      </div>
+      <!-- Terminal input -->
+      <div class="border-t border-slate-800/60 px-4 py-2 flex items-center gap-2 shrink-0">
+        <span class="text-brand-400 text-xs font-mono">$</span>
+        <input type="text" id="cmd-input" placeholder="asc apps list --output json --pretty" class="flex-1 bg-transparent text-sm text-slate-200 font-mono placeholder:text-slate-600 focus:outline-none" autocomplete="off" spellcheck="false" />
+        <kbd class="text-[0.55rem] text-slate-600 bg-slate-800 px-1.5 py-0.5 rounded hidden sm:inline">Enter</kbd>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Palette (quick search overlay) -->
   <div id="cmd-modal" class="fixed inset-0 z-[60] hidden">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="cmd-backdrop"></div>
     <div class="absolute top-[15%] left-1/2 -translate-x-1/2 w-full max-w-lg">
       <div class="bg-slate-900 border border-slate-700/60 rounded-xl shadow-2xl overflow-hidden">
         <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-800">
-          <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-          <input type="text" id="cmd-input" placeholder="asc apps list --output json" class="flex-1 bg-transparent text-sm text-slate-200 font-mono placeholder:text-slate-600 focus:outline-none" />
+          <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="palette-input" placeholder="Search commands... (type to filter)" class="flex-1 bg-transparent text-sm text-slate-200 font-mono placeholder:text-slate-600 focus:outline-none" />
           <kbd class="text-[0.6rem] text-slate-600 bg-slate-800 px-1.5 py-0.5 rounded">ESC</kbd>
         </div>
-        <div id="cmd-output" class="max-h-72 overflow-y-auto p-4 font-mono text-xs text-slate-400">
-          <p class="text-slate-600">Type a command and press Enter to execute...</p>
+        <div id="palette-results" class="max-h-72 overflow-y-auto">
+          <!-- Populated by JS -->
         </div>
       </div>
     </div>
@@ -487,45 +522,337 @@ document.getElementById('search-input').addEventListener('input', (e) => {
   });
 });
 
-// ── Command Palette ───────────────────────────────────
-const cmdModal = document.getElementById('cmd-modal');
+// ── Terminal ──────────────────────────────────────────
+const API_BASE = 'http://127.0.0.1:8420';
+const terminalPanel = document.getElementById('terminal-panel');
 const cmdInput = document.getElementById('cmd-input');
 const cmdOutput = document.getElementById('cmd-output');
+const terminalStatus = document.getElementById('terminal-status');
+let terminalOpen = false;
+let cmdHistory = [];
+let historyIndex = -1;
+let isRunning = false;
 
-document.getElementById('terminal-btn').addEventListener('click', () => toggleCommandPalette());
-document.getElementById('cmd-backdrop').addEventListener('click', () => toggleCommandPalette(false));
-
-function toggleCommandPalette(show) {
-  const isHidden = cmdModal.classList.contains('hidden');
-  const shouldShow = show !== undefined ? show : isHidden;
+function toggleTerminal(show) {
+  const shouldShow = show !== undefined ? show : !terminalOpen;
+  terminalOpen = shouldShow;
   if (shouldShow) {
-    cmdModal.classList.remove('hidden');
-    cmdInput.focus();
+    terminalPanel.classList.remove('translate-y-full');
+    terminalPanel.classList.add('translate-y-0');
+    setTimeout(() => cmdInput.focus(), 300);
   } else {
-    cmdModal.classList.add('hidden');
-    cmdInput.value = '';
+    terminalPanel.classList.remove('translate-y-0');
+    terminalPanel.classList.add('translate-y-full');
   }
 }
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'k' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); toggleCommandPalette(); }
-  if (e.key === 'Escape') toggleCommandPalette(false);
+document.getElementById('terminal-btn').addEventListener('click', () => toggleTerminal());
+document.getElementById('terminal-close').addEventListener('click', () => toggleTerminal(false));
+document.getElementById('terminal-clear').addEventListener('click', () => {
+  cmdOutput.innerHTML = '<div class="text-slate-600">Terminal cleared.</div>';
 });
 
+function setTerminalStatus(status, color) {
+  const colors = {
+    ready: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    running: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    error: 'bg-red-500/10 text-red-400 border-red-500/20',
+  };
+  terminalStatus.textContent = status;
+  terminalStatus.className = `text-[0.55rem] font-mono px-1.5 py-0.5 rounded border ${colors[color] || colors.ready}`;
+}
+
+async function executeCommand(cmd) {
+  if (isRunning) return;
+  isRunning = true;
+
+  // Add to history
+  if (cmdHistory[0] !== cmd) cmdHistory.unshift(cmd);
+  if (cmdHistory.length > 50) cmdHistory.pop();
+  historyIndex = -1;
+
+  // Show command in output
+  const cmdLine = document.createElement('div');
+  cmdLine.innerHTML = `<span class="text-brand-400 select-none">$ </span><span class="text-slate-200">${escapeHtml(cmd)}</span>`;
+  cmdOutput.appendChild(cmdLine);
+
+  // Loading indicator
+  const loader = document.createElement('div');
+  loader.className = 'flex items-center gap-2 text-slate-500';
+  loader.innerHTML = `<svg class="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"/><path d="M12 2a10 10 0 019.95 9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg> Running...`;
+  cmdOutput.appendChild(loader);
+  cmdOutput.scrollTop = cmdOutput.scrollHeight;
+  setTerminalStatus('running', 'running');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ command: cmd }),
+    });
+
+    const data = await res.json();
+    loader.remove();
+
+    if (data.error) {
+      appendOutput(data.error, 'text-red-400');
+      setTerminalStatus('error', 'error');
+    } else {
+      // Show stdout
+      if (data.stdout && data.stdout.trim()) {
+        // Try to parse and pretty-print JSON
+        try {
+          const json = JSON.parse(data.stdout);
+          appendJsonOutput(json);
+        } catch {
+          appendOutput(data.stdout.trim(), 'text-slate-300');
+        }
+      }
+      // Show stderr if present
+      if (data.stderr && data.stderr.trim()) {
+        appendOutput(data.stderr.trim(), 'text-amber-400/70');
+      }
+      // Exit code
+      if (data.exit_code !== 0) {
+        appendOutput(`Exit code: ${data.exit_code}`, 'text-red-400/60');
+        setTerminalStatus('error', 'error');
+      } else {
+        setTerminalStatus('ready', 'ready');
+      }
+      if (!data.stdout?.trim() && !data.stderr?.trim() && data.exit_code === 0) {
+        appendOutput('(no output)', 'text-slate-600');
+        setTerminalStatus('ready', 'ready');
+      }
+    }
+  } catch (err) {
+    loader.remove();
+    appendOutput(`Connection error: ${err.message}. Is the server running?\n  python3 apps/asc-web/server.py`, 'text-red-400');
+    setTerminalStatus('error', 'error');
+  }
+
+  // Spacer
+  const spacer = document.createElement('div');
+  spacer.className = 'h-2';
+  cmdOutput.appendChild(spacer);
+  cmdOutput.scrollTop = cmdOutput.scrollHeight;
+  isRunning = false;
+}
+
+function appendOutput(text, cls) {
+  const el = document.createElement('pre');
+  el.className = `${cls} whitespace-pre-wrap break-words leading-relaxed`;
+  el.textContent = text;
+  cmdOutput.appendChild(el);
+}
+
+function appendJsonOutput(json) {
+  const el = document.createElement('div');
+  el.className = 'text-slate-300 leading-relaxed';
+
+  if (Array.isArray(json)) {
+    // Render as interactive table for arrays of objects
+    if (json.length > 0 && typeof json[0] === 'object') {
+      el.innerHTML = renderJsonTable(json);
+    } else {
+      el.innerHTML = `<pre class="whitespace-pre-wrap">${escapeHtml(JSON.stringify(json, null, 2))}</pre>`;
+    }
+  } else if (typeof json === 'object' && json !== null) {
+    // Check if it has a data array (common ASC response format)
+    if (Array.isArray(json.data) && json.data.length > 0 && typeof json.data[0] === 'object') {
+      el.innerHTML = renderJsonTable(json.data);
+      // Show affordances if present
+      if (json.affordances) {
+        el.innerHTML += renderAffordances(json.affordances);
+      }
+    } else {
+      el.innerHTML = renderJsonObject(json);
+    }
+  } else {
+    el.textContent = JSON.stringify(json, null, 2);
+  }
+  cmdOutput.appendChild(el);
+}
+
+function renderJsonTable(rows) {
+  if (!rows.length) return '<span class="text-slate-600">(empty)</span>';
+  // Get all keys, prioritize id and name-like fields
+  const allKeys = [...new Set(rows.flatMap(r => Object.keys(r)))];
+  const priority = ['id', 'name', 'appName', 'bundleId', 'state', 'platform', 'version', 'locale', 'type', 'status'];
+  const keys = [
+    ...priority.filter(k => allKeys.includes(k)),
+    ...allKeys.filter(k => !priority.includes(k) && k !== 'affordances')
+  ].slice(0, 8); // max 8 columns
+
+  const hasAffordances = rows.some(r => r.affordances);
+
+  return `
+    <div class="overflow-x-auto rounded-lg border border-slate-800/60 my-1">
+      <table class="w-full text-[0.7rem]">
+        <thead>
+          <tr class="bg-slate-800/30">
+            ${keys.map(k => `<th class="text-left px-3 py-1.5 text-slate-500 font-medium">${escapeHtml(k)}</th>`).join('')}
+            ${hasAffordances ? '<th class="text-left px-3 py-1.5 text-slate-500 font-medium">actions</th>' : ''}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row => `
+            <tr class="table-row border-t border-slate-800/30">
+              ${keys.map(k => {
+                const val = row[k];
+                const display = val === null || val === undefined ? '' : typeof val === 'object' ? JSON.stringify(val) : String(val);
+                const colorCls = k === 'state' || k === 'status' ? stateColor(display) : k === 'id' ? 'text-brand-400/70' : 'text-slate-300';
+                return `<td class="px-3 py-1.5 ${colorCls} truncate max-w-[200px]" title="${escapeHtml(display)}">${escapeHtml(display)}</td>`;
+              }).join('')}
+              ${hasAffordances && row.affordances ? `
+                <td class="px-3 py-1.5">
+                  <div class="flex flex-wrap gap-1">
+                    ${Object.entries(row.affordances).map(([name, cmd]) =>
+                      `<button class="run-affordance cmd-tag px-1.5 py-0.5 rounded bg-brand-500/8 text-brand-400 border border-brand-500/20 cursor-pointer hover:bg-brand-500/15 transition-colors" data-cmd="${escapeHtml(cmd)}" title="${escapeHtml(cmd)}">${escapeHtml(name)}</button>`
+                    ).join('')}
+                  </div>
+                </td>
+              ` : hasAffordances ? '<td class="px-3 py-1.5"></td>' : ''}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-[0.6rem] text-slate-600 mt-1">${rows.length} record${rows.length !== 1 ? 's' : ''}</div>
+  `;
+}
+
+function renderAffordances(affordances) {
+  return `
+    <div class="flex flex-wrap gap-1.5 mt-2">
+      ${Object.entries(affordances).map(([name, cmd]) =>
+        `<button class="run-affordance cmd-tag px-2 py-1 rounded bg-slate-800/50 text-brand-400 border border-slate-700/40 cursor-pointer hover:bg-slate-800 hover:border-brand-500/30 transition-colors" data-cmd="${escapeHtml(cmd)}" title="${escapeHtml(cmd)}">${escapeHtml(name)}</button>`
+      ).join('')}
+    </div>
+  `;
+}
+
+function renderJsonObject(obj) {
+  const entries = Object.entries(obj).filter(([k]) => k !== 'affordances');
+  let html = '<div class="space-y-0.5 my-1">';
+  entries.forEach(([key, val]) => {
+    const display = val === null || val === undefined ? 'null' : typeof val === 'object' ? JSON.stringify(val) : String(val);
+    const colorCls = key === 'state' || key === 'status' ? stateColor(display) : key === 'id' ? 'text-brand-400/70' : typeof val === 'boolean' ? (val ? 'text-emerald-400' : 'text-red-400/60') : 'text-slate-300';
+    html += `<div class="flex gap-3"><span class="text-slate-500 shrink-0 w-36 text-right">${escapeHtml(key)}</span><span class="${colorCls}">${escapeHtml(display)}</span></div>`;
+  });
+  html += '</div>';
+  if (obj.affordances) html += renderAffordances(obj.affordances);
+  return html;
+}
+
+function stateColor(state) {
+  const s = String(state).toLowerCase();
+  if (['ready_for_sale','ready_for_distribution','live','active','enabled','complete','succeeded','valid'].some(x => s.includes(x))) return 'text-emerald-400';
+  if (['in_review','processing','pending','waiting','running'].some(x => s.includes(x))) return 'text-amber-400';
+  if (['rejected','failed','error','invalid','expired','revoked'].some(x => s.includes(x))) return 'text-red-400';
+  return 'text-slate-300';
+}
+
+// Terminal input handler
 cmdInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     const cmd = cmdInput.value.trim();
-    if (!cmd) return;
-    cmdOutput.innerHTML += `<div class="mb-1"><span class="text-brand-400">$</span> ${escapeHtml(cmd)}</div>`;
-    cmdOutput.innerHTML += `<div class="text-slate-600 mb-3">Command queued. Run in terminal: <code class="text-emerald-400">${escapeHtml(cmd)}</code></div>`;
+    if (!cmd || isRunning) return;
     cmdInput.value = '';
-    cmdOutput.scrollTop = cmdOutput.scrollHeight;
+    // Auto-prefix with 'asc' if missing
+    const finalCmd = cmd.startsWith('asc ') || cmd === 'asc' ? cmd : `asc ${cmd}`;
+    executeCommand(finalCmd);
+  }
+  // Command history navigation
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (historyIndex < cmdHistory.length - 1) {
+      historyIndex++;
+      cmdInput.value = cmdHistory[historyIndex];
+    }
+  }
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (historyIndex > 0) {
+      historyIndex--;
+      cmdInput.value = cmdHistory[historyIndex];
+    } else {
+      historyIndex = -1;
+      cmdInput.value = '';
+    }
   }
 });
 
 function escapeHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ── Command Palette (Cmd+K) ──────────────────────────
+const cmdModal = document.getElementById('cmd-modal');
+const paletteInput = document.getElementById('palette-input');
+const paletteResults = document.getElementById('palette-results');
+
+function getAllCommands() {
+  const cmds = [];
+  NAV.forEach(g => g.items.forEach(item => {
+    if (item.cmds) item.cmds.forEach(c => cmds.push({ cmd: `asc ${c}`, label: item.label, icon: item.icon }));
+  }));
+  return cmds;
+}
+
+function togglePalette(show) {
+  const shouldShow = show !== undefined ? show : cmdModal.classList.contains('hidden');
+  if (shouldShow) {
+    cmdModal.classList.remove('hidden');
+    paletteInput.value = '';
+    renderPaletteResults('');
+    paletteInput.focus();
+  } else {
+    cmdModal.classList.add('hidden');
+  }
+}
+
+function renderPaletteResults(query) {
+  const all = getAllCommands();
+  const q = query.toLowerCase();
+  const filtered = q ? all.filter(c => c.cmd.includes(q) || c.label.toLowerCase().includes(q)) : all;
+  const shown = filtered.slice(0, 15);
+
+  paletteResults.innerHTML = shown.length ? shown.map((c, i) => `
+    <button class="palette-item w-full flex items-center justify-between px-4 py-2.5 hover:bg-slate-800/50 cursor-pointer transition-colors ${i === 0 ? 'bg-slate-800/30' : ''}" data-cmd="${escapeHtml(c.cmd)}">
+      <div class="flex items-center gap-2.5">
+        ${icon(c.icon, 'w-3.5 h-3.5 text-slate-500')}
+        <code class="text-xs text-slate-300 font-mono">${escapeHtml(c.cmd)}</code>
+      </div>
+      <span class="text-[0.6rem] text-slate-600">${escapeHtml(c.label)}</span>
+    </button>
+  `).join('') : '<div class="px-4 py-6 text-center text-sm text-slate-600">No matching commands</div>';
+}
+
+paletteInput.addEventListener('input', () => renderPaletteResults(paletteInput.value));
+
+paletteInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const first = paletteResults.querySelector('.palette-item');
+    if (first) {
+      const cmd = first.dataset.cmd;
+      togglePalette(false);
+      toggleTerminal(true);
+      setTimeout(() => executeCommand(cmd), 350);
+    }
+  }
+});
+
+document.getElementById('cmd-backdrop').addEventListener('click', () => togglePalette(false));
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'k' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); togglePalette(); }
+  if (e.key === 'Escape') {
+    if (!cmdModal.classList.contains('hidden')) togglePalette(false);
+    else if (terminalOpen) toggleTerminal(false);
+  }
+  // Backtick to toggle terminal
+  if (e.key === '`' && e.ctrlKey) { e.preventDefault(); toggleTerminal(); }
+});
 
 // ── Event delegation ──────────────────────────────────
 document.addEventListener('click', (e) => {
@@ -543,13 +870,30 @@ document.addEventListener('click', (e) => {
     return;
   }
 
-  // Run command
+  // Run command (from feature page buttons or quick actions)
   const runBtn = e.target.closest('.run-cmd') || e.target.closest('.quick-cmd');
   if (runBtn) {
     const cmd = runBtn.dataset.cmd;
-    toggleCommandPalette(true);
-    cmdInput.value = cmd;
-    cmdInput.focus();
+    toggleTerminal(true);
+    setTimeout(() => executeCommand(cmd), 350);
+    return;
+  }
+
+  // Run affordance from terminal output
+  const affordanceBtn = e.target.closest('.run-affordance');
+  if (affordanceBtn) {
+    const cmd = affordanceBtn.dataset.cmd;
+    executeCommand(cmd);
+    return;
+  }
+
+  // Palette item
+  const paletteItem = e.target.closest('.palette-item');
+  if (paletteItem) {
+    const cmd = paletteItem.dataset.cmd;
+    togglePalette(false);
+    toggleTerminal(true);
+    setTimeout(() => executeCommand(cmd), 350);
     return;
   }
 });
