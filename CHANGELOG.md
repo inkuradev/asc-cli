@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **`asc web` → `asc web-server`** — renamed command to reflect its role as a local API proxy, no longer serves static files
 - **Removed Hummingbird dependency** — web server replaced with embedded Node.js proxy (`apps/server.js`), reducing binary size and build dependencies
-- **Unified web apps under `apps/`** — moved dashboard from `Sources/ASCCommand/Resources/web/` to `apps/asc-web-management/`, console from `homepage/asc-web-console/` to `apps/asc-web-console/`
+- **Unified web apps under `apps/`** — moved dashboard from `Sources/ASCCommand/Resources/web/` to `apps/asc-web-command-center/`, console from `homepage/asc-web-console/` to `apps/asc-web-console/`
 - **Dual-mode API detection** — both web apps auto-detect local proxy (tries relative `/api/run`, then `localhost:8420`, then falls back to mock mode)
 
 ### Added
@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 15 management pages: Dashboard, Apps, Versions, Builds, TestFlight, Submissions, App Info, Screenshots, Reviews, In-App Purchases, Subscriptions, Reports, Code Signing, Xcode Cloud, Users & Roles
 - Dashboard with release pipeline timeline, quick actions, and stats overview
 - Command log modal showing every CLI command executed by the UI
-- Standalone development server (`apps/asc-web-management/server.js`) for working on the web UI outside of `asc web`
+- Standalone development server (`apps/asc-web-command-center/server.js`) for working on the web UI outside of `asc web`
 
 ---
 
