@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.51] - 2026-03-17
+
 ### Added
 - `asc web` management dashboard — complete redesign with professional light/dark theme, Plus Jakarta Sans typography, and self-contained CSS (no Tailwind CDN dependency)
 - App context selector in sidebar — select an app from the Apps page and all other sections (Versions, Builds, TestFlight, Reviews, IAP, Subscriptions) use that app context automatically
@@ -478,7 +482,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.50...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.51...HEAD
+[0.1.51]: https://github.com/tddworks/asc-cli/compare/v0.1.50...v0.1.51
 [0.1.50]: https://github.com/tddworks/asc-cli/compare/v0.1.49...v0.1.50
 [0.1.49]: https://github.com/tddworks/asc-cli/compare/v0.1.48...v0.1.49
 [0.1.48]: https://github.com/tddworks/asc-cli/compare/v0.1.47...v0.1.48
