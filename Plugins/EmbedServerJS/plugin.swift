@@ -4,7 +4,7 @@ import PackagePlugin
 @main
 struct EmbedServerJS: BuildToolPlugin {
     func createBuildCommands(context: PluginContext, target: Target) throws -> [Command] {
-        let input = context.package.directoryURL.appendingPathComponent("apps/server.js")
+        let input = context.package.directoryURL.appendingPathComponent("apps/asc-web/server.js")
         let output = context.pluginWorkDirectoryURL.appendingPathComponent("EmbeddedServerJS.swift")
 
         return [
