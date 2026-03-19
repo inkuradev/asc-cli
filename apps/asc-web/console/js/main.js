@@ -4,8 +4,6 @@ import { renderNav, navigate, renderPage } from './presentation/navigation.js';
 import { initTerminal, detectServer, getServerUrl, toggleTerminal, executeCommand, isTerminalOpen } from './presentation/terminal.js';
 import { initPalette, toggle as togglePalette, isPaletteOpen } from './presentation/palette.js';
 import { logCommand, logOutput, logError } from './presentation/state.js';
-import { NAV } from './presentation/nav-data.js';
-import { icon } from './presentation/icons.js';
 
 // Wire DataProvider callbacks (shared infra → console presentation)
 DataProvider._onCommand = logCommand;
@@ -18,34 +16,20 @@ renderPage();
 initTerminal();
 initPalette();
 
-// Search
-document.getElementById('search-input').addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase().trim();
-  if (!q) { renderNav(); return; }
-  const nav = document.getElementById('nav');
-  const allItems = NAV.flatMap(g => g.items);
-  const matched = allItems.filter(item => {
-    if (item.label.toLowerCase().includes(q)) return true;
-    const allCmds = [...(item.entry || []), ...(item.workflow || [])];
-    if (allCmds.some(c => c.includes(q))) return true;
-    return false;
-  });
-  let html = `<div class="nav-group-title">Results (${matched.length})</div>`;
-  matched.forEach(item => {
-    html += `<button data-page="${item.id}" class="nav-item">
-      ${icon(item.icon)}
-      <span>${item.label}</span>
-    </button>`;
-  });
-  nav.innerHTML = html;
-  nav.querySelectorAll('[data-page]').forEach(btn => {
-    btn.addEventListener('click', () => { e.target.value = ''; navigate(btn.dataset.page); });
-  });
+// Search input in header → opens the search overlay
+document.getElementById('search-input').addEventListener('focus', (e) => {
+  e.target.blur();
+  togglePalette(true);
 });
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
+  // Cmd+K or / opens search overlay
   if (e.key === 'k' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); togglePalette(); }
+  if (e.key === '/' && !isPaletteOpen() && !isTerminalOpen() && !e.metaKey && !e.ctrlKey) {
+    const tag = document.activeElement?.tagName;
+    if (tag !== 'INPUT' && tag !== 'TEXTAREA') { e.preventDefault(); togglePalette(true); }
+  }
   if (e.key === 'Escape') {
     if (isPaletteOpen()) togglePalette(false);
     else if (isTerminalOpen()) toggleTerminal(false);
@@ -77,13 +61,7 @@ document.addEventListener('click', (e) => {
   const affordanceBtn = e.target.closest('.run-affordance');
   if (affordanceBtn) { executeCommand(affordanceBtn.dataset.cmd); return; }
 
-  const paletteItem = e.target.closest('.palette-item');
-  if (paletteItem) {
-    togglePalette(false);
-    toggleTerminal(true);
-    setTimeout(() => executeCommand(paletteItem.dataset.cmd), 350);
-    return;
-  }
+  // Palette items are handled internally by palette.js via selectResult
 });
 
 // Async init — detect server

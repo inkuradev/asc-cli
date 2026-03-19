@@ -57,7 +57,7 @@
         <div style="display:flex;align-items:center;gap:8px">
           <div class="search-box">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            <input type="text" id="search-input" placeholder="Search commands..." />
+            <input type="text" id="search-input" placeholder="Search...  /" />
           </div>
           <button class="icon-btn" id="terminal-btn" title="Run command">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
@@ -101,17 +101,22 @@
     </div>
   </div>
 
-  <!-- Command Palette -->
+  <!-- Search Overlay -->
   <div class="cmd-palette-overlay" id="cmd-modal">
     <div class="cmd-palette-backdrop" id="cmd-backdrop"></div>
     <div class="cmd-palette">
       <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border)">
-        <svg style="width:16px;height:16px;color:var(--text-dim)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" id="palette-input" placeholder="Search commands... (type to filter)" style="flex:1;background:transparent;border:none;font-size:14px;color:var(--text-primary);font-family:var(--font-mono);outline:none" />
+        <svg style="width:16px;height:16px;color:var(--text-dim);flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="palette-input" placeholder="Search features and commands..." style="flex:1;background:transparent;border:none;font-size:14px;color:var(--text-primary);outline:none" autocomplete="off" spellcheck="false" />
         <kbd style="font-size:10px;color:var(--text-dim);background:rgba(51,65,85,1);padding:2px 6px;border-radius:4px">ESC</kbd>
       </div>
-      <div id="palette-results" style="max-height:288px;overflow-y:auto">
+      <div id="palette-results" style="max-height:320px;overflow-y:auto">
         <!-- Populated by JS -->
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:8px 16px;border-top:1px solid var(--border);font-size:10px;color:var(--text-dim)">
+        <span style="display:flex;align-items:center;gap:4px"><kbd style="background:rgba(51,65,85,1);padding:1px 5px;border-radius:3px;font-size:9px">↑↓</kbd> navigate</span>
+        <span style="display:flex;align-items:center;gap:4px"><kbd style="background:rgba(51,65,85,1);padding:1px 5px;border-radius:3px;font-size:9px">↵</kbd> select</span>
+        <span style="display:flex;align-items:center;gap:4px"><kbd style="background:rgba(51,65,85,1);padding:1px 5px;border-radius:3px;font-size:9px">esc</kbd> close</span>
       </div>
     </div>
   </div>
