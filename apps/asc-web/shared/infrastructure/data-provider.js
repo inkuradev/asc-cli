@@ -19,10 +19,7 @@ export const DataProvider = {
   _onNotify: null,        // callback: (message, type) => void
 
   async init() {
-    // On file:// origins (e.g. Safari), relative fetches always fail — only try the explicit URL
-    const isFileOrigin = window.location.protocol === 'file:';
-    const bases = isFileOrigin ? ['http://127.0.0.1:8420'] : ['', 'http://127.0.0.1:8420'];
-    for (const base of bases) {
+    for (const base of ['', 'http://127.0.0.1:8420']) {
       try {
         const controller = new AbortController();
         setTimeout(() => controller.abort(), 2000);

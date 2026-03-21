@@ -2,7 +2,6 @@
 import { escapeHtml, stateColor } from './helpers.js';
 
 let API_BASE = '';
-let serverDetected = false;
 let terminalOpen = false;
 let cmdHistory = [];
 let historyIndex = -1;
@@ -26,10 +25,7 @@ export function initTerminal() {
 }
 
 export async function detectServer() {
-  // On file:// origins, relative fetches always fail — only try the explicit URL
-  const isFileOrigin = window.location.protocol === 'file:';
-  const bases = isFileOrigin ? ['http://127.0.0.1:8420'] : ['', 'http://127.0.0.1:8420'];
-  for (const base of bases) {
+  for (const base of ['', 'http://127.0.0.1:8420']) {
     try {
       const controller = new AbortController();
       setTimeout(() => controller.abort(), 2000);
@@ -39,7 +35,7 @@ export async function detectServer() {
         body: JSON.stringify({ command: 'asc version' }),
         signal: controller.signal,
       });
-      if (res.ok) { API_BASE = base; serverDetected = true; return true; }
+      if (res.ok) { API_BASE = base; return true; }
     } catch {}
   }
   return false;
@@ -79,11 +75,8 @@ export async function executeCommand(cmd) {
   els.output.scrollTop = els.output.scrollHeight;
   setStatus('running', 'status-running');
 
-  // Use explicit URL as fallback when server detection failed (e.g. file:// in Safari)
-  const fetchBase = API_BASE || (serverDetected ? '' : 'http://127.0.0.1:8420');
-
   try {
-    const res = await fetch(`${fetchBase}/api/run`, {
+    const res = await fetch(`${API_BASE}/api/run`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ command: cmd }),
@@ -113,11 +106,7 @@ export async function executeCommand(cmd) {
     }
   } catch (err) {
     loader.remove();
-    const isFileOrigin = window.location.protocol === 'file:';
-    const hint = isFileOrigin
-      ? 'Safari blocks network requests from file:// pages.\n  Open via: http://127.0.0.1:8420/console/'
-      : 'Is the server running?\n  asc web-server';
-    appendText(`Connection error: ${err.message}. ${hint}`, 'var(--danger)');
+    appendText(`Connection error: ${err.message}. Is the server running?\n  asc web-server`, 'var(--danger)');
     setStatus('error', 'status-error');
   }
 
