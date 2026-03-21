@@ -10,6 +10,7 @@ public protocol IrisAppBundleRepository: Sendable {
         bundleId: String,
         sku: String,
         primaryLocale: String,
-        platforms: [String]
+        platforms: [String],
+        versionString: String
     ) async throws -> AppBundle
 }

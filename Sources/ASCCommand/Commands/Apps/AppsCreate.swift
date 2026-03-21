@@ -24,6 +24,9 @@ struct AppsCreate: AsyncParsableCommand {
     @Option(name: .long, help: "Platforms (e.g. IOS, MAC_OS)")
     var platforms: [String] = ["IOS"]
 
+    @Option(name: .long, help: "Initial version string (e.g. 1.0)")
+    var version: String = "1.0"
+
     func run() async throws {
         let cookieProvider = ClientProvider.makeIrisCookieProvider()
         let repo = ClientProvider.makeIrisAppBundleRepository()
@@ -41,7 +44,8 @@ struct AppsCreate: AsyncParsableCommand {
             bundleId: bundleId,
             sku: sku,
             primaryLocale: primaryLocale,
-            platforms: platforms
+            platforms: platforms,
+            versionString: version
         )
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
         return try formatter.formatAgentItems(

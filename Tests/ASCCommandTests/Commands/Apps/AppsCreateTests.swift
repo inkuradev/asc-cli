@@ -19,7 +19,8 @@ struct AppsCreateTests {
             bundleId: .any,
             sku: .any,
             primaryLocale: .any,
-            platforms: .any
+            platforms: .any,
+            versionString: .any
         ).willReturn(
             AppBundle(
                 id: "app-1",
