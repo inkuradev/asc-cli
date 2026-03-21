@@ -28,35 +28,48 @@ public struct BrowserIrisCookieProvider: IrisCookieProvider {
 
     private func fetchFromBrowser() -> String? {
         let cookieClient = BrowserCookieClient()
-        let query = BrowserCookieQuery(
-            domains: ["appstoreconnect.apple.com"],
-            domainMatch: .suffix,
-            includeExpired: false
-        )
 
-        // Key cookies needed for iris API
-        let requiredCookieNames: Set<String> = ["myacinfo"]
+        // myacinfo is set on .apple.com (parent domain)
+        // other cookies (itctx, dqsid, wosid) are on appstoreconnect.apple.com
+        let queries: [BrowserCookieQuery] = [
+            BrowserCookieQuery(
+                domains: ["apple.com"],
+                domainMatch: .suffix,
+                includeExpired: false
+            ),
+            BrowserCookieQuery(
+                domains: ["appstoreconnect.apple.com"],
+                domainMatch: .suffix,
+                includeExpired: false
+            ),
+        ]
+
+        // Cookie names relevant for iris API
+        let wantedNames: Set<String> = [
+            "myacinfo", "itctx", "itcdq", "dqsid", "wosid", "woinst",
+            "dssf", "dssid2", "dc",
+        ]
 
         for browser in Browser.allCases {
-            do {
-                let storeRecords = try cookieClient.records(matching: query, in: browser)
-                var cookiePairs: [String] = []
-                var foundRequired = false
+            var cookieMap: [String: String] = [:]
 
-                for storeRecord in storeRecords {
-                    for record in storeRecord.records {
-                        cookiePairs.append("\(record.name)=\(record.value)")
-                        if requiredCookieNames.contains(record.name) {
-                            foundRequired = true
+            for query in queries {
+                do {
+                    let storeRecords = try cookieClient.records(matching: query, in: browser)
+                    for storeRecord in storeRecords {
+                        for record in storeRecord.records where wantedNames.contains(record.name) {
+                            cookieMap[record.name] = record.value
                         }
                     }
+                } catch {
+                    continue
                 }
+            }
 
-                if foundRequired && !cookiePairs.isEmpty {
-                    return cookiePairs.joined(separator: "; ")
-                }
-            } catch {
-                continue
+            // myacinfo is the essential auth cookie
+            if let _ = cookieMap["myacinfo"] {
+                let cookieString = cookieMap.map { "\($0.key)=\($0.value)" }.joined(separator: "; ")
+                return cookieString
             }
         }
         return nil
