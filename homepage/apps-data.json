@@ -1,16 +1,6 @@
 {
-  "generated": "2026-03-19T10:50:05.059Z",
+  "generated": "2026-03-24T08:56:46.205Z",
   "items": [
-    {
-      "developer": "itshan",
-      "github": "hanrw",
-      "x": "itshanrw",
-      "trackId": 6748760927,
-      "trackName": "AppNexus for App Store Connect",
-      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/69/c6/3a/69c63ab6-1075-d68c-8f21-0bd2220f8761/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/100x100bb.jpg",
-      "primaryGenreName": "Developer Tools",
-      "url": "https://apps.apple.com/us/app/appnexus-for-app-store-connect/id6748760927?uo=4"
-    },
     {
       "developer": "itshan",
       "github": "hanrw",
@@ -25,11 +15,11 @@
       "developer": "itshan",
       "github": "hanrw",
       "x": "itshanrw",
-      "trackId": 6758028657,
-      "trackName": "SubCal - Subscription Tracker",
-      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/28/c7/f1/28c7f18a-928c-7777-fc82-1fe1c578e514/AppIcon-0-0-1x_U007epad-0-1-85-220.png/100x100bb.jpg",
-      "primaryGenreName": "Finance",
-      "url": "https://apps.apple.com/us/app/subcal-subscription-tracker/id6758028657?uo=4"
+      "trackId": 6748760927,
+      "trackName": "AppNexus for App Store Connect",
+      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/69/c6/3a/69c63ab6-1075-d68c-8f21-0bd2220f8761/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/100x100bb.jpg",
+      "primaryGenreName": "Developer Tools",
+      "url": "https://apps.apple.com/us/app/appnexus-for-app-store-connect/id6748760927?uo=4"
     },
     {
       "developer": "itshan",
@@ -45,11 +35,11 @@
       "developer": "itshan",
       "github": "hanrw",
       "x": "itshanrw",
-      "trackId": 6743046579,
-      "trackName": "BezelBlend",
-      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/40/94/e2/4094e2f6-5adc-09b7-341b-23b1a0c6c43f/AppIcon-0-0-1x_U007epad-0-1-85-220.png/100x100bb.jpg",
-      "primaryGenreName": "Productivity",
-      "url": "https://apps.apple.com/us/app/bezelblend/id6743046579?uo=4"
+      "trackId": 6758028657,
+      "trackName": "SubCal - Subscription Tracker",
+      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/28/c7/f1/28c7f18a-928c-7777-fc82-1fe1c578e514/AppIcon-0-0-1x_U007epad-0-1-85-220.png/100x100bb.jpg",
+      "primaryGenreName": "Finance",
+      "url": "https://apps.apple.com/us/app/subcal-subscription-tracker/id6758028657?uo=4"
     },
     {
       "developer": "itshan",
@@ -60,6 +50,16 @@
       "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/29/cf/72/29cf72f4-a681-b79a-84cf-6a4096643b47/AppIcon-0-0-1x_U007epad-0-1-85-220.png/100x100bb.jpg",
       "primaryGenreName": "Utilities",
       "url": "https://apps.apple.com/us/app/blurblend-masking-assistant/id6738306175?uo=4"
+    },
+    {
+      "developer": "itshan",
+      "github": "hanrw",
+      "x": "itshanrw",
+      "trackId": 6743046579,
+      "trackName": "BezelBlend",
+      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/40/94/e2/4094e2f6-5adc-09b7-341b-23b1a0c6c43f/AppIcon-0-0-1x_U007epad-0-1-85-220.png/100x100bb.jpg",
+      "primaryGenreName": "Productivity",
+      "url": "https://apps.apple.com/us/app/bezelblend/id6743046579?uo=4"
     },
     {
       "developer": "itshan",
@@ -97,9 +97,19 @@
       "x": null,
       "trackId": 6758156421,
       "trackName": "Wapi: Events for inner circles",
-      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/25/1e/f6/251ef689-4910-0014-1a9d-2c575012d23b/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/100x100bb.jpg",
+      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/27/ac/9e/27ac9e70-381d-31e9-9cc1-b769a37b4cc4/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/100x100bb.jpg",
       "primaryGenreName": "Social Networking",
       "url": "https://apps.apple.com/app/id6758156421"
+    },
+    {
+      "developer": "亮 鲁",
+      "github": null,
+      "x": null,
+      "trackId": 6467128147,
+      "trackName": "Airclap",
+      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/64/2c/5e/642c5ec6-37ca-0661-c550-acb29f503b99/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/100x100bb.jpg",
+      "primaryGenreName": "Utilities",
+      "url": "https://apps.apple.com/app/id6467128147"
     }
   ]
 }
