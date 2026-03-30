@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Build platform field** — builds now include platform from preReleaseVersion
 - **Build number populated** — `buildNumber` field now maps from `Build.attributes.version` (was always nil)
 
+### Fixed
+- **Global options (`--pretty`, `--output`, `--timeout`) now accepted by all commands** — previously 10 leaf commands (`builds add-beta-group`, `builds remove-beta-group`, `builds uploads delete`, `versions set-build`, `reviews responses delete`, `app-clip-experiences delete`, `app-clip-experience-localizations delete`, `analytics-reports delete`, `auth logout`, `auth use`) rejected these flags with "Unknown option"
+
 ### Changed
 - **`asc builds list`** — table output now includes Build Number and Platform columns
 - **Build version semantics** — `version` field now holds the marketing version (from PreReleaseVersion) when available; `buildNumber` holds the build string
