@@ -23,6 +23,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.58] - 2026-03-23
+
+### Changed
+- Bug fixes and improvements.
+
+---
+
+## [0.1.57] - 2026-03-23
+
+### Changed
+- **`asc web-server`** — `/command-center/`, `/console/`, and `/` now redirect (302) to the hosted apps at `asccli.app/command-center` and `asccli.app/console` instead of serving local files that no longer exist; startup banner updated to show hosted URLs
+
+---
+
 ## [0.1.56] - 2026-03-21
 
 ### Changed
@@ -542,7 +556,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.56...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.58...HEAD
+[0.1.58]: https://github.com/tddworks/asc-cli/compare/v0.1.57...v0.1.58
+[0.1.57]: https://github.com/tddworks/asc-cli/compare/v0.1.56...v0.1.57
 [0.1.56]: https://github.com/tddworks/asc-cli/compare/v0.1.55...v0.1.56
 [0.1.55]: https://github.com/tddworks/asc-cli/compare/v0.1.53...v0.1.55
 [0.1.53]: https://github.com/tddworks/asc-cli/compare/v0.1.52...v0.1.53
