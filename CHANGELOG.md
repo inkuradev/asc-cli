@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **`asc builds list --platform`** — filter builds by platform (ios, macos, tvos, visionos)
+- **`asc builds list --version`** — filter builds by marketing version (e.g. 1.0.0)
+- **Build platform field** — builds now include platform from preReleaseVersion
+- **Build number populated** — `buildNumber` field now maps from `Build.attributes.version` (was always nil)
+
+### Changed
+- **`asc builds list`** — table output now includes Build Number and Platform columns
+- **Build version semantics** — `version` field now holds the marketing version (from PreReleaseVersion) when available; `buildNumber` holds the build string
+- **Builds sorted by newest first** — list results default to `-uploadedDate` sort order
+
 ---
 
 ## [0.1.56] - 2026-03-21
