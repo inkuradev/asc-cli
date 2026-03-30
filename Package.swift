@@ -6,6 +6,11 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .executable(name: "asc", targets: ["ASCCommand"]),
+        // Library products for SPM consumers
+        .library(
+            name: "ASCKit",
+            targets: ["Domain", "Infrastructure"]
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/AvdLee/appstoreconnect-swift-sdk.git", from: "4.0.0"),
