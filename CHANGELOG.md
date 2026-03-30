@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **`asc builds list --platform`** — filter builds by platform (ios, macos, tvos, visionos)
 - **`asc builds list --version`** — filter builds by marketing version (e.g. 1.0.0)
+- **`asc builds next-number`** — get the next build number for a version/platform, ideal for CI/CD automation (resolves #13)
 - **Build platform field** — builds now include platform from preReleaseVersion
 - **Build number populated** — `buildNumber` field now maps from `Build.attributes.version` (was always nil)
 
