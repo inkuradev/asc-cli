@@ -101,17 +101,23 @@ function handleRequest(req, res) {
     return handleSimulator(req, res, urlPath, parsedUrl);
   }
 
-  // Redirect to hosted web apps at asccli.app
+  // Serve local files from apps/asc-web/
+  const WEB_DIR = path.join(PROJECT_DIR, 'apps/asc-web');
+  const MIME = { '.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.png':'image/png','.svg':'image/svg+xml' };
 
-  if (urlPath === '/' || urlPath === '/index.html' || urlPath.startsWith('/command-center')) {
-    res.writeHead(302, { 'Location': 'https://asccli.app/command-center' });
-    res.end();
-    return;
+  if (urlPath === '/' || urlPath === '/index.html') {
+    res.writeHead(302, { 'Location': '/command-center/' }); res.end(); return;
   }
-  if (urlPath.startsWith('/console')) {
-    res.writeHead(302, { 'Location': 'https://asccli.app/console' });
-    res.end();
-    return;
+  if (/^\/(command-center|console|simulators)$/.test(urlPath)) {
+    res.writeHead(302, { 'Location': urlPath + '/' }); res.end(); return;
+  }
+
+  let filePath = path.join(WEB_DIR, urlPath);
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) filePath = path.join(filePath, 'index.html');
+  if (fs.existsSync(filePath) && !fs.statSync(filePath).isDirectory()) {
+    const ext = path.extname(filePath).toLowerCase();
+    res.writeHead(200, { 'Content-Type': (MIME[ext] || 'application/octet-stream') + '; charset=utf-8' });
+    res.end(fs.readFileSync(filePath)); return;
   }
 
   res.writeHead(404);
