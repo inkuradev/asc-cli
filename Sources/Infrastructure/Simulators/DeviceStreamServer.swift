@@ -218,8 +218,8 @@ public final class DeviceStreamServer: @unchecked Sendable {
             return sendJSON(["error": "missing udid"], status: 400, connection: connection)
         }
         if streamManager.isAvailable {
-            streamManager.start(udid: udid, fps: 10, quality: 75, scale: 0.5)
-            sendJSON(["success": true, "method": "axe-mjpeg"], connection: connection)
+            streamManager.start(udid: udid, fps: 10)
+            sendJSON(["success": true, "method": "axe-capture"], connection: connection)
         } else {
             sendJSON(["success": true, "method": "simctl-polling"], connection: connection)
         }

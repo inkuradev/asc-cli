@@ -421,17 +421,25 @@
     const SWIPE_THRESHOLD = 10;
 
     // Map view click coordinates to device points for axe.
-    // axe uses UIKit points. Screenshot is at native pixel resolution (e.g. 1320x2868 for 3x).
-    // Most modern iPhones are 3x scale, so device points = pixels / 3.
+    // axe uses UIKit points (e.g. 440x956 for iPhone 16 Pro Max).
+    // We know the actual screen pixel size from frameInsets, and all modern iPhones are 3x.
     function viewToDevice(vx, vy, vw, vh) {
-      if (imgNaturalW > 0 && imgNaturalH > 0) {
-        // Map click position → pixel position → device points (assume 3x Retina)
-        const px = (vx / vw) * imgNaturalW;
-        const py = (vy / vh) * imgNaturalH;
-        const scale = imgNaturalW > 1000 ? 3 : imgNaturalW > 500 ? 2 : 1;
-        return { x: px / scale, y: py / scale };
+      const inset = selectedName ? frameInsets[selectedName] : null;
+      if (inset) {
+        // Exact: screen pixels = outputSize - 2*inset, device points = screenPixels / 3
+        const screenPxW = inset.outputWidth - inset.screenInsetX * 2;
+        const screenPxH = inset.outputHeight - inset.screenInsetY * 2;
+        const ptW = screenPxW / 3;
+        const ptH = screenPxH / 3;
+        return { x: (vx / vw) * ptW, y: (vy / vh) * ptH };
       }
-      // Fallback
+      // Fallback: use screenshot natural dimensions with 3x scale
+      if (imgNaturalW > 0 && imgNaturalH > 0) {
+        // AXe stream may be scaled (e.g. 0.5x), but the aspect ratio is preserved.
+        // Use known device points for common sizes, or estimate.
+        const ptW = 440, ptH = 956; // iPhone Pro Max default
+        return { x: (vx / vw) * ptW, y: (vy / vh) * ptH };
+      }
       return { x: (vx / vw) * 393, y: (vy / vh) * 852 };
     }
 
@@ -721,8 +729,8 @@
           body: JSON.stringify({ udid }),
         });
         const data = await res.json();
-        if (data.method === "axe-mjpeg") {
-          logAction("Stream: axe MJPEG (fast)");
+        if (data.method === "axe-capture") {
+          logAction("Stream: axe capture (fast)");
           // Give AXe a moment to produce the first frame
           await new Promise(r => setTimeout(r, 500));
         } else {
