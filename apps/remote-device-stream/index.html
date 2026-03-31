@@ -737,24 +737,12 @@
         }
       } catch (e) {}
 
-      const loadFrame = () => {
-        if (!streaming) return;
-        const url = `/api/screenshot?udid=${udid}&t=${Date.now()}`;
-        const tmp = new Image();
-        tmp.onload = () => {
-          // Capture actual screenshot dimensions for coordinate mapping
-          if (tmp.naturalWidth > 0) {
-            imgNaturalW = tmp.naturalWidth;
-            imgNaturalH = tmp.naturalHeight;
-          }
-          img.src = tmp.src;
-          frameCount++;
-          if (streaming) frameTimer = setTimeout(loadFrame, 100); // faster polling when AXe caches frames
-        };
-        tmp.onerror = () => { if (streaming) frameTimer = setTimeout(loadFrame, 500); };
-        tmp.src = url;
+      // MJPEG stream — single connection, server pushes frames
+      img.src = `/api/stream?udid=${udid}`;
+      img.onload = function () {
+        if (img.naturalWidth > 0) { imgNaturalW = img.naturalWidth; imgNaturalH = img.naturalHeight; }
+        frameCount++;
       };
-      loadFrame();
 
       fpsTimer = setInterval(() => {
         document.getElementById("streamFps").textContent = frameCount + " fps";

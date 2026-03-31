@@ -249,6 +249,7 @@ export const MockDataProvider = {
         { id: 'ss-001', localizationId: 'vl-001', screenshotDisplayType: 'APP_IPHONE_67', screenshotsCount: 6 },
         { id: 'ss-002', localizationId: 'vl-001', screenshotDisplayType: 'APP_IPHONE_65', screenshotsCount: 6 },
         { id: 'ss-003', localizationId: 'vl-001', screenshotDisplayType: 'APP_IPAD_PRO_129', screenshotsCount: 4 },
+        { id: 'ss-006', localizationId: 'vl-001', screenshotDisplayType: 'APP_DESKTOP', screenshotsCount: 3 },
       ],
     },
     'vl-002': {
@@ -287,6 +288,13 @@ export const MockDataProvider = {
         { id: 'sc-014', setId: 'ss-003', fileName: 'search-ipad.png', fileSize: 2123456, assetState: 'COMPLETE', imageWidth: 2048, imageHeight: 2732 },
         { id: 'sc-015', setId: 'ss-003', fileName: 'detail-ipad.png', fileSize: 2567890, assetState: 'COMPLETE', imageWidth: 2048, imageHeight: 2732 },
         { id: 'sc-016', setId: 'ss-003', fileName: 'settings-ipad.png', fileSize: 1987654, assetState: 'COMPLETE', imageWidth: 2048, imageHeight: 2732 },
+      ],
+    },
+    'ss-006': {
+      data: [
+        { id: 'sc-026', setId: 'ss-006', fileName: 'screenshot_main.png', fileSize: 2945678, assetState: 'COMPLETE', imageWidth: 2880, imageHeight: 1800 },
+        { id: 'sc-027', setId: 'ss-006', fileName: 'screenshot_editor.png', fileSize: 3123456, assetState: 'COMPLETE', imageWidth: 2880, imageHeight: 1800 },
+        { id: 'sc-028', setId: 'ss-006', fileName: 'screenshot_prefs.png', fileSize: 2567890, assetState: 'COMPLETE', imageWidth: 2880, imageHeight: 1800 },
       ],
     },
     'ss-004': {
