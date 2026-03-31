@@ -609,7 +609,7 @@
 
       // Screen area: absolutely positioned inside the frame's screen cutout
       const screenArea = document.createElement("div");
-      screenArea.style.cssText = "position:absolute; overflow:hidden; cursor:crosshair;";
+      screenArea.style.cssText = "position:absolute; overflow:hidden; cursor:crosshair; border-radius:5.5%/2.8%;";
 
       // Screenshot image fills the screen area
       const img = document.createElement("img");
@@ -638,7 +638,6 @@
         screenArea.style.top = insetYPct + "%";
         screenArea.style.width = widthPct + "%";
         screenArea.style.height = heightPct + "%";
-        screenArea.style.borderRadius = "2.8%";
       };
 
       container.appendChild(wrapper);

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **`asc simulators list [--booted]`** — list available iOS simulators with state-aware affordances
+- **`asc simulators boot --udid <udid>`** — boot a simulator
+- **`asc simulators shutdown --udid <udid>`** — shut down a simulator
+- **`asc simulators stream [--udid <udid>] [--port <port>]`** — interactive simulator streaming to the browser with device bezel frames, tap/swipe/type via [AXe](https://github.com/cameroncooke/AXe), gesture presets, and accessibility inspection
+
 ---
 
 ## [0.1.59] - 2026-03-30
