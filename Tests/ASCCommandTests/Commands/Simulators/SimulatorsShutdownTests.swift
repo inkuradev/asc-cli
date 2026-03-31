@@ -6,7 +6,7 @@ import Testing
 @Suite
 struct SimulatorsShutdownTests {
 
-    @Test func `shutdown simulator returns success message`() async throws {
+    @Test func `shutdown simulator returns success message with udid`() async throws {
         let mockRepo = MockSimulatorRepository()
         given(mockRepo).shutdownSimulator(udid: .value("ABCD-1234")).willReturn(())
 
@@ -15,5 +15,10 @@ struct SimulatorsShutdownTests {
 
         #expect(output.contains("ABCD-1234"))
         #expect(output.contains("shut down"))
+    }
+
+    @Test func `shutdown parses udid option correctly`() throws {
+        let cmd = try SimulatorsShutdown.parse(["--udid", "MY-UUID-HERE"])
+        #expect(cmd.udid == "MY-UUID-HERE")
     }
 }

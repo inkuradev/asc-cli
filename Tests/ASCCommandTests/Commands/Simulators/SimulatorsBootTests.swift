@@ -6,7 +6,7 @@ import Testing
 @Suite
 struct SimulatorsBootTests {
 
-    @Test func `boot simulator returns success message`() async throws {
+    @Test func `boot simulator returns success message with udid`() async throws {
         let mockRepo = MockSimulatorRepository()
         given(mockRepo).bootSimulator(udid: .value("ABCD-1234")).willReturn(())
 
@@ -15,5 +15,10 @@ struct SimulatorsBootTests {
 
         #expect(output.contains("ABCD-1234"))
         #expect(output.contains("booted"))
+    }
+
+    @Test func `boot parses udid option correctly`() throws {
+        let cmd = try SimulatorsBoot.parse(["--udid", "MY-UUID-HERE"])
+        #expect(cmd.udid == "MY-UUID-HERE")
     }
 }

@@ -86,7 +86,7 @@ struct SimulatorTests {
         #expect(SimulatorState(rawValue: "Unknown") == nil)
     }
 
-    @Test func `simulator omits nil fields in json encoding`() throws {
+    @Test func `simulator json encoding includes computed fields`() throws {
         let sim = MockRepositoryFactory.makeSimulator(
             id: "sim-1",
             name: "iPhone 16",
@@ -100,7 +100,61 @@ struct SimulatorTests {
         #expect(json.contains("\"id\""))
         #expect(json.contains("\"name\""))
         #expect(json.contains("\"state\""))
-        #expect(json.contains("\"isBooted\""))
-        #expect(json.contains("\"displayRuntime\""))
+        #expect(json.contains("\"isBooted\" : true"))
+        #expect(json.contains("\"displayRuntime\" : \"iOS 18.2\""))
+    }
+
+    @Test func `simulator codable round trip preserves all fields`() throws {
+        let sim = MockRepositoryFactory.makeSimulator(
+            id: "rt-1",
+            name: "iPad Pro",
+            state: .shutdown,
+            runtime: "com.apple.CoreSimulator.SimRuntime.iOS-17-5"
+        )
+        let data = try JSONEncoder().encode(sim)
+        let decoded = try JSONDecoder().decode(Simulator.self, from: data)
+        #expect(decoded == sim)
+    }
+
+    @Test func `simulator button raw values match axe cli`() {
+        #expect(SimulatorButton.home.rawValue == "home")
+        #expect(SimulatorButton.lock.rawValue == "lock")
+        #expect(SimulatorButton.siri.rawValue == "siri")
+        #expect(SimulatorButton.sideButton.rawValue == "side-button")
+        #expect(SimulatorButton.applePay.rawValue == "apple-pay")
+    }
+
+    @Test func `simulator gesture raw values match axe cli`() {
+        #expect(SimulatorGesture.scrollUp.rawValue == "scroll-up")
+        #expect(SimulatorGesture.scrollDown.rawValue == "scroll-down")
+        #expect(SimulatorGesture.scrollLeft.rawValue == "scroll-left")
+        #expect(SimulatorGesture.scrollRight.rawValue == "scroll-right")
+        #expect(SimulatorGesture.swipeFromLeftEdge.rawValue == "swipe-from-left-edge")
+        #expect(SimulatorGesture.swipeFromRightEdge.rawValue == "swipe-from-right-edge")
+        #expect(SimulatorGesture.swipeFromTopEdge.rawValue == "swipe-from-top-edge")
+        #expect(SimulatorGesture.swipeFromBottomEdge.rawValue == "swipe-from-bottom-edge")
+    }
+
+    @Test func `simulator filter enum cases exist`() {
+        let filters: [SimulatorFilter] = [.all, .booted, .available]
+        #expect(filters.count == 3)
+        #expect(SimulatorFilter.all == .all)
+        #expect(SimulatorFilter.booted != .available)
+    }
+
+    @Test func `shuttingDown simulator has no boot or stream affordances`() {
+        let sim = Simulator(id: "x", name: "Test", state: .shuttingDown, runtime: "r")
+        #expect(sim.affordances["boot"] == nil)
+        #expect(sim.affordances["shutdown"] == nil)
+        #expect(sim.affordances["stream"] == nil)
+        #expect(sim.affordances["listSimulators"] == "asc simulators list")
+    }
+
+    @Test func `creating simulator has no action affordances`() {
+        let sim = Simulator(id: "x", name: "Test", state: .creating, runtime: "r")
+        #expect(sim.affordances["boot"] == nil)
+        #expect(sim.affordances["shutdown"] == nil)
+        #expect(sim.affordances["stream"] == nil)
+        #expect(sim.affordances["listSimulators"] == "asc simulators list")
     }
 }

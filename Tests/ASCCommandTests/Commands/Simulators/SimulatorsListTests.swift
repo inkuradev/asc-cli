@@ -110,4 +110,27 @@ struct SimulatorsListTests {
         #expect(output.contains("Booted"))
         #expect(output.contains("iOS 18.2"))
     }
+
+    @Test func `default filter is available not booted`() async throws {
+        let mockRepo = MockSimulatorRepository()
+        given(mockRepo).listSimulators(filter: .value(.available)).willReturn([])
+
+        let cmd = try SimulatorsList.parse(["--pretty"])
+        let output = try await cmd.execute(repo: mockRepo)
+
+        #expect(output.contains("\"data\""))
+    }
+
+    @Test func `markdown output works`() async throws {
+        let mockRepo = MockSimulatorRepository()
+        given(mockRepo).listSimulators(filter: .any).willReturn([
+            Simulator(id: "s-1", name: "iPhone 16", state: SimulatorState.booted, runtime: "com.apple.CoreSimulator.SimRuntime.iOS-18-2"),
+        ])
+
+        let cmd = try SimulatorsList.parse(["--output", "markdown"])
+        let output = try await cmd.execute(repo: mockRepo)
+
+        #expect(output.contains("|"))
+        #expect(output.contains("iPhone 16"))
+    }
 }

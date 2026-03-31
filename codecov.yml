@@ -32,3 +32,9 @@ ignore:
   # Iris — real browser cookie extraction and HTTP calls, not unit-testable
   - "Sources/Infrastructure/Iris/BrowserIrisCookieProvider.swift"
   - "Sources/Infrastructure/Iris/IrisClient.swift"
+
+  # Simulator stream — HTTP server, subprocess management, AXe shell integration
+  - "Sources/Infrastructure/Simulators/DeviceStreamServer.swift"
+  - "Sources/Infrastructure/Simulators/AXeStreamManager.swift"
+  - "Sources/Infrastructure/Simulators/AXeInteractionRepository.swift"
+  - "Sources/ASCCommand/Commands/Simulators/SimulatorsStream.swift"
