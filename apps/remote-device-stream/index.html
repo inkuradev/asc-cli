@@ -408,8 +408,8 @@
     let frameTimer = null;
     let frameCount = 0;
     let fpsTimer = null;
-    let deviceConfig = {};
     let axeAvailable = false;
+    let frameInsets = {};
 
     // Actual screenshot dimensions (detected from loaded image)
     let imgNaturalW = 0;
@@ -420,49 +420,19 @@
     let isDragging = false;
     const SWIPE_THRESHOLD = 10;
 
-    async function loadDeviceConfig() {
-      try {
-        const res = await fetch("/api/device-config");
-        const data = await res.json();
-        deviceConfig = data.devices || {};
-      } catch (e) {}
-    }
-
-    function findBezelConfig(name) {
-      if (deviceConfig[name]) return deviceConfig[name];
-      for (const [k, v] of Object.entries(deviceConfig)) {
-        if (name.includes(k) || k.includes(name)) return v;
-      }
-      return null;
-    }
-
     // Map view click coordinates to device points for axe.
-    // axe uses the same coordinate space as idb: device points (UIKit points).
-    // Screenshot is at native pixel resolution (e.g. 1320x2868 for 3x device).
-    // Device points = pixels / scale.
-    // We detect the scale from naturalWidth / config.width_points.
+    // axe uses UIKit points. Screenshot is at native pixel resolution (e.g. 1320x2868 for 3x).
+    // Most modern iPhones are 3x scale, so device points = pixels / 3.
     function viewToDevice(vx, vy, vw, vh) {
-      const cfg = findBezelConfig(selectedName);
-      if (cfg && imgNaturalW > 0 && imgNaturalH > 0) {
-        // Compute scale factor: screenshot pixels → device points
-        const scale = imgNaturalW / cfg.width_points;
-        // Map click position → pixel position → device points
+      if (imgNaturalW > 0 && imgNaturalH > 0) {
+        // Map click position → pixel position → device points (assume 3x Retina)
         const px = (vx / vw) * imgNaturalW;
         const py = (vy / vh) * imgNaturalH;
+        const scale = imgNaturalW > 1000 ? 3 : imgNaturalW > 500 ? 2 : 1;
         return { x: px / scale, y: py / scale };
       }
-      // Fallback: if we have natural dimensions but no config, assume device
-      // points = natural pixels (scale 1, unlikely but safe)
-      if (imgNaturalW > 0 && imgNaturalH > 0) {
-        return {
-          x: (vx / vw) * imgNaturalW,
-          y: (vy / vh) * imgNaturalH,
-        };
-      }
-      // Last resort: use config points directly
-      const wp = cfg ? cfg.width_points : 393;
-      const hp = cfg ? cfg.height_points : 852;
-      return { x: (vx / vw) * wp, y: (vy / vh) * hp };
+      // Fallback
+      return { x: (vx / vw) * 393, y: (vy / vh) * 852 };
     }
 
     // --- Actions ---
@@ -609,46 +579,62 @@
     function buildBezelFrame(name, containerId) {
       const container = document.getElementById(containerId);
       container.innerHTML = "";
-      const cfg = findBezelConfig(name);
 
-      if (!cfg) {
-        const img = document.createElement("img");
-        img.id = "streamImg"; img.className = "no-bezel"; img.alt = "Device screen";
-        container.appendChild(img);
-        attachTouchHandlers(container);
-        return { img };
-      }
+      const frameUrl = `/api/frame?name=${encodeURIComponent(name)}`;
 
-      const ch = container.clientHeight || 700;
-      const aspect = cfg.width_points / cfg.height_points;
-      const bs = 1.8;
-      const bx = cfg.borderX * bs, by = cfg.borderY * bs;
-      const cr = 44;
-      const sh = Math.min(ch - 40, 780);
-      const sw = sh * aspect;
+      // Outer wrapper sized to frame aspect ratio
+      const wrapper = document.createElement("div");
+      wrapper.style.cssText = "position:relative; display:inline-block; max-height:85vh;";
 
-      const bezel = document.createElement("div");
-      bezel.className = "device-bezel";
-      bezel.style.width = (sw + bx*2) + "px";
-      bezel.style.height = (sh + by*2) + "px";
-      bezel.style.borderRadius = cr + "px";
-      bezel.style.padding = `${by}px ${bx}px`;
+      // Frame image defines the overall size
+      const frameImg = document.createElement("img");
+      frameImg.src = frameUrl;
+      frameImg.alt = "";
+      frameImg.draggable = false;
+      frameImg.style.cssText = "display:block; height:100%; max-height:85vh; pointer-events:none; position:relative; z-index:2;";
+      frameImg.onerror = () => {
+        // No frame available — show screenshot directly
+        frameImg.style.display = "none";
+        screenArea.style.cssText = "position:relative; height:100%; max-height:85vh;";
+        img.style.cssText = "display:block; height:100%; max-height:85vh; border-radius:12px; cursor:crosshair;";
+      };
 
-      const island = document.createElement("div");
-      island.className = "dynamic-island";
-      island.style.top = (by - 4) + "px";
-      bezel.appendChild(island);
+      // Screen area: absolutely positioned inside the frame's screen cutout
+      const screenArea = document.createElement("div");
+      screenArea.style.cssText = "position:absolute; overflow:hidden; cursor:crosshair;";
 
-      const screen = document.createElement("div");
-      screen.className = "screen-area";
-      screen.style.borderRadius = (cr - 8) + "px";
-
+      // Screenshot image fills the screen area
       const img = document.createElement("img");
-      img.id = "streamImg"; img.alt = "Device screen";
-      screen.appendChild(img);
-      bezel.appendChild(screen);
-      container.appendChild(bezel);
-      attachTouchHandlers(screen);
+      img.id = "streamImg";
+      img.alt = "Device screen";
+      img.style.cssText = "display:block; width:100%; height:100%; object-fit:fill;";
+      screenArea.appendChild(img);
+
+      wrapper.appendChild(screenArea);
+      wrapper.appendChild(frameImg);
+
+      // Once frame loads, position the screen area using exact insets from devices.json
+      frameImg.onload = () => {
+        const fw = frameImg.naturalWidth;   // e.g. 1470
+        const fh = frameImg.naturalHeight;  // e.g. 3000
+        // Look up exact insets from devices.json data
+        const inset = frameInsets[name];
+        const ix = inset ? inset.screenInsetX : Math.round(fw * 0.05);
+        const iy = inset ? inset.screenInsetY : Math.round(fh * 0.022);
+        // Convert pixel insets to percentages of frame
+        const insetXPct = (ix / fw) * 100;
+        const insetYPct = (iy / fh) * 100;
+        const widthPct = ((fw - ix * 2) / fw) * 100;
+        const heightPct = ((fh - iy * 2) / fh) * 100;
+        screenArea.style.left = insetXPct + "%";
+        screenArea.style.top = insetYPct + "%";
+        screenArea.style.width = widthPct + "%";
+        screenArea.style.height = heightPct + "%";
+        screenArea.style.borderRadius = "2.8%";
+      };
+
+      container.appendChild(wrapper);
+      attachTouchHandlers(screenArea);
       return { img };
     }
 
@@ -790,7 +776,7 @@
     }
     function hideLoading() { document.getElementById("loadingOverlay").classList.remove("active"); }
 
-    loadDeviceConfig();
+    fetch("/api/frame-insets").then(r=>r.json()).then(d=>{frameInsets=d}).catch(()=>{});
     loadDevices();
   </script>
 </body>

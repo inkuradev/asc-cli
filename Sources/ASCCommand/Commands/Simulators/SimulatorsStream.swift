@@ -30,16 +30,18 @@ struct SimulatorsStream: AsyncParsableCommand {
             }
         }
 
-        // Load the HTML UI and device config from bundled files
+        // Load the HTML UI, frames, and insets
         let htmlContent = Self.loadHTML()
-        let deviceConfig = Self.loadDeviceConfig()
+        let framesDir = Self.findFramesDirectory()
+        let insetsJSON = Self.loadFileContent("apps/remote-device-stream/frames/insets.json") ?? "{}"
 
         let server = try DeviceStreamServer(
             port: UInt16(port),
             simulatorRepo: simulatorRepo,
             interactionRepo: interactionRepo,
             htmlContent: htmlContent,
-            deviceConfigJSON: deviceConfig
+            framesDirectory: framesDir,
+            frameInsetsJSON: insetsJSON
         )
         server.start()
 
@@ -104,19 +106,23 @@ struct SimulatorsStream: AsyncParsableCommand {
         """
     }
 
-    private static func loadDeviceConfig() -> String {
+    private static func loadFileContent(_ relativePath: String) -> String? {
+        let url = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            .appendingPathComponent(relativePath)
+        return try? String(contentsOf: url, encoding: .utf8)
+    }
+
+    private static func findFramesDirectory() -> URL? {
         let candidates = [
-            URL(fileURLWithPath: ProcessInfo.processInfo.arguments[0])
-                .deletingLastPathComponent()
-                .appendingPathComponent("../../apps/remote-device-stream/simulator-config.json"),
             URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-                .appendingPathComponent("apps/remote-device-stream/simulator-config.json"),
+                .appendingPathComponent("apps/remote-device-stream/frames"),
         ]
         for candidate in candidates {
-            if let content = try? String(contentsOf: candidate, encoding: .utf8) {
-                return content
+            var isDir: ObjCBool = false
+            if FileManager.default.fileExists(atPath: candidate.path, isDirectory: &isDir), isDir.boolValue {
+                return candidate
             }
         }
-        return "{}"
+        return nil
     }
 }

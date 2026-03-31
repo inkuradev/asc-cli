@@ -12,7 +12,8 @@ public final class DeviceStreamServer: @unchecked Sendable {
     private let simulatorRepo: any SimulatorRepository
     private let interactionRepo: any SimulatorInteractionRepository
     private let htmlContent: String
-    private let deviceConfigJSON: String
+    private let framesDirectory: URL?
+    private let frameInsetsJSON: String
     private let streamManager = AXeStreamManager()
 
     public init(
@@ -20,7 +21,8 @@ public final class DeviceStreamServer: @unchecked Sendable {
         simulatorRepo: any SimulatorRepository,
         interactionRepo: any SimulatorInteractionRepository,
         htmlContent: String,
-        deviceConfigJSON: String = "{}"
+        framesDirectory: URL? = nil,
+        frameInsetsJSON: String = "{}"
     ) throws {
         guard let nwPort = NWEndpoint.Port(rawValue: port) else {
             throw DeviceStreamServerError.invalidPort
@@ -29,7 +31,8 @@ public final class DeviceStreamServer: @unchecked Sendable {
         self.simulatorRepo = simulatorRepo
         self.interactionRepo = interactionRepo
         self.htmlContent = htmlContent
-        self.deviceConfigJSON = deviceConfigJSON
+        self.framesDirectory = framesDirectory
+        self.frameInsetsJSON = frameInsetsJSON
         self.listener = try NWListener(using: .tcp, on: nwPort)
     }
 
@@ -95,8 +98,11 @@ public final class DeviceStreamServer: @unchecked Sendable {
         case ("GET", "/"), ("GET", "/index.html"):
             sendHTML(connection: connection)
 
-        case ("GET", "/api/device-config"):
-            sendRawJSON(deviceConfigJSON, connection: connection)
+        case ("GET", "/api/frame-insets"):
+            sendRawJSON(frameInsetsJSON, connection: connection)
+
+        case ("GET", "/api/frame"):
+            handleFrame(name: query["name"] ?? "", connection: connection)
 
         case ("GET", "/api/devices"):
             handleDevices(connection: connection)
@@ -192,6 +198,18 @@ public final class DeviceStreamServer: @unchecked Sendable {
                 sendJSON(["error": "capture failed"], status: 500, connection: connection)
             }
         }
+    }
+
+    private func handleFrame(name: String, connection: NWConnection) {
+        guard !name.isEmpty, let framesDir = framesDirectory else {
+            return sendJSON(["error": "no frame available"], status: 404, connection: connection)
+        }
+        // Frames are stored as "<device name>.png" in the frames directory
+        let framePath = framesDir.appendingPathComponent("\(name).png")
+        if let data = try? Data(contentsOf: framePath) {
+            return sendPNG(data, connection: connection)
+        }
+        sendJSON(["error": "frame not found for \(name)"], status: 404, connection: connection)
     }
 
     private func handleStreamStart(body: [String: Any], connection: NWConnection) {
@@ -460,7 +478,8 @@ public final class DeviceStreamServer: @unchecked Sendable {
         for pair in queryString.split(separator: "&") {
             let kv = pair.split(separator: "=", maxSplits: 1)
             if kv.count == 2 {
-                result[String(kv[0])] = String(kv[1]).removingPercentEncoding ?? String(kv[1])
+                let value = String(kv[1]).replacingOccurrences(of: "+", with: " ")
+                result[String(kv[0])] = value.removingPercentEncoding ?? value
             }
         }
         return result
