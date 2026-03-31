@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Screenshot image URLs** — `asc screenshots list` now returns `imageUrl` for each screenshot, so you can view and render real App Store images directly from CLI output
+- **Screenshot platform filtering** — filter and browse screenshots by platform (iPhone, iPad, etc.) in the web UI
+- **Simulator screenshot capture** — capture and browse simulator screenshots in the web gallery
+- **Simulator live streaming** — stream your simulator screen in real-time via MJPEG to the browser
+
+### Changed
+- **Simulator interaction feedback** — improved tap ripple effect and gesture responsiveness in the streaming UI
+
 ---
 
 ## [0.1.60] - 2026-03-31
