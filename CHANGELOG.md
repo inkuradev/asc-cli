@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.60] - 2026-03-31
+
 ### Added
 - **`asc simulators list [--booted]`** — list available iOS simulators with state-aware affordances
 - **`asc simulators boot --udid <udid>`** — boot a simulator
@@ -567,7 +571,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.59...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.60...HEAD
+[0.1.60]: https://github.com/tddworks/asc-cli/compare/v0.1.59...v0.1.60
 [0.1.59]: https://github.com/tddworks/asc-cli/compare/v0.1.58...v0.1.59
 [0.1.58]: https://github.com/tddworks/asc-cli/compare/v0.1.57...v0.1.58
 [0.1.57]: https://github.com/tddworks/asc-cli/compare/v0.1.56...v0.1.57
