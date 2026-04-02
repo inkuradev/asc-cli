@@ -7,16 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.63] - 2026-04-02
+
 ### Added
-- **Plugin Marketplace** — `asc plugins market list` and `asc plugins market search --query X` to browse and search a plugin registry
-- **Plugins page in Command Center** — web UI with Installed and Marketplace tabs, install/uninstall actions
-- **`asc plugins install --name X`** — install dylib plugins from the marketplace
-- **`asc plugins uninstall --name X`** — remove installed `.plugin` bundles
+- **Plugin Marketplace** — `asc plugins market list` and `asc plugins market search --query X` to browse and search plugins from [tddworks/asc-registry](https://github.com/tddworks/asc-registry)
+- **Multi-source plugin registry** — `PluginSource` protocol with `GitHubPluginSource` implementation; composable sources in `PluginMarketRepository`
+- **`asc plugins install --name X`** — download and install `.plugin` bundles from the marketplace
+- **`asc plugins uninstall --name X`** — remove installed plugin bundles (matches by slug or registry ID)
+- **Plugins page in Command Center** — web UI with Installed and Marketplace tabs, stats bar, install/uninstall with loading spinners
+- **Enriched plugin manifest** — `manifest.json` now supports `description`, `author`, `repositoryURL`, `categories`; installed plugins display the same rich info as marketplace listings
+- **Centralized plugin affordance merging** — `AffordanceRegistry` affordances merged automatically in `OutputFormatter` via `WithPluginAffordances`; domain models no longer need manual registry calls
+- **Example plugin** — `examples/hello-plugin/` demonstrates `AffordanceRegistry`, server routes, and UI affordance handlers
+- **Plugin registry repo** — [tddworks/asc-registry](https://github.com/tddworks/asc-registry) with `registry.json` and release assets for ASC Pro + Hello Plugin
 
 ### Changed
-- **Refactored plugin system** — replaced event-based script plugins with dylib `.plugin` bundle management. `asc plugins list` now shows installed dylib plugins (from `PluginLoader`), not script-based event plugins
-- **Removed event plugin system** — deleted `PluginEvent`, `PluginEventPayload`, `PluginResult`, `PluginRunner`, `PluginEventBus` and all infrastructure (`LocalPluginRepository`, `ProcessPluginRunner`, `LocalPluginEventBus`)
+- **Unified `Plugin` model** — merged `Plugin` and `MarketPlugin` into a single model with `isInstalled`, `downloadURL?`, `slug?` fields
+- **Refactored plugin system** — replaced event-based script plugins with dylib `.plugin` bundle management
+- **Removed event plugin system** — deleted `PluginEvent`, `PluginEventPayload`, `PluginResult`, `PluginRunner`, `PluginEventBus` and all infrastructure
 - **Removed event bus from commands** — `BuildsUpload` and `VersionsSubmit` no longer emit plugin events
+- **Apps page affordance buttons** — plugin affordances (e.g. `greet` from Hello Plugin) render as clickable buttons via `appAffordanceHandlers` registry
 
 ---
 
