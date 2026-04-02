@@ -113,11 +113,34 @@ public struct PluginMarketRepository: PluginRepository {
 
     public func uninstall(name: String) async throws {
         let pluginsDir = PluginLoader.pluginsDirectory
-        let bundlePath = pluginsDir.appendingPathComponent("\(name).plugin")
-        guard FileManager.default.fileExists(atPath: bundlePath.path) else {
+        // Try exact match first (slug like "ASCPro"), then scan for matching plugin
+        let exactPath = pluginsDir.appendingPathComponent("\(name).plugin")
+        if FileManager.default.fileExists(atPath: exactPath.path) {
+            try FileManager.default.removeItem(at: exactPath)
+            return
+        }
+        // Scan installed plugins — match by slug or name-derived id
+        let nameLower = name.lowercased()
+        let fm = FileManager.default
+        guard let entries = try? fm.contentsOfDirectory(atPath: pluginsDir.path) else {
             throw PluginMarketError.pluginNotFound(name)
         }
-        try FileManager.default.removeItem(at: bundlePath)
+        for entry in entries where entry.hasSuffix(".plugin") {
+            let slug = (entry as NSString).deletingPathExtension
+            let slugLower = slug.lowercased()
+            // Match: exact slug, lowercased slug, or name-derived id (e.g. "asc-pro" matches "ASC Pro")
+            let manifestURL = pluginsDir.appendingPathComponent(entry).appendingPathComponent("manifest.json")
+            let manifestName = (try? Data(contentsOf: manifestURL))
+                .flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
+                .flatMap { $0["name"] as? String }
+            let nameId = manifestName?.lowercased().replacingOccurrences(of: " ", with: "-")
+
+            if slugLower == nameLower || nameId == nameLower {
+                try fm.removeItem(at: pluginsDir.appendingPathComponent(entry))
+                return
+            }
+        }
+        throw PluginMarketError.pluginNotFound(name)
     }
 
     // MARK: - Private
