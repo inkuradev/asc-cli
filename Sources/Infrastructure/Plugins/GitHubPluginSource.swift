@@ -6,6 +6,8 @@ import Foundation
 /// The registry URL defaults to:
 ///   `https://raw.githubusercontent.com/{owner}/{repo}/main/registry.json`
 ///
+/// Default registry: `tddworks/asc-registry`
+///
 /// Registry format:
 /// ```json
 /// {
