@@ -652,39 +652,27 @@ struct MockRepositoryFactory {
         id: String = "asc-pro",
         name: String = "ASC Pro",
         version: String = "1.0",
-        slug: String = "ASCPro",
+        description: String = "Simulator streaming, interaction & tunnel sharing",
+        author: String? = "tddworks",
+        repositoryURL: String? = "https://github.com/tddworks/asc-registry",
+        categories: [String] = ["simulators", "streaming"],
+        downloadURL: String? = "https://github.com/tddworks/asc-registry/releases/latest/download/ASCPro.plugin.zip",
+        isInstalled: Bool = true,
+        slug: String? = "ASCPro",
         uiScripts: [String] = ["ui/sim-stream.js"]
     ) -> Plugin {
         Plugin(
             id: id,
             name: name,
             version: version,
-            slug: slug,
-            uiScripts: uiScripts
-        )
-    }
-
-    static func makeMarketPlugin(
-        id: String = "asc-pro",
-        name: String = "ASC Pro",
-        version: String = "1.0",
-        description: String = "Simulator streaming, interaction & tunnel sharing",
-        author: String? = "tddworks",
-        repositoryURL: String? = "https://github.com/tddworks/asc-pro",
-        downloadURL: String = "https://github.com/tddworks/asc-pro/releases/latest/download/ASCPro.plugin.zip",
-        categories: [String] = ["simulators", "streaming"],
-        isInstalled: Bool = false
-    ) -> MarketPlugin {
-        MarketPlugin(
-            id: id,
-            name: name,
-            version: version,
             description: description,
             author: author,
             repositoryURL: repositoryURL,
-            downloadURL: downloadURL,
             categories: categories,
-            isInstalled: isInstalled
+            downloadURL: downloadURL,
+            isInstalled: isInstalled,
+            slug: slug,
+            uiScripts: uiScripts
         )
     }
 

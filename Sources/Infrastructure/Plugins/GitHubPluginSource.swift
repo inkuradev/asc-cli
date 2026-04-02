@@ -50,7 +50,7 @@ public struct GitHubPluginSource: PluginSource {
         self.fetcher = fetcher
     }
 
-    public func fetchPlugins() async throws -> [MarketPlugin] {
+    public func fetchPlugins() async throws -> [Plugin] {
         let url = URL(string: "https://raw.githubusercontent.com/\(owner)/\(repo)/main/registry.json")!
         let data = try await fetcher(url)
 
@@ -63,15 +63,15 @@ public struct GitHubPluginSource: PluginSource {
         let entries = try JSONDecoder().decode([RegistryPluginEntry].self, from: pluginsData)
 
         return entries.map { entry in
-            MarketPlugin(
+            Plugin(
                 id: entry.id,
                 name: entry.name,
                 version: entry.version,
                 description: entry.description,
                 author: entry.author,
                 repositoryURL: entry.repositoryURL,
-                downloadURL: entry.downloadURL,
                 categories: entry.categories ?? [],
+                downloadURL: entry.downloadURL,
                 isInstalled: false
             )
         }

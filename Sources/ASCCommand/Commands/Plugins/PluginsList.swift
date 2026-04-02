@@ -19,8 +19,8 @@ struct PluginsList: AsyncParsableCommand {
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
         return try formatter.formatAgentItems(
             plugins,
-            headers: ["Name", "Version", "Slug"],
-            rowMapper: { [$0.name, $0.version, $0.slug] }
+            headers: ["Name", "Version", "Author", "Description"],
+            rowMapper: { [$0.name, $0.version, $0.author ?? "-", $0.description] }
         )
     }
 }

@@ -11,41 +11,46 @@ public struct PluginMarketRepository: PluginRepository {
     }
 
     public func listInstalled() async throws -> [Plugin] {
-        PluginLoader.discover().map { loaded in
-            Plugin(
-                id: loaded.slug,
-                name: loaded.name,
-                version: "1.0",
-                slug: loaded.slug,
-                uiScripts: loaded.uiScripts
+        let loaded = PluginLoader.discover()
+        return loaded.map { p in
+            let manifest = readManifest(at: p.directory)
+            return Plugin(
+                id: p.slug,
+                name: p.name,
+                version: manifest?["version"] as? String ?? "1.0",
+                description: manifest?["description"] as? String ?? "",
+                author: manifest?["author"] as? String,
+                repositoryURL: manifest?["repositoryURL"] as? String,
+                categories: manifest?["categories"] as? [String] ?? [],
+                isInstalled: true,
+                slug: p.slug,
+                uiScripts: p.uiScripts
             )
         }
     }
 
-    public func listAvailable() async throws -> [MarketPlugin] {
+    public func listAvailable() async throws -> [Plugin] {
         let installed = PluginLoader.discover()
         let installedIds = Set(
             installed.flatMap { p in
-                // Match by slug ("ASCPro"), lowercased slug ("ascpro"),
-                // and name-derived id ("asc-pro") to handle registry ID variations
                 [p.slug, p.slug.lowercased(), p.name.lowercased().replacingOccurrences(of: " ", with: "-")]
             }
         )
 
-        var all: [MarketPlugin] = []
+        var all: [Plugin] = []
         for source in sources {
             let plugins = try await source.fetchPlugins()
             all.append(contentsOf: plugins.map { plugin in
                 let matched = installedIds.contains(plugin.id) || installedIds.contains(plugin.id.lowercased())
-                return MarketPlugin(
+                return Plugin(
                     id: plugin.id,
                     name: plugin.name,
                     version: plugin.version,
                     description: plugin.description,
                     author: plugin.author,
                     repositoryURL: plugin.repositoryURL,
-                    downloadURL: plugin.downloadURL,
                     categories: plugin.categories,
+                    downloadURL: plugin.downloadURL,
                     isInstalled: matched
                 )
             })
@@ -53,7 +58,7 @@ public struct PluginMarketRepository: PluginRepository {
         return all
     }
 
-    public func searchAvailable(query: String) async throws -> [MarketPlugin] {
+    public func searchAvailable(query: String) async throws -> [Plugin] {
         let all = try await listAvailable()
         let q = query.lowercased()
         return all.filter {
@@ -65,14 +70,15 @@ public struct PluginMarketRepository: PluginRepository {
 
     public func install(name: String) async throws -> Plugin {
         let available = try await listAvailable()
-        guard let entry = available.first(where: { $0.id == name }) else {
+        guard let entry = available.first(where: { $0.id == name }),
+              let downloadURL = entry.downloadURL else {
             throw PluginMarketError.pluginNotFound(name)
         }
 
         let pluginsDir = PluginLoader.pluginsDirectory
         try FileManager.default.createDirectory(at: pluginsDir, withIntermediateDirectories: true)
 
-        let zipURL = URL(string: entry.downloadURL)!
+        let zipURL = URL(string: downloadURL)!
         let (zipData, _) = try await URLSession.shared.data(from: zipURL)
 
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -80,7 +86,6 @@ public struct PluginMarketRepository: PluginRepository {
         let zipPath = tempDir.appendingPathComponent("\(name).zip")
         try zipData.write(to: zipPath)
 
-        // Extract zip to plugins directory
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
         process.arguments = ["-o", zipPath.path, "-d", pluginsDir.path]
@@ -97,8 +102,12 @@ public struct PluginMarketRepository: PluginRepository {
             id: name,
             name: entry.name,
             version: entry.version,
-            slug: name,
-            uiScripts: []
+            description: entry.description,
+            author: entry.author,
+            repositoryURL: entry.repositoryURL,
+            categories: entry.categories,
+            isInstalled: true,
+            slug: name
         )
     }
 
@@ -109,6 +118,17 @@ public struct PluginMarketRepository: PluginRepository {
             throw PluginMarketError.pluginNotFound(name)
         }
         try FileManager.default.removeItem(at: bundlePath)
+    }
+
+    // MARK: - Private
+
+    private func readManifest(at directory: URL) -> [String: Any]? {
+        let manifestURL = directory.appendingPathComponent("manifest.json")
+        guard let data = try? Data(contentsOf: manifestURL),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return nil
+        }
+        return json
     }
 }
 
