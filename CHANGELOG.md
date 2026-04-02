@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.62] - 2026-04-02
+
 ### Added
 - **`asc web-server`** — Swift/Hummingbird HTTP+WebSocket server replacing Node.js. Single binary, zero external dependencies, HTTPS with self-signed cert
 - **Plugin architecture** — `.plugin` bundles in `~/.asc/plugins/` extend the CLI with routes, commands, affordances, and UI. Dylibs built with `dynamic_lookup` (~300KB)
@@ -587,7 +591,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.61...HEAD
+[Unreleased]: https://github.com/tddworks/asc-cli/compare/v0.1.62...HEAD
+[0.1.62]: https://github.com/tddworks/asc-cli/compare/v0.1.61...v0.1.62
 [0.1.61]: https://github.com/tddworks/asc-cli/compare/v0.1.60...v0.1.61
 [0.1.60]: https://github.com/tddworks/asc-cli/compare/v0.1.59...v0.1.60
 [0.1.59]: https://github.com/tddworks/asc-cli/compare/v0.1.58...v0.1.59
