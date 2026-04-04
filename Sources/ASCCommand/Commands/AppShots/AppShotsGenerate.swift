@@ -23,15 +23,6 @@ struct AppShotsGenerate: AsyncParsableCommand {
     @Option(name: .long, help: "Output directory (default: .asc/app-shots/output)")
     var outputDir: String = ".asc/app-shots/output"
 
-    @Option(name: .long, help: "Output width in pixels")
-    var outputWidth: Int = 1320
-
-    @Option(name: .long, help: "Output height in pixels")
-    var outputHeight: Int = 2868
-
-    @Option(name: .long, help: "Named device type — overrides width/height")
-    var deviceType: AppShotsDisplayType?
-
     @Option(name: .long, help: "Style reference image — Gemini replicates its visual style")
     var styleReference: String?
 
@@ -46,9 +37,6 @@ struct AppShotsGenerate: AsyncParsableCommand {
     }
 
     func execute(repo: any ScreenshotGenerationRepository) async throws -> String {
-        let effectiveWidth = deviceType.map { $0.dimensions.width } ?? outputWidth
-        let effectiveHeight = deviceType.map { $0.dimensions.height } ?? outputHeight
-
         // Validate input file
         let fileURL = URL(fileURLWithPath: file)
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
@@ -98,8 +86,7 @@ struct AppShotsGenerate: AsyncParsableCommand {
         for (index, data) in images.sorted(by: { $0.key < $1.key }) {
             let fileName = "screen-\(index).png"
             let fileURL = outputDirURL.appendingPathComponent(fileName)
-            let resized = resizeImageData(data, toWidth: effectiveWidth, height: effectiveHeight)
-            try resized.write(to: fileURL)
+            try data.write(to: fileURL)
             entries.append((index: index, path: fileURL.path))
         }
 

@@ -52,28 +52,22 @@ struct AppShotsGenerateKeyResolutionTests {
 
     @Test func `resolveApiKey prefers explicit flag`() throws {
         let mockStorage = MockAppShotsConfigStorage()
-        var cmd = AppShotsGenerate()
-        cmd.geminiApiKey = "flag-key"
-        let key = try cmd.resolveApiKey(configStorage: mockStorage)
+        let key = try resolveGeminiApiKey("flag-key", configStorage: mockStorage)
         #expect(key == "flag-key")
     }
 
     @Test func `resolveApiKey falls back to config file`() throws {
         let mockStorage = MockAppShotsConfigStorage()
         given(mockStorage).load().willReturn(Domain.AppShotsConfig(geminiApiKey: "stored-key"))
-        var cmd = AppShotsGenerate()
-        cmd.geminiApiKey = nil
-        let key = try cmd.resolveApiKey(configStorage: mockStorage)
+        let key = try resolveGeminiApiKey(nil, configStorage: mockStorage)
         #expect(key == "stored-key")
     }
 
     @Test func `resolveApiKey throws when no key available`() throws {
         let mockStorage = MockAppShotsConfigStorage()
         given(mockStorage).load().willReturn(nil)
-        var cmd = AppShotsGenerate()
-        cmd.geminiApiKey = nil
         #expect(throws: (any Error).self) {
-            try cmd.resolveApiKey(configStorage: mockStorage)
+            try resolveGeminiApiKey(nil, configStorage: mockStorage)
         }
     }
 }
