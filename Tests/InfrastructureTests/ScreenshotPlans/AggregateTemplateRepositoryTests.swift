@@ -15,8 +15,8 @@ struct AggregateTemplateRepositoryTests {
     @Test func `registered provider templates are returned`() async throws {
         let repo = AggregateTemplateRepository()
         let provider = StubTemplateProvider(providerId: "test", templates: [
-            MockRepositoryFactory.makeScreenshotTemplate(id: "t-1", name: "Template One"),
-            MockRepositoryFactory.makeScreenshotTemplate(id: "t-2", name: "Template Two"),
+            makeTemplate(id: "t-1", name: "Template One"),
+            makeTemplate(id: "t-2", name: "Template Two"),
         ])
         await repo.register(provider: provider)
 
@@ -29,11 +29,11 @@ struct AggregateTemplateRepositoryTests {
     @Test func `multiple providers are aggregated`() async throws {
         let repo = AggregateTemplateRepository()
         await repo.register(provider: StubTemplateProvider(providerId: "a", templates: [
-            MockRepositoryFactory.makeScreenshotTemplate(id: "a-1"),
+            makeTemplate(id: "a-1"),
         ]))
         await repo.register(provider: StubTemplateProvider(providerId: "b", templates: [
-            MockRepositoryFactory.makeScreenshotTemplate(id: "b-1"),
-            MockRepositoryFactory.makeScreenshotTemplate(id: "b-2"),
+            makeTemplate(id: "b-1"),
+            makeTemplate(id: "b-2"),
         ]))
 
         let templates = try await repo.listTemplates(size: nil)
@@ -43,9 +43,9 @@ struct AggregateTemplateRepositoryTests {
     @Test func `list filters by size`() async throws {
         let repo = AggregateTemplateRepository()
         await repo.register(provider: StubTemplateProvider(providerId: "test", templates: [
-            MockRepositoryFactory.makeScreenshotTemplate(id: "portrait-1", supportedSizes: [.portrait]),
-            MockRepositoryFactory.makeScreenshotTemplate(id: "landscape-1", supportedSizes: [.landscape]),
-            MockRepositoryFactory.makeScreenshotTemplate(id: "both-1", supportedSizes: [.portrait, .landscape]),
+            makeTemplate(id: "portrait-1", supportedSizes: [.portrait]),
+            makeTemplate(id: "landscape-1", supportedSizes: [.landscape]),
+            makeTemplate(id: "both-1", supportedSizes: [.portrait, .landscape]),
         ]))
 
         let portrait = try await repo.listTemplates(size: .portrait)
@@ -62,10 +62,10 @@ struct AggregateTemplateRepositoryTests {
     @Test func `get template by id finds across providers`() async throws {
         let repo = AggregateTemplateRepository()
         await repo.register(provider: StubTemplateProvider(providerId: "a", templates: [
-            MockRepositoryFactory.makeScreenshotTemplate(id: "a-1", name: "From A"),
+            makeTemplate(id: "a-1", name: "From A"),
         ]))
         await repo.register(provider: StubTemplateProvider(providerId: "b", templates: [
-            MockRepositoryFactory.makeScreenshotTemplate(id: "b-1", name: "From B"),
+            makeTemplate(id: "b-1", name: "From B"),
         ]))
 
         let found = try await repo.getTemplate(id: "b-1")
@@ -76,7 +76,24 @@ struct AggregateTemplateRepositoryTests {
     }
 }
 
-// MARK: - Test Helper
+// MARK: - Test Helpers
+
+private func makeTemplate(
+    id: String = "test",
+    name: String = "Test Template",
+    supportedSizes: [ScreenSize] = [.portrait]
+) -> ScreenshotTemplate {
+    ScreenshotTemplate(
+        id: id,
+        name: name,
+        category: .bold,
+        supportedSizes: supportedSizes,
+        description: "Test",
+        background: .gradient(from: "#000", to: "#111", angle: 180),
+        textSlots: [TemplateTextSlot(role: .heading, preview: "Test", x: 0.5, y: 0.04, fontSize: 0.1, color: "#fff")],
+        deviceSlots: [TemplateDeviceSlot(x: 0.5, y: 0.18, scale: 0.85)]
+    )
+}
 
 private struct StubTemplateProvider: TemplateProvider {
     let providerId: String

@@ -14,7 +14,7 @@ public protocol TemplateProvider: Sendable {
     func templates() async throws -> [ScreenshotTemplate]
 }
 
-/// Repository that aggregates templates from all registered providers.
+/// Repository for querying screenshot templates.
 ///
 /// The platform ships with no built-in templates. Plugins register
 /// `TemplateProvider` implementations to supply templates.
@@ -25,7 +25,4 @@ public protocol TemplateRepository: Sendable {
 
     /// Get a specific template by ID (searches all providers).
     func getTemplate(id: String) async throws -> ScreenshotTemplate?
-
-    /// Register a template provider.
-    func register(provider: any TemplateProvider) async
 }
