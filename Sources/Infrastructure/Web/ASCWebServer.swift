@@ -161,9 +161,6 @@ public struct ASCWebServer: Sendable {
                      body: .init(byteBuffer: ByteBuffer(data: pluginJSON)))
         }
 
-        // Platform routes
-        TemplatesRoute.register(on: router)
-
         // Serve each plugin UI file at its exact path
         for p in plugins {
             let pluginDir = p.directory
