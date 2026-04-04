@@ -52,6 +52,9 @@ struct AppShotsTemplatesGet: AsyncParsableCommand {
     @Option(name: .long, help: "Template ID")
     var id: String
 
+    @Flag(name: .long, help: "Output self-contained HTML preview page")
+    var preview: Bool = false
+
     func run() async throws {
         let repo = ClientProvider.makeTemplateRepository()
         print(try await execute(repo: repo))
@@ -61,6 +64,11 @@ struct AppShotsTemplatesGet: AsyncParsableCommand {
         guard let template = try await repo.getTemplate(id: id) else {
             throw ValidationError("Template '\(id)' not found. Run `asc app-shots templates list` to see available templates.")
         }
+
+        if preview {
+            return template.previewHTML
+        }
+
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
         return try formatter.formatAgentItems(
             [template],

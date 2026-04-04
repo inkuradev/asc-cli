@@ -184,20 +184,6 @@ public struct ASCWebServer: Sendable {
                             body: .init(byteBuffer: .init(data: data)))
         }
 
-        // /api/templates/{id}/preview — rendered HTML preview page
-        router.get("/api/templates/{id}/preview") { _, context in
-            guard let id = context.parameters.get("id") else {
-                return jsonError("Missing template id")
-            }
-            guard let template = try await AggregateTemplateRepository.shared.getTemplate(id: id) else {
-                return jsonError("Template not found", status: .notFound)
-            }
-            let html = template.previewHTML
-            return Response(status: .ok,
-                            headers: [.contentType: "text/html; charset=utf-8", .cacheControl: "no-cache"],
-                            body: .init(byteBuffer: .init(string: html)))
-        }
-
         // Serve each plugin UI file at its exact path
         for p in plugins {
             let pluginDir = p.directory
