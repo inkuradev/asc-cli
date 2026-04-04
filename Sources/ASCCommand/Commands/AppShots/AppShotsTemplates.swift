@@ -72,4 +72,4 @@ struct AppShotsTemplatesGet: AsyncParsableCommand {
 
 // MARK: - ScreenSize ArgumentParser conformance
 
-extension ScreenSize: @retroactive ExpressibleByArgument {}
+extension ScreenSize: ExpressibleByArgument {}
