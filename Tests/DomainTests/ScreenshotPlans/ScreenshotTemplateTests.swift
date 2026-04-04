@@ -47,11 +47,44 @@ struct ScreenshotTemplateTests {
         #expect(duo.deviceCount == 2)
     }
 
-    @Test func `template affordances include apply and list commands`() {
+    @Test func `template affordances include preview, apply, and list`() {
         let template = MockRepositoryFactory.makeScreenshotTemplate(id: "top-hero")
         #expect(template.affordances["apply"] == "asc app-shots templates apply --id top-hero --screenshot screen.png")
         #expect(template.affordances["detail"] == "asc app-shots templates get --id top-hero")
         #expect(template.affordances["listAll"] == "asc app-shots templates list")
+        #expect(template.affordances["preview"]?.contains("<div") == true)
+    }
+
+    @Test func `previewHTML contains background and text`() {
+        let template = MockRepositoryFactory.makeScreenshotTemplate()
+        let html = template.previewHTML
+        #expect(html.contains("linear-gradient"))
+        #expect(html.contains("Your"))
+        #expect(html.contains("Headline"))
+    }
+
+    @Test func `apply produces a ScreenshotDesign with user content`() {
+        let template = MockRepositoryFactory.makeScreenshotTemplate(id: "top-hero")
+        let design = template.apply(
+            appName: "MyApp",
+            headline: "Ship Faster",
+            subtitle: "One command away",
+            screenshotFile: "screen-1.png"
+        )
+        #expect(design.appName == "MyApp")
+        #expect(design.tagline == "Ship Faster")
+        #expect(design.screens.count == 1)
+        #expect(design.screens[0].heading == "Ship Faster")
+        #expect(design.screens[0].subheading == "One command away")
+        #expect(design.screens[0].screenshotFile == "screen-1.png")
+    }
+
+    @Test func `apply maps template category to tone`() {
+        let bold = MockRepositoryFactory.makeScreenshotTemplate(category: .bold)
+        #expect(bold.apply(appName: "A", headline: "H", screenshotFile: "s.png").tone == .bold)
+
+        let minimal = MockRepositoryFactory.makeScreenshotTemplate(category: .minimal)
+        #expect(minimal.apply(appName: "A", headline: "H", screenshotFile: "s.png").tone == .minimal)
     }
 
     @Test func `template is codable`() throws {
