@@ -33,7 +33,7 @@ struct AppShotsTemplatesList: AsyncParsableCommand {
     }
 
     func execute(repo: any TemplateRepository) async throws -> String {
-        var templates = try await repo.listTemplates(size: size)
+        let templates = try await repo.listTemplates(size: size)
 
         if preview {
             // Include previewHTML in affordances
@@ -109,7 +109,7 @@ struct AppShotsTemplatesGet: AsyncParsableCommand {
 struct AppShotsTemplatesApply: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "apply",
-        abstract: "Apply a template to a screenshot — returns a previewable screen design"
+        abstract: "Apply a template to a screenshot — returns the composed design with preview"
     )
 
     @OptionGroup var globals: GlobalOptions
@@ -129,6 +129,9 @@ struct AppShotsTemplatesApply: AsyncParsableCommand {
     @Option(name: .long, help: "App name")
     var appName: String = "My App"
 
+    @Flag(name: .long, help: "Output self-contained HTML preview with real screenshot")
+    var preview: Bool = false
+
     func run() async throws {
         let repo = ClientProvider.makeTemplateRepository()
         print(try await execute(repo: repo))
@@ -147,6 +150,10 @@ struct AppShotsTemplatesApply: AsyncParsableCommand {
             subheading: subtitle ?? ""
         )
 
+        if preview {
+            return screen.previewHTML
+        }
+
         let formatter = OutputFormatter(format: globals.outputFormat, pretty: globals.pretty)
         return try formatter.formatAgentItems(
             [screen],
@@ -160,7 +167,3 @@ struct AppShotsTemplatesApply: AsyncParsableCommand {
 
 extension ScreenSize: ExpressibleByArgument {}
 
-enum PreviewFormat: String, ExpressibleByArgument, CaseIterable {
-    case html
-    case png
-}

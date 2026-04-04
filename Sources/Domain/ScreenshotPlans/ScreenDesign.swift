@@ -96,8 +96,9 @@ extension ScreenDesign: AffordanceProviding {
         var cmds: [String: String] = [
             "changeTemplate": "asc app-shots templates list",
         ]
-        if isComplete {
+        if isComplete, let template {
             cmds["generate"] = "asc app-shots generate --design design.json"
+            cmds["preview"] = "asc app-shots templates apply --id \(template.id) --screenshot \(screenshotFile) --headline \"\(heading)\""
         }
         if let template {
             cmds["templateDetail"] = "asc app-shots templates get --id \(template.id)"
