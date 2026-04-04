@@ -5,7 +5,12 @@ import Foundation
 ///
 /// The platform ships with no built-in templates. Plugins register
 /// providers to supply their own templates.
+///
+/// Use `AggregateTemplateRepository.shared` as the global registry.
 public final actor AggregateTemplateRepository: TemplateRepository {
+    /// Global shared instance — plugins register providers here.
+    public static let shared = AggregateTemplateRepository()
+
     private var providers: [any TemplateProvider] = []
 
     public init() {}

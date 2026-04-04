@@ -241,7 +241,7 @@ struct ClientProvider {
     }
 
     static func makeTemplateRepository() -> AggregateTemplateRepository {
-        AggregateTemplateRepository()
+        AggregateTemplateRepository.shared
     }
 
     static func makeAppShotsConfigStorage() -> any AppShotsConfigStorage {
