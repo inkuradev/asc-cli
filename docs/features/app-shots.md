@@ -1,13 +1,13 @@
 # App Shots
 
-Create professional App Store marketing screenshots from raw app screenshots. Three approaches — pick the one that fits your workflow:
+Create professional App Store marketing screenshots from raw app screenshots. Two approaches:
 
-| | **Enhance** | **Compose + Enhance** | **HTML Export** |
-|---|---|---|---|
-| **What you do** | Feed a screenshot to Gemini AI | Pick a template, apply it, then enhance with AI | Write a layout plan, export from browser |
-| **Command** | `asc app-shots generate` | `templates apply` → `generate` | `asc app-shots html` |
-| **AI required** | Yes (Gemini) | Yes (Gemini) | No |
-| **Control level** | Low — AI decides layout | Medium — you pick the template | Full — pixel-perfect |
+| | **Enhance** | **Compose + Enhance** |
+|---|---|---|
+| **What you do** | Feed a screenshot to Gemini AI | Pick a template, apply it, then enhance with AI |
+| **Command** | `asc app-shots generate` | `templates apply` → `generate` |
+| **AI required** | Yes (Gemini) | Yes (Gemini) |
+| **Control level** | Low — AI decides layout | Medium — you pick the template |
 
 ---
 
@@ -36,6 +36,7 @@ Enhance a single screenshot into a marketing image using Gemini AI.
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--file` | *(required)* | Screenshot file to enhance |
+| `--device-type` | — | Named device type — resizes output to exact App Store dimensions |
 | `--style-reference` | — | Reference image whose visual style Gemini replicates |
 | `--prompt` | — | Custom prompt (overrides the built-in auto-enhance prompt) |
 | `--gemini-api-key` | — | Gemini API key (falls back to `GEMINI_API_KEY` env, then saved config) |
@@ -46,12 +47,20 @@ Enhance a single screenshot into a marketing image using Gemini AI.
 # Auto-enhance — AI analyzes and designs everything
 asc app-shots generate --file screen.png
 
+# Resize to exact App Store dimensions
+asc app-shots generate --file screen.png --device-type APP_IPHONE_67
+
 # Style transfer — match another screenshot's look
 asc app-shots generate --file screen.png --style-reference competitor.png
 
 # Custom prompt — tell Gemini exactly what you want
 asc app-shots generate --file screen.png \
   --prompt "Add warm glow, deepen shadows, make text pop"
+
+# Generate multiple device sizes
+asc app-shots generate --file screen.png --device-type APP_IPHONE_69 --output-dir output/69
+asc app-shots generate --file screen.png --device-type APP_IPHONE_67 --output-dir output/67
+asc app-shots generate --file screen.png --device-type APP_IPAD_PRO_129 --output-dir output/ipad
 ```
 
 **JSON output:**
@@ -72,44 +81,6 @@ The default auto-enhance prompt tells Gemini to:
 - Add 1-2 subtle supporting elements (badges, stats)
 
 For better results, use the **`asc-app-shots-prompt` skill** in Claude Code — it reads your screenshot, identifies exact UI panels and colors, and generates a targeted `--prompt` that names specific elements instead of letting Gemini guess.
-
----
-
-### `asc app-shots translate`
-
-Translate already-generated screenshots into other locales. Gemini reproduces the image exactly, only translating text overlays outside the device mockup.
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--plan` | `.asc/app-shots/app-shots-plan.json` | Source `ScreenshotDesign` JSON |
-| `--from` | `en` | Source locale |
-| `--to` | *(required, repeatable)* | Target locale(s) |
-| `--source-dir` | `.asc/app-shots/output` | Directory with existing generated screenshots |
-| `--gemini-api-key` | — | Gemini API key |
-| `--model` | `gemini-3.1-flash-image-preview` | Gemini model |
-| `--output-dir` | `.asc/app-shots/output` | Base output directory (creates `<locale>/` subdirs) |
-| `--device-type` | — | Named device type (overrides width/height) |
-| `--style-reference` | — | Style reference for visual consistency |
-| `--output-width` | `1320` | Output width in pixels |
-| `--output-height` | `2868` | Output height in pixels |
-
-```bash
-# Translate to Chinese and Japanese
-asc app-shots translate --to zh --to ja
-
-# With style reference for consistency
-asc app-shots translate --to zh --style-reference ref.png
-```
-
-**JSON output:**
-```json
-{
-  "data": [
-    { "locale": "ja", "screens": 3, "outputDir": ".asc/app-shots/output/ja" },
-    { "locale": "zh", "screens": 3, "outputDir": ".asc/app-shots/output/zh" }
-  ]
-}
-```
 
 ---
 
@@ -213,41 +184,6 @@ asc app-shots templates apply \
 
 ---
 
-### `asc app-shots html`
-
-Generate a self-contained HTML page from a plan JSON — no AI API key needed. Supports two plan formats:
-
-- **`CompositionPlan`** (has `"canvas"` key) — pixel-perfect control with normalized 0-1 coordinates
-- **`ScreenshotDesign`** (legacy) — simpler format, rendered via `LegacyHTMLRenderer`
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--plan` | `.asc/app-shots/app-shots-plan.json` | Path to plan JSON |
-| `--output-dir` | `.asc/app-shots/output` | Directory for the HTML file |
-| `--output-width` | `1320` | Canvas width in pixels |
-| `--output-height` | `2868` | Canvas height in pixels |
-| `--device-type` | — | Named device type (overrides width/height) |
-| `--mockup` | *(bundled iPhone 17 Pro Max)* | Device mockup: file path, device name, or `"none"` |
-| `--screen-inset-x` | — | Screen area X inset (overrides mockups.json) |
-| `--screen-inset-y` | — | Screen area Y inset (overrides mockups.json) |
-| `<screenshots>` | *(auto-discovered)* | Screenshot files; omit to auto-discover from plan directory |
-
-```bash
-# Default — uses .asc/app-shots/app-shots-plan.json
-asc app-shots html
-
-# With a specific device type
-asc app-shots html --device-type APP_IPHONE_67
-
-# Custom mockup
-asc app-shots html --mockup "iPhone 17 Pro Max"
-
-# No device frame
-asc app-shots html --mockup none
-```
-
----
-
 ### `asc app-shots config`
 
 Manage the stored Gemini API key.
@@ -269,6 +205,9 @@ asc app-shots config --remove                       # Delete
 ```bash
 # One command — AI handles everything
 asc app-shots generate --file .asc/app-shots/screen-0.png
+
+# Resize to required App Store dimensions
+asc app-shots generate --file .asc/app-shots/screen-0.png --device-type APP_IPHONE_67
 ```
 
 ### Workflow 2: Template + Enhance (recommended)
@@ -290,34 +229,20 @@ asc app-shots templates apply \
 open composed.html
 
 # 4. Enhance the composed result with AI
-asc app-shots generate --file .asc/app-shots/output/screen-0.png
-
-# 5. Translate (optional)
-asc app-shots translate --to zh --to ja
+asc app-shots generate --file .asc/app-shots/output/screen-0.png --device-type APP_IPHONE_67
 ```
 
-### Workflow 3: HTML Export (no AI)
+### Workflow 3: Skill-driven (Claude writes the prompt)
 
 ```bash
-# Write a CompositionPlan JSON (see Domain Models below)
-# Then generate HTML
-asc app-shots html --plan .asc/app-shots/composition-plan.json
+# In Claude Code, use the asc-app-shots-prompt skill:
+# "Analyze this screenshot and generate a prompt for app-shots"
+# → Claude reads the image, generates a targeted --prompt
 
-# Open in browser to preview and export
-open .asc/app-shots/output/app-shots.html
-```
-
-### Workflow 4: Skill-driven (Claude writes the plan)
-
-```bash
-# In Claude Code, use the asc-app-shots skill:
-# "Plan my App Store screenshots for app 6736834466"
-# → Claude fetches metadata, analyzes screenshots, writes app-shots-plan.json
-
-# Then generate HTML or enhance with AI
-asc app-shots html
-# or
-asc app-shots generate --file .asc/app-shots/screen-0.png
+# Then generate
+asc app-shots generate --file screen.png \
+  --prompt '<generated prompt>' \
+  --device-type APP_IPHONE_67
 ```
 
 ---
@@ -327,61 +252,35 @@ asc app-shots generate --file .asc/app-shots/screen-0.png
 ```
 ASCCommand                            Domain                              Infrastructure
 +-----------------------------------+ +-----------------------------------+ +-----------------------------------+
-| AppShotsCommand                   | | ScreenshotDesign                  | | GeminiScreenshotGeneration-       |
-|   ├── templates                   | |   appId, appName, tagline, tone   | |   Repository                      |
-|   │   ├── list  (TemplateRepo)    | |   colors, screens[]               | |   POST generateContent            |
-|   │   ├── get   (TemplateRepo)    | |   affordances: generate, html     | |   (native Gemini REST API)        |
-|   │   └── apply (TemplateRepo)    | |                                   | +-----------------------------------+
-|   ├── generate  (Gemini direct)   | | ScreenDesign                      | | AggregateTemplateRepository       |
-|   ├── translate (GenRepo)         | |   index, heading, subheading      | |   (actor)                         |
-|   ├── html      (local render)    | |   template?, screenshotFile       | |   Aggregates TemplateProviders    |
-|   └── config    (ConfigStorage)   | |   isComplete, previewHTML         | +-----------------------------------+
-+-----------------------------------+ |   affordances: generate, preview  | | FileAppShotsConfigStorage         |
-                                      |                                   | |   ~/.asc/app-shots-config.json    |
-                                      | ScreenshotTemplate                | +-----------------------------------+
-                                      |   id, name, category, background  |
+| AppShotsCommand                   | | ScreenDesign                      | | AggregateTemplateRepository       |
+|   ├── templates                   | |   index, heading, subheading      | |   (actor)                         |
+|   │   ├── list  (TemplateRepo)    | |   template?, screenshotFile       | |   Aggregates TemplateProviders    |
+|   │   ├── get   (TemplateRepo)    | |   isComplete, previewHTML         | +-----------------------------------+
+|   │   └── apply (TemplateRepo)    | |   affordances: generate, preview  | | FileAppShotsConfigStorage         |
+|   ├── generate  (Gemini direct)   | |                                   | |   ~/.asc/app-shots-config.json    |
+|   └── config    (ConfigStorage)   | | ScreenshotTemplate                | +-----------------------------------+
++-----------------------------------+ |   id, name, category, background  |
                                       |   textSlots[], deviceSlots[]      |
                                       |   isPortrait, deviceCount         |
                                       |   previewHTML, affordances        |
                                       |                                   |
-                                      | CompositionPlan                   |
-                                      |   canvas, defaults, screens[]     |
-                                      |   (normalized 0-1 coordinates)    |
+                                      | SlideBackground                   |
+                                      |   .solid(color)                   |
+                                      |   .gradient(from, to, angle)      |
                                       |                                   |
                                       | TemplateProvider (protocol)       |
                                       | TemplateRepository (protocol)     |
-                                      | ScreenshotGenerationRepository    |
                                       | AppShotsConfigStorage (protocol)  |
                                       +-----------------------------------+
 ```
 
 **Dependency flow:** `ASCCommand → Domain ← Infrastructure`
 
-**Key design note:** `generate` calls the Gemini API directly (no repository) for single-file enhancement. `translate` uses `ScreenshotGenerationRepository` for multi-screen batch generation. `html` renders locally with no network calls.
+**Key design note:** `generate` calls the Gemini API directly via `URLSession` — no repository abstraction. This keeps the single-file enhancement path simple. When `--device-type` is specified, output is resized to exact App Store dimensions via CoreGraphics.
 
 ---
 
 ## Domain Models
-
-### `ScreenshotDesign`
-
-The top-level design plan — a collection of screens with shared styling. Used by `translate` and `html` (legacy path).
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `appId` | `String` | App ID (also the model's `id`) |
-| `appName` | `String` | App display name |
-| `tagline` | `String` | Marketing tagline |
-| `appDescription` | `String?` | Summary for Gemini context (omitted from JSON when nil) |
-| `tone` | `ScreenTone` | `bold`, `minimal`, `elegant`, `professional`, `playful` |
-| `colors` | `ScreenColors` | `primary`, `accent`, `text`, `subtext` |
-| `screens` | `[ScreenDesign]` | Ordered screen designs |
-
-**Affordances:**
-| Key | Command |
-|-----|---------|
-| `generate` | `asc app-shots generate --plan app-shots-plan.json --gemini-api-key $GEMINI_API_KEY` |
-| `generateHTML` | `asc app-shots html --plan app-shots-plan.json` |
 
 ### `ScreenDesign`
 
@@ -431,34 +330,12 @@ Reusable template for composing screenshots. Registered by plugins via `Template
 
 **Affordances:** `preview`, `apply`, `detail`, `listAll`
 
-### `CompositionPlan`
+### `SlideBackground`
 
-Deterministic layout plan for HTML export. All positions use **normalized 0-1 coordinates** relative to canvas dimensions.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `appName` | `String` | App name |
-| `canvas` | `CanvasSize` | `width`, `height`, optional `displayType` |
-| `defaults` | `SlideDefaults` | `background`, `textColor`, `subtextColor`, `accentColor`, `font` |
-| `screens` | `[SlideComposition]` | Each with `texts: [TextOverlay]` and `devices: [DeviceSlot]` |
-
-**Example:**
-```json
-{
-  "appName": "MyApp",
-  "canvas": { "width": 1320, "height": 2868 },
-  "defaults": {
-    "background": { "type": "gradient", "from": "#2A1B5E", "to": "#000000", "angle": 180 },
-    "textColor": "#FFFFFF", "subtextColor": "#A8B8D0", "accentColor": "#4A7CFF", "font": "Inter"
-  },
-  "screens": [{
-    "texts": [
-      { "content": "ALL YOUR APPS", "x": 0.065, "y": 0.028, "fontSize": 0.028, "fontWeight": 700, "color": "#B8A0FF" }
-    ],
-    "devices": [
-      { "screenshotFile": "screen-1.png", "mockup": "iPhone 17 Pro Max", "x": 0.5, "y": 0.65, "scale": 0.88 }
-    ]
-  }]
+```swift
+public enum SlideBackground: Sendable, Equatable, Codable {
+    case solid(String)
+    case gradient(from: String, to: String, angle: Int)
 }
 ```
 
@@ -478,11 +355,6 @@ public protocol TemplateRepository: Sendable {
 }
 
 @Mockable
-public protocol ScreenshotGenerationRepository: Sendable {
-    func generateImages(plan: ScreenshotDesign, screenshotURLs: [URL], styleReferenceURL: URL?) async throws -> [Int: Data]
-}
-
-@Mockable
 public protocol AppShotsConfigStorage: Sendable {
     func load() throws -> AppShotsConfig?
     func save(_ config: AppShotsConfig) throws
@@ -493,6 +365,8 @@ public protocol AppShotsConfigStorage: Sendable {
 ---
 
 ## Device Sizes
+
+Use `--device-type` on `generate` to resize output to exact App Store dimensions.
 
 | Display Type | Device | Width | Height |
 |---|---|---|---|
@@ -511,33 +385,6 @@ public protocol AppShotsConfigStorage: Sendable {
 
 ---
 
-## Device Mockups
-
-Mockup resolution order:
-1. `--mockup <file-path>` — use a PNG file directly
-2. `--mockup <device-name>` — look up in `~/.asc/mockups/mockups.json`, then bundled `mockups.json`
-3. `--mockup` omitted — use the entry marked `"default": true`
-4. `--mockup none` — no device frame
-
-Custom mockups go in `~/.asc/mockups/`:
-```json
-{
-  "iPhone 17 Pro Max - Deep Blue": {
-    "category": "iPhone",
-    "model": "iPhone 17 Pro Max",
-    "displayType": "APP_IPHONE_67",
-    "outputWidth": 1470,
-    "outputHeight": 3000,
-    "screenInsetX": 75,
-    "screenInsetY": 66,
-    "file": "iPhone 17 Pro Max - Deep Blue - Portrait.png",
-    "default": true
-  }
-}
-```
-
----
-
 ## File Map
 
 ### Sources
@@ -545,36 +392,24 @@ Custom mockups go in `~/.asc/mockups/`:
 ```
 Sources/
 ├── Domain/ScreenshotPlans/
-│   ├── ScreenshotDesign.swift              # Top-level design (collection of screens)
 │   ├── ScreenDesign.swift                  # Single screen (rich domain, carries template)
-│   ├── ScreenshotTemplate.swift            # Template model + TemplateCategory, ScreenSize, TextSlot, DeviceSlot
+│   ├── ScreenshotTemplate.swift            # Template model + SlideBackground, TemplateCategory, ScreenSize, TextSlot, DeviceSlot
 │   ├── TemplateRepository.swift            # TemplateProvider + TemplateRepository protocols
-│   ├── ScreenshotGenerationRepository.swift # @Mockable generation protocol
-│   ├── CompositionPlan.swift               # Deterministic layout (SlideComposition, TextOverlay, DeviceSlot)
 │   ├── TemplateHTMLRenderer.swift          # Renders template previews as HTML
 │   ├── TemplateContent.swift               # Content to fill into a template
 │   ├── AppShotsConfig.swift                # Gemini API key model
 │   ├── AppShotsConfigStorage.swift         # @Mockable config storage protocol
-│   ├── ScreenTone.swift                    # bold, minimal, elegant, professional, playful
-│   ├── ScreenColors.swift                  # primary, accent, text, subtext
 │   └── LayoutMode.swift                    # center, left, right (legacy)
 ├── Infrastructure/ScreenshotPlans/
-│   ├── GeminiScreenshotGenerationRepository.swift  # Implements ScreenshotGenerationRepository
-│   ├── AggregateTemplateRepository.swift           # Actor aggregating TemplateProviders
-│   └── FileAppShotsConfigStorage.swift             # ~/.asc/app-shots-config.json
+│   ├── AggregateTemplateRepository.swift   # Actor aggregating TemplateProviders
+│   └── FileAppShotsConfigStorage.swift     # ~/.asc/app-shots-config.json
 └── ASCCommand/Commands/AppShots/
     ├── AppShotsCommand.swift               # Entry point, registers subcommands
     ├── AppShotsGenerate.swift              # Single-file AI enhancement (direct Gemini call)
-    ├── AppShotsTranslate.swift             # Multi-locale translation via GenRepo
     ├── AppShotsTemplates.swift             # list, get, apply subcommands
-    ├── AppShotsHTML.swift                  # HTML export (CompositionPlan or legacy)
     ├── AppShotsConfig.swift                # Gemini key management
     ├── AppShotsDisplayType.swift           # Device type enum with dimensions
-    ├── AppShotsUtils.swift                 # resolveGeminiApiKey(), resizeImageData()
-    ├── MockupConfig.swift                  # MockupResolver, MockupEntry
-    ├── CompositionHTMLRenderer.swift       # Renders CompositionPlan to HTML
-    ├── LegacyHTMLRenderer.swift            # Renders ScreenshotDesign to HTML
-    └── RenderAssets.swift                  # Screenshot data URIs + mockup info for renderers
+    └── AppShotsUtils.swift                 # resolveGeminiApiKey(), resizeImageData()
 ```
 
 ### Tests
@@ -587,13 +422,9 @@ Tests/
 │   └── FileAppShotsConfigStorageTests.swift
 └── ASCCommandTests/Commands/AppShots/
     ├── AppShotsGenerateTests.swift
-    ├── AppShotsTranslateTests.swift
     ├── AppShotsTemplatesTests.swift
-    ├── AppShotsHTMLTests.swift
     ├── AppShotsConfigTests.swift
-    ├── AppShotsDisplayTypeTests.swift
-    ├── CompositionHTMLRendererTests.swift
-    └── LegacyHTMLRendererTests.swift
+    └── AppShotsDisplayTypeTests.swift
 ```
 
 ---
@@ -601,12 +432,8 @@ Tests/
 ## Testing
 
 ```bash
-swift test --filter 'AppShotsGenerate'              # Generate command (6)
+swift test --filter 'AppShotsGenerate'              # Generate command (10)
 swift test --filter 'AppShotsTemplates'              # Template commands
-swift test --filter 'AppShotsTranslate'              # Translation
-swift test --filter 'AppShotsHTML'                   # HTML export
-swift test --filter 'CompositionHTMLRenderer'        # Composition renderer
-swift test --filter 'LegacyHTMLRenderer'             # Legacy renderer
 swift test --filter 'AppShotsDisplayType'            # Device types
 swift test --filter 'AppShotsConfig'                 # Config management
 swift test --filter 'AppShots'                       # All app-shots tests
