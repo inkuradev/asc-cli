@@ -1,0 +1,35 @@
+import Domain
+import Foundation
+
+/// Aggregates themes from all registered `ThemeProvider`s.
+///
+/// The platform ships with no built-in themes. Plugins register
+/// providers to supply their own themes with their own AI solutions.
+///
+/// Use `AggregateThemeRepository.shared` as the global registry.
+public final actor AggregateThemeRepository: ThemeRepository {
+    /// Global shared instance — plugins register providers here.
+    public static let shared = AggregateThemeRepository()
+
+    private var providers: [any ThemeProvider] = []
+
+    public init() {}
+
+    public func register(provider: any ThemeProvider) {
+        providers.append(provider)
+    }
+
+    public func listThemes() async throws -> [ScreenTheme] {
+        var all: [ScreenTheme] = []
+        for provider in providers {
+            let themes = try await provider.themes()
+            all.append(contentsOf: themes)
+        }
+        return all
+    }
+
+    public func getTheme(id: String) async throws -> ScreenTheme? {
+        let all = try await listThemes()
+        return all.first { $0.id == id }
+    }
+}
